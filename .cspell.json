@@ -1,0 +1,12 @@
+{
+    "language": "en,pt-br",
+    "ignorePaths": ["config/*"],
+    "ignoreRegExpList": [
+        // cSpell: disable
+        // cSpell: enable
+    ],
+    "words": [
+        "autoload",
+        "difft"
+    ]
+}
