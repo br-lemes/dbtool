@@ -46,14 +46,14 @@ class DiffCommand
         $columns1 = $this->db1->getColumns($this->tableName);
         $columns2 = $this->db2->getColumns($this->tableName);
         if ($this->fieldName) {
-            $columns1 = array_filter(
+            $columns1 = array_values(array_filter(
                 $columns1,
                 fn(array $column) => $column['Field'] === $this->fieldName
-            );
-            $columns2 = array_filter(
+            ));
+            $columns2 = array_values(array_filter(
                 $columns2,
                 fn(array $column) => $column['Field'] === $this->fieldName
-            );
+            ));
         } else {
             usort($columns1, fn($a, $b) => $a['Field'] <=> $b['Field']);
             usort($columns2, fn($a, $b) => $a['Field'] <=> $b['Field']);
