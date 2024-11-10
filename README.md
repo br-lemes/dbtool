@@ -47,24 +47,29 @@ Usage: `db cat <config1> [<config2>] <table|query>`
 
 **Examples:**
 
-Display data from the `users` table of the database configured in `config.php`:
+Display data from the `users` table of the database configured in
+`example1.php`:
 
-`db cat config.php users`
+`db cat example1.php users`
+![db cat example1.php users](screenshots/example01.png)
 
 Compare data from the `orders` table between the databases configured in
-`config1.php` and `config2.php`:
+`example1.php` and `example2.php`:
 
-`db cat config1.php config2.php orders`
+`db cat example1.php example2.php orders`
+![db cat example1.php example2.php orders](screenshots/example02.png)
 
 Display the results of the query `SELECT * FROM products WHERE price > 100`
-from the database configured in `config.php`:
+from the database configured in `example1.php`:
 
-`db cat config.php 'SELECT * FROM products WHERE price > 100'`
+`db cat example1.php 'SELECT * FROM products WHERE price > 100'`
+![db cat example1.php 'SELECT * FROM ...'](screenshots/example03.png)
 
 Compare the results of the query `SELECT * FROM products WHERE price > 100`
-between the databases configured in `config1.php` and `config2.php`:
+between the databases configured in `example1.php` and `example2.php`:
 
-`db cat config1.php config2.php 'SELECT * FROM products WHERE price > 100'`
+`db cat example1.php example2.php 'SELECT * FROM products WHERE price > 100'`
+![db cat example1.php example2.php 'SELECT * ...'](screenshots/example04.png)
 
 ### Copy table from one database to another
 
@@ -76,10 +81,10 @@ Usage: `db cp <source_config> <destination_config> <table>`
 
 **Examples:**
 
-Copy the `users` table from the database configured in `config1.php` to the
-database configured in `config2.php`:
+Copy the `users` table from the database configured in `example1.php` to the
+database configured in `example2.php`:
 
-`db cp config1.php config2.php users`
+`db cp example1.php example2.php users`
 
 ### Compare two databases or table schemas
 
@@ -94,20 +99,23 @@ Usage: `db diff <config1> <config2> [table] [field]`
 
 **Examples:**
 
-Compare the databases (list of tables) configured in `config1.php` and
-`config2.php`:
+Compare the databases (list of tables) configured in `example1.php` and
+`example2.php`:
 
-`db diff config1.php config2.php`
+`db diff example1.php example2.php`
+![db diff example1.php example2.php](screenshots/example05.png)
 
 Compare the schema of the `products` table between the databases configured in
-`config1.php` and `config2.php`:
+`example1.php` and `example2.php`:
 
-`db diff config1.php config2.php products`
+`db diff example1.php example2.php products`
+![db diff example1.php example2.php products](screenshots/example06.png)
 
 Compare the `name` field of the `users` table between the databases configured
-in `config1.php` and `config2.php`:
+in `example1.php` and `example2.php`:
 
-`db diff config1.php config2.php users name`
+`db diff example1.php example2.php users name`
+![db diff example1.php example2.php users name](screenshots/example07.png)
 
 ### List tables of a database or fields of a table
 
@@ -121,13 +129,15 @@ Usage: `db ls <config> [table] [field]`
 
 **Examples:**
 
-List all tables in the database configured in `config.php`:
+List all tables in the database configured in `example1.php`:
 
-`db ls config.php`
+`db ls example1.php`
+![db ls example1.php](screenshots/example08.png)
 
-List the fields of the `users` table of the database configured in `config.php`:
+List the fields of the `users` table of the database configured in `example1.php`:
 
-`db ls config.php users`
+`db ls example1.php users`
+![db ls example1.php users](screenshots/example09.png)
 
 ### List tables or table schema in JSON
 
@@ -141,18 +151,21 @@ Usage: `db ll <config> [table] [field]`
 
 **Examples:**
 
-List all tables in the database configured in `config.php`:
+List all tables in the database configured in `example1.php`:
 
-`db ll config.php`
+`db ll example1.php`
+![db ll example1.php](screenshots/example10.png)
 
-List the schema of the 'users' table of the database configured in `config.php`:
+List the schema of the 'users' table of the database configured in `example1.php`:
 
-`db ll config.php users`
+`db ll example1.php users`
+![db ll example1.php users](screenshots/example11.png)
 
 Show details of the `email` field from the `users` table of the database
-configured in `config.php`:
+configured in `example1.php`:
 
-`db ll config.php users email`
+`db ll example1.php users email`
+![db ll example1.php users email](screenshots/example12.png)
 
 ## Autocomplete (Fish Shell)
 
