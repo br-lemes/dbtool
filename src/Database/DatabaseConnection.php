@@ -58,8 +58,20 @@ class DatabaseConnection
                     'Type' => $column['Type'],
                     'Null' => $column['Null'],
                     'Key' => $column['Key'],
-                    'Default' => $column['Default'],
-                    'Extra' => $column['Extra'],
+                    'Default' => is_string($column['Default'])
+                        ? str_replace(
+                            'current_timestamp()',
+                            'CURRENT_TIMESTAMP',
+                            $column['Default'],
+                        )
+                        : $column['Default'],
+                    'Extra' => is_string($column['Extra'])
+                        ? str_replace(
+                            'current_timestamp()',
+                            'CURRENT_TIMESTAMP',
+                            $column['Extra'],
+                        )
+                        : $column['Extra'],
                 ],
                 $columns,
             );
