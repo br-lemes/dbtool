@@ -74,12 +74,34 @@ class DiffCommand
         $path = realpath(__DIR__ . '/../..');
         $a = "$path/.a.json";
         $b = "$path/.b.json";
+        $tables1 = array_fill_keys($this->db1->getTables(), '==');
+        $tables2 = array_fill_keys($this->db2->getTables(), '==');
+        $allKeys = array_merge(array_keys($tables1), array_keys($tables2));
+        sort($allKeys);
+        foreach ($allKeys as $key) {
+            if (isset($tables1[$key]) && !isset($tables2[$key])) {
+                $tables1[$key] = '>';
+                continue;
+            }
+            if (!isset($tables1[$key]) && isset($tables2[$key])) {
+                $tables2[$key] = '<';
+                continue;
+            }
+            $columns1 = $this->db1->getColumns($key);
+            $columns2 = $this->db2->getColumns($key);
+            usort($columns1, fn($a, $b) => $a['Field'] <=> $b['Field']);
+            usort($columns2, fn($a, $b) => $a['Field'] <=> $b['Field']);
+            if ($columns1 != $columns2) {
+                $tables1[$key] = '!=';
+                $tables2[$key] = '<>';
+            }
+        }
         file_put_contents($a, json_encode(
-            $this->db1->getTables(),
+            $tables1,
             JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
         ));
         file_put_contents($b, json_encode(
-            $this->db2->getTables(),
+            $tables2,
             JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
         ));
         echo shell_exec("difft --color always $a $b");
