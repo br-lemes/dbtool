@@ -1,26 +1,29 @@
 # DBTool
 
-DBTool is a command-line tool for interacting with MySQL databases. It provides
-a simple interface to perform various operations on databases, such as:
+A command-line utility for managing and comparing MySQL databases. BTool helps
+you inspect, compare and copy database structures and data across different
+environments.
 
-- Listing tables and their fields
-- Comparing data and table schemas
-- Copying tables between databases
-- Displaying table data
+## Features
+
+- List database tables and schema information
+- Display and compare table contents
+- Copy tables between databases
+- Compare database schemas and structures
+- SQL query execution support
+- Auto-completion for commands and arguments
 
 ## Installation
 
-1. **Difftastic:** DBTool uses Difftastic for comparison. Install it by
-following the instructions at
-[Difftastic Manual](https://difftastic.wilfred.me.uk/installation.html).
-2. `git clone https://github.com/br-lemes/dbtool.git`
-3. `cd dbtool`
-4. `composer install`
+1. Clone the repository
+2. Run `composer install`
+3. Create configuration files in the `config` directory
+4. DBTool uses Difftastic for comparison. Follow the instructions at
+   [Difftastic Manual](https://difftastic.wilfred.me.uk/installation.html)
 
-## Configuration
+### Configuration Files
 
-DBTool uses configuration files to store database credentials. Create a
-configuration file in `config/` following this example:
+Create PHP files in the `config` directory with database credentials:
 
 ```php
 return [
@@ -31,150 +34,156 @@ return [
 ];
 ```
 
-## Usage
+## Commands
 
-DBTool offers the following commands:
+### List Command (ls)
 
-### Display or compare data from a table
+List database structures at different levels.
 
-**The output of this command will be in JSON format.**
+```bash
+# List all tables in a database
+db ls config1
+```
 
-Usage: `db cat <config1> [<config2>] <table|query>`
+![db ls config1](screenshots/example01.png)
 
-- `<config1>`: Configuration file of the first database.
-- `<config2>`: Configuration file of the second database (optional).
-- `<table|query>`: Table to display or compare data, or a SQL query.
+```bash
+# Show schema for specific table
+db ls config1 users
+```
 
-**Examples:**
+![db ls config1 users](screenshots/example02.png)
 
-Display data from the `users` table of the database configured in
-`example1.php`:
+```bash
+# Show details for specific field
+db ls config1 users email
+```
 
-`db cat example1.php users`
-![db cat example1.php users](screenshots/example01.png)
+![db ls config1 users email](screenshots/example03.png)
 
-Compare data from the `orders` table between the databases configured in
-`example1.php` and `example2.php`:
+Notes:
 
-`db cat example1.php example2.php orders`
-![db cat example1.php example2.php orders](screenshots/example02.png)
+- Output is in JSON format for easy parsing
+- Shows complete schema information including indexes
+- Field details include type, length, nullable and default values
 
-Display the results of the query `SELECT * FROM products WHERE price > 100`
-from the database configured in `example1.php`:
+### Cat Command (cat)
 
-`db cat example1.php 'SELECT * FROM products WHERE price > 100'`
-![db cat example1.php 'SELECT * FROM ...'](screenshots/example03.png)
+Displays table contents or compares data between databases.
 
-Compare the results of the query `SELECT * FROM products WHERE price > 100`
-between the databases configured in `example1.php` and `example2.php`:
+```bash
+# Display table contents
+db cat config1 users
+```
 
-`db cat example1.php example2.php 'SELECT * FROM products WHERE price > 100'`
-![db cat example1.php example2.php 'SELECT * ...'](screenshots/example04.png)
+![db cat config1 users](screenshots/example04.png)
 
-### Copy table from one database to another
+```bash
+# Execute SQL query
+db cat config1 "SELECT * FROM users WHERE id = 1"
+```
 
-Usage: `db cp <source_config> <destination_config> <table>`
+![db cat config1 "SELECT * FROM users WHERE id = 1"](screenshots/example05.png)
 
-- `<source_config>`: Configuration file of the source database.
-- `<destination_config>`: Configuration file of the destination database.
-- `<table>`: Name of the table to be copied.
+```bash
+# Compare users table data between databases
+db cat config1 config2 users
+```
 
-**Examples:**
+![db cat config1 config2 users](screenshots/example06.png)
 
-Copy the `users` table from the database configured in `example1.php` to the
-database configured in `example2.php`:
+```bash
+# Compare query results between databases
+db cat config1 config2 "SELECT * FROM users ORDER BY id DESC"
+```
 
-`db cp example1.php example2.php users`
+![db cat config1 config2 "SELECT ..."](screenshots/example07.png)
 
-### Compare two databases or table schemas
+Notes:
 
-**The output of this command will be in JSON format.**
+- When comparing tables, uses difft to highlight differences
+- SQL queries must be quoted when using spaces or special characters
+- Table names can only contain letters, numbers and underscore
 
-Usage: `db diff <config1> <config2> [table] [field]`
+### Copy Command (cp)
 
-- `<config1>`: Configuration file of the first database.
-- `<config2>`: Configuration file of the second database.
-- `[table]`: Table to compare the schema (optional).
-- `[field]`: Field to compare (optional, requires table).
+Copies a table including its schema and data to another database.
 
-**Examples:**
+```bash
+# Copy users table with all data from source to destination
+db cp source_config dest_config users
 
-Compare the databases (list of tables) configured in `example1.php` and
-`example2.php`:
+# Copy products table between environments
+db cp prod-db stage-db products
+```
 
-`db diff example1.php example2.php`
-![db diff example1.php example2.php](screenshots/example05.png)
+Notes:
 
-Compare the schema of the `products` table between the databases configured in
-`example1.php` and `example2.php`:
+- Will prompt for confirmation if table exists in destination
+- Copies both table structure (schema) and all data
+- Source and destination can be different database types
 
-`db diff example1.php example2.php products`
-![db diff example1.php example2.php products](screenshots/example06.png)
+### Diff Command (diff)
 
-Compare the `name` field of the `users` table between the databases configured
-in `example1.php` and `example2.php`:
+Compare database structures at different levels.
 
-`db diff example1.php example2.php users name`
-![db diff example1.php example2.php users name](screenshots/example07.png)
+```bash
+# Compare tables list between databases
+db diff db1 db2
+# Shows: '==' same, '!=' & '<>' different schema
+# Shows: '>' only in db1 and '<' only in db2
+```
 
-### List tables of a database or fields of a table
+![db diff db1 db2](screenshots/example08.png)
 
-**The output of this command will be in simple format, one name per line.**
+```bash
+# Compare users table schema in detail
+db diff db1 db2 users
+```
 
-Usage: `db ls <config> [table] [field]`
+![db diff db1 db2 users](screenshots/example09.png)
 
-- `<config>`: Configuration file with database credentials.
-- `[table]`: Table to show the schema (optional).
-- `[field]`: Field to show (optional, requires table).
+```bash
+# Compare just the id field definition
+db diff db1 db2 users id
+```
 
-**Examples:**
+![db diff db1 db2 users id](screenshots/example10.png)
 
-List all tables in the database configured in `example1.php`:
+Notes:
 
-`db ls example1.php`
-![db ls example1.php](screenshots/example08.png)
+- Uses difft for colored output showing differences
+- Can compare entire databases, single tables, or specific fields
+- Useful for checking schema consistency across environments
 
-List the fields of the `users` table of the database configured in `example1.php`:
+## Versioning
 
-`db ls example1.php users`
-![db ls example1.php users](screenshots/example09.png)
+DBTool uses semantic versioning based on commit messages:
 
-### List tables or table schema in JSON
+- `fix:` commits increment patch version (0.0.X)
+- `feat:` commits increment minor version (0.X.0)
+- Breaking changes (commits with `!:`) increment major version (X.0.0)
 
-**The output of this command will be in JSON format.**
+## Auto-completion Support
 
-Usage: `db ll <config> [table] [field]`
+Command auto-completion is supported for:
 
-- `<config>`: Configuration file with database credentials.
-- `[table]`: Table to show the schema (optional).
-- `[field]`: Field to show (optional, requires table).
+- Configuration files
+- Table names
+- Field names
 
-**Examples:**
+See `db completion --help` to see how to install and use.
 
-List all tables in the database configured in `example1.php`:
+## Requirements
 
-`db ll example1.php`
-![db ll example1.php](screenshots/example10.png)
+- PHP 8.2 or higher
+- Composer
+- MySQL/MariaDB
+- difft (for comparison features)
 
-List the schema of the 'users' table of the database configured in `example1.php`:
+## Contributing
 
-`db ll example1.php users`
-![db ll example1.php users](screenshots/example11.png)
-
-Show details of the `email` field from the `users` table of the database
-configured in `example1.php`:
-
-`db ll example1.php users email`
-![db ll example1.php users email](screenshots/example12.png)
-
-## Autocomplete (Fish Shell)
-
-To enable autocompletion of DBTool commands and options in Fish Shell, add the
-file `completions/db.fish` to your autocomplete path.
-
-## Contribution
-
-Contributions are welcome! Feel free to open issues and pull requests.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 

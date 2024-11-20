@@ -1,68 +1,111 @@
 <?php
-
 declare(strict_types=1);
 
 namespace DBTool\Commands;
 
 use DBTool\Database\DatabaseConnection;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-class CopyCommand
+class CopyCommand extends Command
 {
-    private DatabaseConnection $db1;
-    private DatabaseConnection $db2;
-    private ?string $tableName;
+    private string $help = <<<HELP
+    Copies a table including its schema and data to another database.
 
-    function __construct(array $args)
-    {
-        $configFile1 = $args[2] ?? null;
-        $configFile2 = $args[3] ?? null;
-        $this->tableName = $args[4] ?? null;
+    Usage examples:
+      <info>cp source-db dest-db users</info>    Copy users table with all data
+      <info>cp prod-db stage-db products</info>  Copy products table between env
 
-        if (!$configFile1 || !$configFile2 || !$this->tableName) {
-            $this->showUsage($args[0]);
-            exit(1);
+    Notes:
+      - Will prompt for confirmation if table exists in destination
+      - Copies both table structure (schema) and all data
+      - Source and destination can be different database types
+    HELP;
+
+    function complete(
+        CompletionInput $input,
+        CompletionSuggestions $suggestions,
+    ): void {
+        if (
+            $input->mustSuggestArgumentValuesFor('source') ||
+            $input->mustSuggestArgumentValuesFor('destination')
+        ) {
+            $suggestions->suggestValues(
+                array_map(
+                    fn(string $file): string => basename($file, '.php'),
+                    glob(__DIR__ . '/../../config/*.php', GLOB_BRACE),
+                ),
+            );
         }
-
-        $this->db1 = new DatabaseConnection($configFile1);
-        $this->db2 = new DatabaseConnection($configFile2);
+        if ($input->mustSuggestArgumentValuesFor('table')) {
+            $source = $input->getArgument('source');
+            $db = new DatabaseConnection($source);
+            $suggestions->suggestValues($db->getTables());
+        }
     }
 
-    function run(): void
+    protected function configure(): void
     {
-        if ($this->db2->tableExists($this->tableName)) {
-            echo "A tabela '$this->tableName' ja existe no destino.\n";
-            echo "Deseja sobrescrever? [s/N] ";
-            $handle = fopen("php://stdin", "r");
-            $line = fgets($handle);
+        $this->setName('cp')
+            ->setDescription('Copy table from one database to another')
+            ->setHelp($this->help)
+            ->addArgument(
+                'source',
+                InputArgument::REQUIRED,
+                'Configuration file of the source database',
+            )
+            ->addArgument(
+                'destination',
+                InputArgument::REQUIRED,
+                'Configuration file of the destination database',
+            )
+            ->addArgument(
+                'table',
+                InputArgument::REQUIRED,
+                'Name of the table to be copied',
+            );
+    }
 
-            if (!in_array(trim($line), ['S', 's', 'Y', 'y'])) {
-                echo "Operação cancelada.\n";
-                exit(1);
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
+        $source = $input->getArgument('source');
+        $destination = $input->getArgument('destination');
+        $tableName = $input->getArgument('table');
+
+        $db1 = new DatabaseConnection($source, $output);
+        $db2 = new DatabaseConnection($destination, $output);
+
+        if ($db2->tableExists($tableName)) {
+            /** @var QuestionHelper $helper */
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion(
+                "Table '$tableName' already exists in the destination. " .
+                    'Do you want to overwrite it? (y/N) ',
+                false,
+            );
+
+            if (!$helper->ask($input, $output, $question)) {
+                $output->writeln('Operation cancelled.');
+                return Command::FAILURE;
             }
 
-            $this->db2->dropTable($this->tableName);
+            $db2->dropTable($tableName);
         }
 
-        $schema = $this->db1->getTableSchema($this->tableName);
-        $this->db2->query($schema);
-        $data = $this->db1->getTableData($this->tableName);
-        $this->db2->insertInto($this->tableName, $data);
+        $schema = $db1->getTableSchema($tableName);
+        $db2->query($schema);
 
-        echo "Tabela '$this->tableName' copiada com sucesso.\n";
-    }
+        $data = $db1->getTableData($tableName);
+        $db2->insertInto($tableName, $data);
 
-    private function showUsage(string $name)
-    {
-        $name = basename($name);
-        echo <<<END
-            Uso: $name cp <configFile1> <configFile2> <tabela>
-                Copiar tabela de um banco de dados para outro
-
-                <configFile1>  Arquivo de configuração do primeiro banco
-                <configFile2>  Arquivo de configuração do segundo banco
-                <tabela>       Tabela para comparar o schema (opcional)
-                <campo>        Campo para comparar (opcional, requer tabela)
-
-            END;
+        $output->writeln("Table '$tableName' copied successfully.");
+        return Command::SUCCESS;
     }
 }

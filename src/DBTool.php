@@ -1,71 +1,54 @@
 <?php
-
 declare(strict_types=1);
 
 namespace DBTool;
 
 use DBTool\Commands\CatCommand;
-use DBTool\Commands\ListCommand;
 use DBTool\Commands\CopyCommand;
 use DBTool\Commands\DiffCommand;
+use DBTool\Commands\ListCommand;
+use Symfony\Component\Console\Application;
 
-class DBTool
+class DBTool extends Application
 {
-    function run(array $args)
+    function __construct()
     {
-        $command = $args[1] ?? null;
-
-        if (!$command) {
-            $this->showUsage($args[0]);
-            exit(1);
-        }
-
-        switch ($command) {
-            case 'cat':
-                $cmd = new CatCommand($args);
-                $cmd->run();
-                break;
-
-            case 'cp':
-                $cmd = new CopyCommand($args);
-                $cmd->run();
-                break;
-
-            case 'diff':
-                $cmd = new DiffCommand($args);
-                $cmd->run();
-                break;
-
-            case 'll':
-                $cmd = new ListCommand($args);
-                $cmd->run();
-                break;
-
-            case 'ls':
-                $cmd = new ListCommand($args);
-                $cmd->run(true);
-                break;
-
-            default:
-                echo "Comando não reconhecido.\n";
-                $this->showUsage($args[0]);
-                exit(1);
-        }
+        parent::__construct('DBTool', $this->version());
+        $this->add(new CatCommand());
+        $this->add(new CopyCommand());
+        $this->add(new DiffCommand());
+        $this->add(new ListCommand());
     }
 
-    private function showUsage(string $name)
+    private function version(): string
     {
-        $name = basename($name);
-        echo <<<END
-            Uso: $name <comando> [...]
+        $major = 0;
+        $minor = 0;
+        $patch = 0;
 
-            Comandos disponíveis:
-                cat           Mostrar ou comparar dados de uma tabela
-                cp            Copiar tabela de um banco de dados para outro
-                diff          Comparar dois bancos de dados ou schema de tabelas
-                ls            Listar tabelas de um banco ou campos de uma tabela
-                ll            Listar em JSON tabelas ou schema de uma tabela
-
-            END;
+        $command = 'git log --pretty=format:%s 2>/dev/null';
+        $output = [];
+        $resultCode = 0;
+        chdir(__DIR__);
+        exec($command, $output, $resultCode);
+        if ($resultCode !== 0) {
+            return "$major.$minor.$patch";
+        }
+        foreach (array_reverse($output) as $line) {
+            $line = trim($line);
+            if (str_starts_with($line, 'fix')) {
+                $patch++;
+            }
+            if (str_starts_with($line, 'feat')) {
+                $minor++;
+                $patch = 0;
+            }
+            if (preg_match('/^[a-z]+!:/', $line)) {
+                $major++;
+                $minor = 0;
+                $patch = 0;
+            }
+        }
+        return "$major.$minor.$patch";
     }
 }

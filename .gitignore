@@ -1,5 +1,7 @@
 /.a.json
 /.b.json
+/bun.lockb
 /composer.lock
 /config
+/node_modules
 /vendor

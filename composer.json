@@ -3,5 +3,8 @@
         "psr-4": {
             "DBTool\\": "src/"
         }
+    },
+    "require": {
+        "symfony/console": "^7.1"
     }
 }
