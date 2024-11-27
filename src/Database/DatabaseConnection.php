@@ -7,16 +7,20 @@ use PDO;
 use PDOException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseConnection
 {
     private ?OutputInterface $errOutput;
+    private ?OutputInterface $output;
     private PDO $pdo;
+    private int $batchSize = 1000;
 
     function __construct(string $configFile, ?OutputInterface $output = null)
     {
+        $this->output = $output;
         $this->errOutput =
             $output instanceof ConsoleOutputInterface
                 ? $output->getErrorOutput()
@@ -24,6 +28,7 @@ class DatabaseConnection
 
         $path = realpath(__DIR__ . '/../../config');
         $config = require "$path/$configFile.php";
+        $this->batchSize = $config['batchSize'] ?? 1000;
         $host = $this->sanitize($config['host'], '/^[a-zA-Z0-9.-]+$/', 'host');
         $database = $this->sanitize(
             $config['database'],
@@ -131,6 +136,39 @@ class DatabaseConnection
         }
     }
 
+    function streamTableData(string $table, callable $callback): void
+    {
+        try {
+            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM `$table`");
+            $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+            if ($this->output) {
+                $progress = new ProgressBar($this->output, $total);
+            }
+
+            for ($offset = 0; $offset < $total; $offset += $this->batchSize) {
+                $stmt = $this->pdo->query(
+                    "SELECT * FROM `$table` LIMIT $this->batchSize OFFSET $offset",
+                );
+                $batch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                if (empty($batch)) {
+                    break;
+                }
+                $callback($batch);
+                if ($this->output) {
+                    $progress->advance(count($batch));
+                }
+            }
+            if ($this->output) {
+                $progress->finish();
+                $this->output->writeln('');
+            }
+        } catch (PDOException $e) {
+            $this->error("Error streaming table '$table'", $e);
+        }
+    }
+
     function query(string $sql): array
     {
         try {
@@ -148,19 +186,35 @@ class DatabaseConnection
         }
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            $columns = array_keys($data[0]);
-            $placeholders = array_map(fn($col) => ":$col", $columns);
+            $columns = array_map(fn($col) => "`$col`", array_keys($data[0]));
+
+            $singlePlaceholders =
+                '(' . implode(', ', array_fill(0, count($columns), '?')) . ')';
+            $batchPlaceholders = implode(
+                ', ',
+                array_fill(
+                    0,
+                    min($this->batchSize, count($data)),
+                    $singlePlaceholders,
+                ),
+            );
+
             $sql =
                 "INSERT INTO `$table` (" .
                 implode(', ', $columns) .
-                ') VALUES (' .
-                implode(', ', $placeholders) .
-                ')';
+                ') VALUES ' .
+                $batchPlaceholders;
+
+            $values = [];
+            foreach ($data as $row) {
+                foreach ($row as $value) {
+                    $values[] = $value;
+                }
+            }
+
             $this->pdo->beginTransaction();
             $stmt = $this->pdo->prepare($sql);
-            foreach ($data as $row) {
-                $stmt->execute($row);
-            }
+            $stmt->execute($values);
             $this->pdo->commit();
         } catch (PDOException $e) {
             $this->pdo->rollBack();

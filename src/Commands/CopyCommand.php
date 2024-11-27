@@ -102,8 +102,10 @@ class CopyCommand extends Command
         $schema = $db1->getTableSchema($tableName);
         $db2->query($schema);
 
-        $data = $db1->getTableData($tableName);
-        $db2->insertInto($tableName, $data);
+        $db1->streamTableData(
+            $tableName,
+            fn($batch) => $db2->insertInto($tableName, $batch),
+        );
 
         $output->writeln("Table '$tableName' copied successfully.");
         return Command::SUCCESS;
