@@ -29,6 +29,7 @@ class DatabaseConnection
         $path = realpath(__DIR__ . '/../../config');
         $config = require "$path/$configFile.php";
         $this->batchSize = $config['batchSize'] ?? 1000;
+        $port = $config['port'] ?? 3306;
         $host = $this->sanitize($config['host'], '/^[a-zA-Z0-9.-]+$/', 'host');
         $database = $this->sanitize(
             $config['database'],
@@ -40,7 +41,7 @@ class DatabaseConnection
             '/^[a-zA-Z0-9_]+$/',
             'username',
         );
-        $dsn = "mysql:host={$host};dbname={$database};charset=utf8mb4";
+        $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
         try {
             $this->pdo = new PDO($dsn, $username, $config['password']);
         } catch (PDOException $e) {
