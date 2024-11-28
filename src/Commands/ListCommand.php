@@ -49,7 +49,9 @@ class ListCommand extends Command
             $table = $input->getArgument('table');
             $db = new DatabaseConnection($config);
             $suggestions->suggestValues(
-                array_filter(array_column($db->getColumns($table), 'Field')),
+                array_filter(
+                    array_column($db->getColumns($table), 'COLUMN_NAME'),
+                ),
             );
         }
     }
@@ -89,7 +91,7 @@ class ListCommand extends Command
                 $filtered = array_values(
                     array_filter(
                         $columns,
-                        fn(array $col) => $col['Field'] === $fieldName,
+                        fn(array $col) => $col['COLUMN_NAME'] === $fieldName,
                     ),
                 );
                 $output->writeln(

@@ -59,7 +59,9 @@ class DiffCommand extends Command
             $table = $input->getArgument('table');
             $db = new DatabaseConnection($config);
             $suggestions->suggestValues(
-                array_filter(array_column($db->getColumns($table), 'Field')),
+                array_filter(
+                    array_column($db->getColumns($table), 'COLUMN_NAME'),
+                ),
             );
         }
     }
@@ -125,18 +127,26 @@ class DiffCommand extends Command
             $columns1 = array_values(
                 array_filter(
                     $columns1,
-                    fn(array $column) => $column['Field'] === $this->fieldName,
+                    fn(array $column) => $column['COLUMN_NAME'] ===
+                        $this->fieldName,
                 ),
             );
             $columns2 = array_values(
                 array_filter(
                     $columns2,
-                    fn(array $column) => $column['Field'] === $this->fieldName,
+                    fn(array $column) => $column['COLUMN_NAME'] ===
+                        $this->fieldName,
                 ),
             );
         } else {
-            usort($columns1, fn($a, $b) => $a['Field'] <=> $b['Field']);
-            usort($columns2, fn($a, $b) => $a['Field'] <=> $b['Field']);
+            usort(
+                $columns1,
+                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
+            );
+            usort(
+                $columns2,
+                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
+            );
         }
 
         file_put_contents(
@@ -175,8 +185,14 @@ class DiffCommand extends Command
 
             $columns1 = $this->db1->getColumns($key);
             $columns2 = $this->db2->getColumns($key);
-            usort($columns1, fn($a, $b) => $a['Field'] <=> $b['Field']);
-            usort($columns2, fn($a, $b) => $a['Field'] <=> $b['Field']);
+            usort(
+                $columns1,
+                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
+            );
+            usort(
+                $columns2,
+                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
+            );
 
             if ($columns1 != $columns2) {
                 $tables1[$key] = '!=';

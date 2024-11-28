@@ -17,6 +17,7 @@ class DatabaseConnection
     private ?OutputInterface $output;
     private PDO $pdo;
     private int $batchSize = 1000;
+    private string $database;
 
     function __construct(string $configFile, ?OutputInterface $output = null)
     {
@@ -47,6 +48,7 @@ class DatabaseConnection
         } catch (PDOException $e) {
             $this->error('Error connecting to database', $e);
         }
+        $this->database = $database;
     }
 
     function getTables(): array
@@ -63,31 +65,23 @@ class DatabaseConnection
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            $stmt = $this->pdo->query("DESCRIBE $table");
-            $columns = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-            return array_map(
-                fn(array $column) => [
-                    'Field' => $column['Field'],
-                    'Type' => $column['Type'],
-                    'Null' => $column['Null'],
-                    'Key' => $column['Key'],
-                    'Default' => is_string($column['Default'])
-                        ? str_replace(
-                            'current_timestamp()',
-                            'CURRENT_TIMESTAMP',
-                            $column['Default'],
-                        )
-                        : $column['Default'],
-                    'Extra' => is_string($column['Extra'])
-                        ? str_replace(
-                            'current_timestamp()',
-                            'CURRENT_TIMESTAMP',
-                            $column['Extra'],
-                        )
-                        : $column['Extra'],
-                ],
-                $columns,
-            );
+            $sql = <<<END
+                SELECT
+                    COLUMN_NAME,
+                    IS_NULLABLE,
+                    DATA_TYPE,
+                    CHARACTER_MAXIMUM_LENGTH,
+                    NUMERIC_PRECISION,
+                    NUMERIC_SCALE,
+                    DATETIME_PRECISION,
+                    COLUMN_KEY
+                FROM
+                    INFORMATION_SCHEMA.COLUMNS
+                WHERE
+                    TABLE_SCHEMA = '{$this->database}' AND TABLE_NAME = '$table'
+            END;
+            $stmt = $this->pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
         }
