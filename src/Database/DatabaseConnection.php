@@ -86,12 +86,12 @@ class DatabaseConnection
                     CASE
                         WHEN COLUMN_DEFAULT LIKE '%CURRENT_TIMESTAMP%'
                             THEN 'YES' ELSE 'NO'
-                    END AS IS_DEFAULT_CURRENT_TIMESTAMP,
+                    END AS IS_DEFAULT_TIMESTAMP,
                     IS_NULLABLE,
                     CASE
                         WHEN EXTRA LIKE '%ON UPDATE CURRENT_TIMESTAMP%'
                             THEN 'YES' ELSE 'NO'
-                    END AS IS_ON_UPDATE_CURRENT_TIMESTAMP,
+                    END AS IS_UPDATE_TIMESTAMP,
                     NUMERIC_PRECISION,
                     NUMERIC_SCALE
                 FROM
