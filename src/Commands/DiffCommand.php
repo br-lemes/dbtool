@@ -121,7 +121,9 @@ class DiffCommand extends Command
         $b = "$path/.b.json";
 
         $columns1 = $this->db1->getColumns($this->tableName);
+        $keys1 = $this->db1->getKeys($this->tableName);
         $columns2 = $this->db2->getColumns($this->tableName);
+        $keys2 = $this->db2->getKeys($this->tableName);
 
         if ($this->fieldName) {
             $columns1 = array_values(
@@ -131,11 +133,25 @@ class DiffCommand extends Command
                         $this->fieldName,
                 ),
             );
+            $keys1 = array_values(
+                array_filter(
+                    $keys1,
+                    fn(array $key) => $key['KEY_NAME'] === $this->fieldName ||
+                        $key['COLUMN_NAME'] === $this->fieldName,
+                ),
+            );
             $columns2 = array_values(
                 array_filter(
                     $columns2,
                     fn(array $column) => $column['COLUMN_NAME'] ===
                         $this->fieldName,
+                ),
+            );
+            $keys2 = array_values(
+                array_filter(
+                    $keys2,
+                    fn(array $key) => $key['KEY_NAME'] === $this->fieldName ||
+                        $key['COLUMN_NAME'] === $this->fieldName,
                 ),
             );
         } else {
@@ -151,11 +167,17 @@ class DiffCommand extends Command
 
         file_put_contents(
             $a,
-            json_encode($columns1, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            json_encode(
+                ['columns' => $columns1, 'keys' => $keys1],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE,
+            ),
         );
         file_put_contents(
             $b,
-            json_encode($columns2, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            json_encode(
+                ['columns' => $columns2, 'keys' => $keys2],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE,
+            ),
         );
 
         $output->write(shell_exec("difft --color always $a $b"));

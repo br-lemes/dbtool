@@ -86,17 +86,25 @@ class ListCommand extends Command
 
         if ($tableName) {
             $columns = $db->getColumns($tableName);
+            $keys = $db->getKeys($tableName);
 
             if ($fieldName) {
-                $filtered = array_values(
+                $columns = array_values(
                     array_filter(
                         $columns,
                         fn(array $col) => $col['COLUMN_NAME'] === $fieldName,
                     ),
                 );
+                $keys = array_values(
+                    array_filter(
+                        $keys,
+                        fn(array $key) => $key['KEY_NAME'] === $fieldName ||
+                            $key['COLUMN_NAME'] === $fieldName,
+                    ),
+                );
                 $output->writeln(
                     json_encode(
-                        $filtered,
+                        ['columns' => $columns, 'keys' => $keys],
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE,
                     ),
                 );
@@ -105,7 +113,7 @@ class ListCommand extends Command
 
             $output->writeln(
                 json_encode(
-                    $columns,
+                    ['columns' => $columns, 'keys' => $keys],
                     JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE,
                 ),
             );

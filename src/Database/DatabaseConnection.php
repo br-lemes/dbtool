@@ -65,21 +65,70 @@ class DatabaseConnection
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            $sql = <<<END
+            $sql = <<<SQL
                 SELECT
-                    COLUMN_NAME,
-                    IS_NULLABLE,
-                    DATA_TYPE,
                     CHARACTER_MAXIMUM_LENGTH,
-                    NUMERIC_PRECISION,
-                    NUMERIC_SCALE,
+                    CASE
+                        WHEN COLUMN_DEFAULT LIKE '%CURRENT_TIMESTAMP%'
+                            THEN NULL
+                        WHEN COLUMN_DEFAULT IS NULL OR COLUMN_DEFAULT = 'NULL'
+                            THEN NULL
+                        ELSE COLUMN_DEFAULT
+                    END AS COLUMN_DEFAULT,
+                    COLUMN_KEY,
+                    COLUMN_NAME,
+                    DATA_TYPE,
                     DATETIME_PRECISION,
-                    COLUMN_KEY
+                    CASE
+                        WHEN EXTRA LIKE '%AUTO_INCREMENT%'
+                            THEN 'YES' ELSE 'NO'
+                    END AS IS_AUTO_INCREMENT,
+                    CASE
+                        WHEN COLUMN_DEFAULT LIKE '%CURRENT_TIMESTAMP%'
+                            THEN 'YES' ELSE 'NO'
+                    END AS IS_DEFAULT_CURRENT_TIMESTAMP,
+                    IS_NULLABLE,
+                    CASE
+                        WHEN EXTRA LIKE '%ON UPDATE CURRENT_TIMESTAMP%'
+                            THEN 'YES' ELSE 'NO'
+                    END AS IS_ON_UPDATE_CURRENT_TIMESTAMP,
+                    NUMERIC_PRECISION,
+                    NUMERIC_SCALE
                 FROM
                     INFORMATION_SCHEMA.COLUMNS
                 WHERE
                     TABLE_SCHEMA = '{$this->database}' AND TABLE_NAME = '$table'
-            END;
+            SQL;
+            $stmt = $this->pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            $this->error("Error querying table '$table'", $e);
+        }
+    }
+
+    function getKeys(string $table): array
+    {
+        try {
+            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $sql = <<<SQL
+                SELECT
+                    CASE
+                        WHEN INDEX_NAME = 'PRIMARY'
+                            THEN 'PRIMARY'
+                        WHEN NON_UNIQUE = 0
+                            THEN 'UNIQUE'
+                        ELSE 'INDEX'
+                    END AS KEY_TYPE,
+                    INDEX_NAME AS KEY_NAME,
+                    COLUMN_NAME,
+                    SEQ_IN_INDEX AS KEY_POSITION
+                FROM
+                    INFORMATION_SCHEMA.STATISTICS
+                WHERE
+                    TABLE_SCHEMA = '{$this->database}' AND TABLE_NAME = '$table'
+                ORDER BY
+                    INDEX_NAME, SEQ_IN_INDEX;
+            SQL;
             $stmt = $this->pdo->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
