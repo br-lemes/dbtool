@@ -51,17 +51,18 @@ class DatabaseConnection
         $this->database = $database;
     }
 
-    function getTables(): array
+    function getTables(): ?array
     {
         try {
             $stmt = $this->pdo->query('SHOW TABLES');
             return $stmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
         } catch (PDOException $e) {
             $this->error('Error querying tables', $e);
+            return null;
         }
     }
 
-    function getColumns(string $table): array
+    function getColumns(string $table): ?array
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
@@ -103,10 +104,11 @@ class DatabaseConnection
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
+            return null;
         }
     }
 
-    function getKeys(string $table): array
+    function getKeys(string $table): ?array
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
@@ -133,10 +135,11 @@ class DatabaseConnection
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
+            return null;
         }
     }
 
-    function tableExists(string $table): bool
+    function tableExists(string $table): ?bool
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
@@ -144,6 +147,7 @@ class DatabaseConnection
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
+            return null;
         }
     }
 
@@ -157,7 +161,7 @@ class DatabaseConnection
         }
     }
 
-    function getTableSchema(string $table): string
+    function getTableSchema(string $table): ?string
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
@@ -166,10 +170,11 @@ class DatabaseConnection
             return $result['Create Table'] ?? '';
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
+            return null;
         }
     }
 
-    function getTableData(string $table): array
+    function getTableData(string $table): ?array
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
@@ -177,6 +182,7 @@ class DatabaseConnection
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
+            return null;
         }
     }
 
@@ -213,13 +219,14 @@ class DatabaseConnection
         }
     }
 
-    function query(string $sql): array
+    function query(string $sql): ?array
     {
         try {
             $stmt = $this->pdo->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             $this->error('Error executing query', $e);
+            return null;
         }
     }
 
