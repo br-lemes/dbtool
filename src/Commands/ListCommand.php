@@ -98,8 +98,7 @@ class ListCommand extends Command
                 $keys = array_values(
                     array_filter(
                         $keys,
-                        fn(array $key) => $key['KEY_NAME'] === $fieldName ||
-                            $key['COLUMN_NAME'] === $fieldName,
+                        fn(array $key) => $key['COLUMN_NAME'] === $fieldName,
                     ),
                 );
                 $output->writeln(

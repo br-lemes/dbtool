@@ -121,9 +121,15 @@ class DiffCommand extends Command
         $b = "$path/.b.json";
 
         $columns1 = $this->db1->getColumns($this->tableName);
-        $keys1 = $this->db1->getKeys($this->tableName);
+        $keys1 = array_map(
+            fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
+            $this->db1->getKeys($this->tableName),
+        );
         $columns2 = $this->db2->getColumns($this->tableName);
-        $keys2 = $this->db2->getKeys($this->tableName);
+        $keys2 = array_map(
+            fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
+            $this->db2->getKeys($this->tableName),
+        );
 
         if ($this->fieldName) {
             $columns1 = array_values(
@@ -154,15 +160,6 @@ class DiffCommand extends Command
                         $key['COLUMN_NAME'] === $this->fieldName,
                 ),
             );
-        } else {
-            usort(
-                $columns1,
-                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
-            );
-            usort(
-                $columns2,
-                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
-            );
         }
 
         file_put_contents(
@@ -180,7 +177,7 @@ class DiffCommand extends Command
             ),
         );
 
-        $output->write(shell_exec("difft --color always $a $b"));
+        $output->write(shell_exec("difft --context 7 --color always $a $b"));
     }
 
     private function diffDatabases(OutputInterface $output): void
@@ -196,31 +193,32 @@ class DiffCommand extends Command
         sort($allKeys);
 
         foreach ($allKeys as $key) {
-            if (isset($tables1[$key]) && !isset($tables2[$key])) {
-                $tables1[$key] = '>';
-                continue;
+            if (isset($tables1[$key])) {
+                $columns = $this->db1->getColumns($key);
+                $keys = array_map(
+                    fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
+                    $this->db1->getKeys($key),
+                );
+                $json = json_encode(['columns' => $columns, 'keys' => $keys]);
+                $tables1[$key] = md5($json);
+            } else {
+                $tables1[$key] = '';
             }
-            if (!isset($tables1[$key]) && isset($tables2[$key])) {
-                $tables2[$key] = '<';
-                continue;
-            }
-
-            $columns1 = $this->db1->getColumns($key);
-            $columns2 = $this->db2->getColumns($key);
-            usort(
-                $columns1,
-                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
-            );
-            usort(
-                $columns2,
-                fn($a, $b) => $a['COLUMN_NAME'] <=> $b['COLUMN_NAME'],
-            );
-
-            if ($columns1 != $columns2) {
-                $tables1[$key] = '!=';
-                $tables2[$key] = '<>';
+            if (isset($tables2[$key])) {
+                $columns = $this->db2->getColumns($key);
+                $keys = array_map(
+                    fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
+                    $this->db2->getKeys($key),
+                );
+                $json = json_encode(['columns' => $columns, 'keys' => $keys]);
+                $tables2[$key] = md5($json);
+            } else {
+                $tables2[$key] = '';
             }
         }
+
+        ksort($tables1);
+        ksort($tables2);
 
         file_put_contents(
             $a,

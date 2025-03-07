@@ -1,17 +1,36 @@
 {
     "language": "en,pt-br",
-    "ignorePaths": ["config/*"],
+    "ignorePaths": [
+        "config/*"
+    ],
     "ignoreRegExpList": [
         // cSpell: disable
         // cSpell: enable
     ],
     "words": [
+        "attname",
+        "attnum",
+        "attrelid",
         "autoload",
         "dbtool",
         "difft",
         "Difftastic",
+        "ERRMODE",
+        "indexrelid",
+        "indisprimary",
+        "indisunique",
+        "indkey",
+        "indrelid",
         "lockb",
+        "longtext",
+        "mediumint",
+        "mediumtext",
+        "nextval",
+        "nspname",
         "nullable",
-        "symfony"
+        "relname",
+        "relnamespace",
+        "symfony",
+        "tinyint"
     ]
 }

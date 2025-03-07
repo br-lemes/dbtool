@@ -1,5 +1,6 @@
 /.a.json
 /.b.json
+/bun.lock
 /bun.lockb
 /composer.lock
 /config

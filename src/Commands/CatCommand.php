@@ -127,8 +127,10 @@ class CatCommand extends Command
             $this->query = $tableOrQuery;
         }
 
-        $this->db1 = new DatabaseConnection($config1);
-        $this->db2 = $config2 ? new DatabaseConnection($config2) : null;
+        $this->db1 = new DatabaseConnection($config1, $output);
+        $this->db2 = $config2
+            ? new DatabaseConnection($config2, $output)
+            : null;
 
         if ($this->db2) {
             $this->compare($output);
