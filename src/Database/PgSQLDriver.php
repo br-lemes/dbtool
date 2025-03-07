@@ -165,7 +165,7 @@ class PgSQLDriver extends AbstractServerDriver
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    function getTableSchema(string $table): array
+    function getTableSchema(string $table): string
     {
         throw new RuntimeException('Not implemented for PostgreSQL');
     }
