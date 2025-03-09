@@ -46,6 +46,16 @@ class DatabaseConnection
         $this->type = $driver;
     }
 
+    function dropTable(string $table): void
+    {
+        try {
+            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->driver->dropTable($table);
+        } catch (PDOException $e) {
+            $this->error("Error dropping table '$table'", $e);
+        }
+    }
+
     function exec(string $sql): int|false
     {
         try {
@@ -53,16 +63,6 @@ class DatabaseConnection
         } catch (PDOException $e) {
             $this->error('Error executing query', $e);
             return false;
-        }
-    }
-
-    function getTables(): ?array
-    {
-        try {
-            return $this->driver->getTables();
-        } catch (PDOException $e) {
-            $this->error('Error querying tables', $e);
-            return null;
         }
     }
 
@@ -88,24 +88,14 @@ class DatabaseConnection
         }
     }
 
-    function tableExists(string $table): ?bool
+    function getTableData(string $table): ?array
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            return $this->driver->tableExists($table);
+            return $this->driver->getTableData($table);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
             return null;
-        }
-    }
-
-    function dropTable(string $table): void
-    {
-        try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            $this->driver->dropTable($table);
-        } catch (PDOException $e) {
-            $this->error("Error dropping table '$table'", $e);
         }
     }
 
@@ -120,33 +110,12 @@ class DatabaseConnection
         }
     }
 
-    function getTableData(string $table): ?array
+    function getTables(): ?array
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            return $this->driver->getTableData($table);
+            return $this->driver->getTables();
         } catch (PDOException $e) {
-            $this->error("Error querying table '$table'", $e);
-            return null;
-        }
-    }
-
-    function streamTableData(string $table, callable $callback): void
-    {
-        try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            $this->driver->streamTableData($table, $callback);
-        } catch (PDOException $e) {
-            $this->error("Error streaming table '$table'", $e);
-        }
-    }
-
-    function query(string $sql): ?array
-    {
-        try {
-            return $this->driver->query($sql);
-        } catch (PDOException $e) {
-            $this->error('Error executing query', $e);
+            $this->error('Error querying tables', $e);
             return null;
         }
     }
@@ -161,6 +130,37 @@ class DatabaseConnection
             $this->driver->insertInto($table, $data);
         } catch (PDOException $e) {
             $this->error("Error inserting into table '$table'", $e);
+        }
+    }
+
+    function query(string $sql): ?array
+    {
+        try {
+            return $this->driver->query($sql);
+        } catch (PDOException $e) {
+            $this->error('Error executing query', $e);
+            return null;
+        }
+    }
+
+    function streamTableData(string $table, callable $callback): void
+    {
+        try {
+            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->driver->streamTableData($table, $callback);
+        } catch (PDOException $e) {
+            $this->error("Error streaming table '$table'", $e);
+        }
+    }
+
+    function tableExists(string $table): ?bool
+    {
+        try {
+            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            return $this->driver->tableExists($table);
+        } catch (PDOException $e) {
+            $this->error("Error querying table '$table'", $e);
+            return null;
         }
     }
 }

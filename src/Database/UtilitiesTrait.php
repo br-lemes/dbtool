@@ -11,17 +11,6 @@ trait UtilitiesTrait
 {
     private ?OutputInterface $errOutput;
 
-    private function sanitize(
-        string $value,
-        string $pattern,
-        string $name,
-    ): string {
-        if (!preg_match($pattern, $value)) {
-            $this->error("Parameter '$name' contains invalid characters.");
-        }
-        return $value;
-    }
-
     protected function error(string $message, ?\PDOException $e = null): void
     {
         if (!$this->errOutput) {
@@ -35,5 +24,16 @@ trait UtilitiesTrait
         );
         $this->errOutput->writeln(['', $formattedBlock, '']);
         exit(Command::FAILURE);
+    }
+
+    private function sanitize(
+        string $value,
+        string $pattern,
+        string $name,
+    ): string {
+        if (!preg_match($pattern, $value)) {
+            $this->error("Parameter '$name' contains invalid characters.");
+        }
+        return $value;
     }
 }
