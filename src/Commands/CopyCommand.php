@@ -81,6 +81,12 @@ class CopyCommand extends Command
 
         $db1 = new DatabaseConnection($source, $output);
         $db2 = new DatabaseConnection($destination, $output);
+        if ($db1->type !== $db2->type) {
+            $output->writeln(
+                'Source and destination databases must be of the same type.',
+            );
+            return Command::FAILURE;
+        }
 
         if ($db2->tableExists($tableName)) {
             /** @var QuestionHelper $helper */
@@ -100,7 +106,7 @@ class CopyCommand extends Command
         }
 
         $schema = $db1->getTableSchema($tableName);
-        $db2->query($schema);
+        $db2->exec($schema);
 
         $db1->streamTableData(
             $tableName,

@@ -45,6 +45,11 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
         $this->configureConnection();
     }
 
+    function exec(string $sql): int|false
+    {
+        return $this->pdo->exec($sql);
+    }
+
     function query(string $sql): array
     {
         $stmt = $this->pdo->query($sql);

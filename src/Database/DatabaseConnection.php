@@ -11,6 +11,8 @@ class DatabaseConnection
 {
     use UtilitiesTrait;
 
+    public string $type;
+
     private ?OutputInterface $output;
     private DatabaseDriver $driver;
 
@@ -40,6 +42,17 @@ class DatabaseConnection
             $this->driver->connect();
         } catch (PDOException $e) {
             $this->error('Error connecting to database', $e);
+        }
+        $this->type = $driver;
+    }
+
+    function exec(string $sql): int|false
+    {
+        try {
+            return $this->driver->exec($sql);
+        } catch (PDOException $e) {
+            $this->error('Error executing query', $e);
+            return false;
         }
     }
 

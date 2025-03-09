@@ -25,7 +25,7 @@ class MySQLDriver extends AbstractServerDriver
 
     function dropTable(string $table): void
     {
-        $this->pdo->exec("DROP TABLE IF EXISTS $table");
+        $this->pdo->exec("DROP TABLE IF EXISTS `$table`");
     }
 
     function getColumns(string $table): array
@@ -152,13 +152,13 @@ class MySQLDriver extends AbstractServerDriver
 
     function getTableData(string $table): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM $table ORDER BY id");
+        $stmt = $this->pdo->query("SELECT * FROM `$table` ORDER BY id");
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     function getTableSchema(string $table): string
     {
-        $stmt = $this->pdo->query("SHOW CREATE TABLE $table");
+        $stmt = $this->pdo->query("SHOW CREATE TABLE `$table`");
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['Create Table'] ?? '';
     }

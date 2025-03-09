@@ -12,6 +12,7 @@
         "attnum",
         "attrelid",
         "autoload",
+        "bigserial",
         "dbtool",
         "difft",
         "Difftastic",

@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace DBTool\Database;
 
 use PDO;
-use RuntimeException;
+use PDOException;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PgSQLDriver extends AbstractServerDriver
@@ -31,7 +32,9 @@ class PgSQLDriver extends AbstractServerDriver
 
     function dropTable(string $table): void
     {
-        $this->pdo->exec("DROP TABLE IF EXISTS $this->config[schema].$table");
+        $this->pdo->exec(
+            "DROP TABLE IF EXISTS \"{$this->config['schema']}\".\"$table\"",
+        );
     }
 
     function getColumns(string $table): array
@@ -160,14 +163,157 @@ class PgSQLDriver extends AbstractServerDriver
 
     function getTableData(string $table): array
     {
-        $sql = "SELECT * FROM $this->config[schema].$table ORDER BY id";
+        $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
+        $sql = "SELECT * FROM $schemaTable ORDER BY id";
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     function getTableSchema(string $table): string
     {
-        throw new RuntimeException('Not implemented for PostgreSQL');
+        $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
+        $sqlParts = ["CREATE TABLE $schemaTable ("];
+
+        $columnsSql = <<<SQL
+            SELECT
+                column_name,
+                data_type,
+                character_maximum_length,
+                numeric_precision,
+                numeric_scale,
+                is_nullable,
+                column_default
+            FROM
+                information_schema.columns
+            WHERE
+                table_schema = :schema AND table_name = :table
+            ORDER BY
+                ordinal_position
+        SQL;
+        $stmt = $this->pdo->prepare($columnsSql);
+        $stmt->execute([
+            ':schema' => $this->config['schema'],
+            ':table' => $table,
+        ]);
+        $columns = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        $columnDefs = [];
+        foreach ($columns as $col) {
+            $def = "    \"{$col['column_name']}\" ";
+
+            if (strpos($col['column_default'] ?? '', 'nextval') !== false) {
+                $col['data_type'] =
+                    $col['data_type'] === 'bigint' ? 'bigserial' : 'serial';
+                $col['column_default'] = null;
+            }
+
+            $type = $col['data_type'];
+            if ($col['character_maximum_length']) {
+                $type .= "({$col['character_maximum_length']})";
+            } elseif ($col['numeric_precision'] && $col['numeric_scale']) {
+                $type .= "({$col['numeric_precision']}, {$col['numeric_scale']})";
+            }
+            $def .= $type;
+
+            if ($col['is_nullable'] === 'NO') {
+                $def .= ' NOT NULL';
+            }
+
+            if ($col['column_default'] !== null) {
+                $def .= " DEFAULT {$col['column_default']}";
+            }
+
+            $columnDefs[] = $def;
+        }
+
+        $constraintsSql = <<<SQL
+            SELECT
+                CASE
+                    WHEN i.indisprimary
+                        THEN 'PRIMARY KEY'
+                    WHEN i.indisunique
+                        THEN 'UNIQUE'
+                        ELSE NULL
+                END AS key_type,
+                array_agg(a.attname) AS column_names
+            FROM
+                pg_index i
+            JOIN
+                pg_class t ON t.oid = i.indrelid
+            JOIN
+                pg_attribute a ON a.attrelid = t.oid
+                    AND a.attnum = ANY(i.indkey)
+            WHERE
+                t.relname = :table
+                    AND t.relnamespace =
+                        (SELECT oid FROM pg_namespace WHERE nspname = :schema)
+                    AND (i.indisprimary OR i.indisunique)
+            GROUP BY
+                i.indisprimary, i.indisunique
+        SQL;
+        $stmt = $this->pdo->prepare($constraintsSql);
+        $stmt->execute([
+            ':schema' => $this->config['schema'],
+            ':table' => $table,
+        ]);
+        $keys = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        foreach ($keys as $key) {
+            $columnNames = explode(',', trim($key['column_names'], '{}'));
+            $columnsList = implode(
+                ', ',
+                array_map(fn($col) => "\"$col\"", $columnNames),
+            );
+            if ($key['key_type'] === 'PRIMARY KEY') {
+                $columnDefs[] = "    CONSTRAINT \"{$table}_pkey\" {$key['key_type']} ($columnsList)";
+            } elseif ($key['key_type'] === 'UNIQUE') {
+                $constraintName = $table . '_' . implode('_', $columnNames);
+                $columnDefs[] = "    CONSTRAINT \"$constraintName\" {$key['key_type']} ($columnsList)";
+            }
+        }
+
+        $sqlParts[] = implode(",\n", $columnDefs);
+        $sqlParts[] = ');';
+
+        $indexesSql = <<<SQL
+            SELECT
+                ic.relname AS index_name,
+                array_agg(a.attname) AS column_names
+            FROM
+                pg_index i
+            JOIN
+                pg_class t ON t.oid = i.indrelid
+            JOIN
+                pg_class ic ON ic.oid = i.indexrelid
+            JOIN
+                pg_attribute a ON a.attrelid = t.oid
+                    AND a.attnum = ANY(i.indkey)
+            WHERE
+                t.relname = :table
+                    AND t.relnamespace =
+                        (SELECT oid FROM pg_namespace WHERE nspname = :schema)
+                    AND NOT i.indisprimary AND NOT i.indisunique
+            GROUP BY
+                ic.relname
+        SQL;
+        $stmt = $this->pdo->prepare($indexesSql);
+        $stmt->execute([
+            ':schema' => $this->config['schema'],
+            ':table' => $table,
+        ]);
+        $indexes = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        foreach ($indexes as $index) {
+            $columnNames = explode(',', trim($index['column_names'], '{}'));
+            $columnsList = implode(
+                ', ',
+                array_map(fn($col) => "\"$col\"", $columnNames),
+            );
+            $indexName = $table . '_' . implode('_', $columnNames);
+            $sqlParts[] = "CREATE INDEX \"$indexName\" ON $schemaTable ($columnsList);";
+        }
+
+        return implode("\n", $sqlParts);
     }
 
     function getTables(): array
@@ -185,12 +331,66 @@ class PgSQLDriver extends AbstractServerDriver
 
     function insertInto(string $table, array $data): void
     {
-        throw new RuntimeException('Not implemented for PostgreSQL');
+        $batchSize = $this->config['batchSize'];
+        $columns = array_map(fn($col) => "\"$col\"", array_keys($data[0]));
+        $singlePlaceholders =
+            '(' . implode(', ', array_fill(0, count($columns), '?')) . ')';
+        $batchPlaceholders = implode(
+            ', ',
+            array_fill(0, min($batchSize, count($data)), $singlePlaceholders),
+        );
+
+        $sql =
+            "INSERT INTO \"{$this->config['schema']}\".\"$table\" (" .
+            implode(', ', $columns) .
+            ') VALUES ' .
+            $batchPlaceholders;
+
+        $values = [];
+        foreach ($data as $row) {
+            foreach ($row as $value) {
+                $values[] = $value;
+            }
+        }
+        try {
+            $this->pdo->beginTransaction();
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($values);
+            $this->pdo->commit();
+        } catch (PDOException $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 
     function streamTableData(string $table, callable $callback): void
     {
-        throw new RuntimeException('Not implemented for PostgreSQL');
+        $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
+        $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM $schemaTable");
+        $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        if ($this->output) {
+            $progress = new ProgressBar($this->output, $total);
+        }
+
+        $batchSize = $this->config['batchSize'];
+        for ($offset = 0; $offset < $total; $offset += $batchSize) {
+            $stmt = $this->pdo->query(
+                "SELECT * FROM $schemaTable LIMIT $batchSize OFFSET $offset",
+            );
+            $batch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (empty($batch)) {
+                break;
+            }
+            $callback($batch);
+            if ($this->output) {
+                $progress->advance(count($batch));
+            }
+        }
+        if ($this->output) {
+            $progress->finish();
+            $this->output->writeln('');
+        }
     }
 
     function tableExists(string $table): bool
