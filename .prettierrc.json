@@ -1,5 +1,6 @@
 {
     "jsxSingleQuote": true,
+    "objectWrap": "collapse",
     "overrides": [
         {
             "files": ["*.md"],

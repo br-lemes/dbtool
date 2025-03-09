@@ -1,8 +1,6 @@
 {
     "language": "en,pt-br",
-    "ignorePaths": [
-        "config/*"
-    ],
+    "ignorePaths": ["config/*"],
     "ignoreRegExpList": [
         // cSpell: disable
         // cSpell: enable
