@@ -1,8 +1,10 @@
 /.a.json
 /.b.json
+/.phpunit.result.cache
 /bun.lock
 /bun.lockb
 /composer.lock
 /config
+/coverage
 /node_modules
 /vendor
