@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CatCommand extends Command
+class CatCommand extends BaseCommand
 {
     private string $help = <<<HELP
     Displays table contents or compares data between databases.
@@ -98,10 +98,8 @@ class CatCommand extends Command
             );
     }
 
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    function exec(InputInterface $input, OutputInterface $output): int
+    {
         $config1 = $input->getArgument('config1');
         $config2 = $input->getArgument('argument2');
         $argument3 = $input->getArgument('argument3');

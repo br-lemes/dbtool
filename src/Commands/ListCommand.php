@@ -11,7 +11,7 @@ use DBTool\Database\DatabaseConnection;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 
-class ListCommand extends Command
+class ListCommand extends BaseCommand
 {
     private string $help = <<<HELP
     List database structures at different levels.
@@ -74,10 +74,8 @@ class ListCommand extends Command
             ->addArgument('field', InputArgument::OPTIONAL, 'Field to show');
     }
 
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    function exec(InputInterface $input, OutputInterface $output): int
+    {
         $configFile = $input->getArgument('config');
         $tableName = $input->getArgument('table');
         $fieldName = $input->getArgument('field');

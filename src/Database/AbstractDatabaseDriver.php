@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace DBTool\Database;
 
 use PDO;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 abstract class AbstractDatabaseDriver implements DatabaseDriver
 {
     use UtilitiesTrait;
@@ -14,9 +11,8 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
     protected array $config;
     protected PDO $pdo;
 
-    function __construct(array $config, ?OutputInterface $output = null)
+    function __construct(array $config)
     {
-        $this->output = $output;
         $this->config = $config + [
             'batchSize' => 1000,
             'password' => null,

@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-class CopyCommand extends Command
+class CopyCommand extends BaseCommand
 {
     private string $help = <<<HELP
     Copies a table including its schema and data to another database.
@@ -71,10 +71,8 @@ class CopyCommand extends Command
             );
     }
 
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    function exec(InputInterface $input, OutputInterface $output): int
+    {
         $source = $input->getArgument('source');
         $destination = $input->getArgument('destination');
         $tableName = $input->getArgument('table');

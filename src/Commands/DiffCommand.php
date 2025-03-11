@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DiffCommand extends Command
+class DiffCommand extends BaseCommand
 {
     private string $help = <<<HELP
     Compare database structures at different levels.
@@ -93,10 +93,8 @@ class DiffCommand extends Command
             );
     }
 
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    function exec(InputInterface $input, OutputInterface $output): int
+    {
         $config1 = $input->getArgument('config1');
         $config2 = $input->getArgument('config2');
         $this->db1 = new DatabaseConnection($config1, $output);

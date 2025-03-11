@@ -21,7 +21,6 @@ class DatabaseConnection
 
     function __construct(string $configFile, ?OutputInterface $output = null)
     {
-        $this->output = $output;
         $path = realpath(__DIR__ . '/../../config');
         $config = require "$path/$configFile.php";
 
@@ -30,7 +29,7 @@ class DatabaseConnection
             $this->error("Unsupported driver: $driver");
         }
 
-        $this->driver = new (self::DRIVERS[$driver])($config, $this->output);
+        $this->driver = new (self::DRIVERS[$driver])($config, $output);
         try {
             $this->driver->connect();
         } catch (PDOException $e) {

@@ -12,6 +12,8 @@ class PgSQLDriver extends AbstractServerDriver
 {
     use UtilitiesTrait;
 
+    private ?OutputInterface $output;
+
     function __construct(array $config, ?OutputInterface $output)
     {
         $this->output = $output;
