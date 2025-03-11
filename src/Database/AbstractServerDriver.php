@@ -11,11 +11,8 @@ abstract class AbstractServerDriver extends AbstractDatabaseDriver
 
     protected int $defaultPort;
 
-    function __construct(
-        array $config,
-        int $defaultPort,
-        ?OutputInterface $output,
-    ) {
+    function __construct(array $config, int $defaultPort)
+    {
         $this->defaultPort = $defaultPort;
 
         $required = ['host', 'database', 'username'];
@@ -25,14 +22,14 @@ abstract class AbstractServerDriver extends AbstractDatabaseDriver
                 $missing[] = $field;
             }
         }
-        if ($missing) {
+        if (!empty($missing)) {
             $this->error(
                 'Missing required server configuration: ' .
                     implode(', ', $missing),
             );
         }
 
-        parent::__construct($config, $output);
+        parent::__construct($config);
 
         $this->config['host'] = $this->sanitize(
             $this->config['host'],

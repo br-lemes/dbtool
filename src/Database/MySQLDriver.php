@@ -10,12 +10,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MySQLDriver extends AbstractServerDriver
 {
+    use UtilitiesTrait;
+
     function __construct(array $config, ?OutputInterface $output)
     {
-        parent::__construct($config, 3306, $output);
+        $this->output = $output;
+        parent::__construct($config, 3306);
     }
 
-    function buildDSN(array $config): string
+    function buildDSN(): string
     {
         $host = $this->config['host'];
         $port = $this->config['port'];

@@ -12,9 +12,10 @@ class PgSQLDriver extends AbstractServerDriver
 {
     use UtilitiesTrait;
 
-    function __construct(array $config, ?OutputInterface $errOutput)
+    function __construct(array $config, ?OutputInterface $output)
     {
-        parent::__construct($config, 5432, $errOutput);
+        $this->output = $output;
+        parent::__construct($config, 5432);
         $this->config['schema'] = $this->sanitize(
             $this->config['schema'] ?? 'public',
             '/^[a-zA-Z0-9_]+$/',
@@ -22,7 +23,7 @@ class PgSQLDriver extends AbstractServerDriver
         );
     }
 
-    function buildDSN(array $config): string
+    function buildDSN(): string
     {
         $host = $this->config['host'];
         $port = $this->config['port'];

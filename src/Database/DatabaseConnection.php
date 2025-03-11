@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace DBTool\Database;
 
 use PDOException;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseConnection
@@ -13,7 +12,6 @@ class DatabaseConnection
 
     public string $type;
 
-    private ?OutputInterface $output;
     private DatabaseDriver $driver;
 
     private const DRIVERS = [
@@ -24,11 +22,6 @@ class DatabaseConnection
     function __construct(string $configFile, ?OutputInterface $output = null)
     {
         $this->output = $output;
-        $this->errOutput =
-            $output instanceof ConsoleOutputInterface
-                ? $output->getErrorOutput()
-                : $output;
-
         $path = realpath(__DIR__ . '/../../config');
         $config = require "$path/$configFile.php";
 
@@ -37,7 +30,7 @@ class DatabaseConnection
             $this->error("Unsupported driver: $driver");
         }
 
-        $this->driver = new (self::DRIVERS[$driver])($config, $this->errOutput);
+        $this->driver = new (self::DRIVERS[$driver])($config, $this->output);
         try {
             $this->driver->connect();
         } catch (PDOException $e) {

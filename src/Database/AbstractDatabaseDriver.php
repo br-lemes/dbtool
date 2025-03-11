@@ -13,15 +13,10 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
 
     protected array $config;
     protected PDO $pdo;
-    protected ?OutputInterface $output = null;
 
-    function __construct(array $config, ?OutputInterface $output)
+    function __construct(array $config, ?OutputInterface $output = null)
     {
         $this->output = $output;
-        $this->errOutput =
-            $output instanceof ConsoleOutputInterface
-                ? $output->getErrorOutput()
-                : $output;
         $this->config = $config + [
             'batchSize' => 1000,
             'password' => null,
@@ -37,7 +32,7 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
     function connect(): void
     {
         $this->pdo = new PDO(
-            $this->buildDSN($this->config),
+            $this->buildDSN(),
             $this->config['username'],
             $this->config['password'],
         );
@@ -104,7 +99,7 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
         return array_merge($id, $related, $others, $sortedSpecial);
     }
 
-    abstract function buildDSN(array $config): string;
+    abstract function buildDSN(): string;
     abstract function dropTable(string $table): void;
     abstract function getColumns(string $table): array;
     abstract function getKeys(string $table): array;
