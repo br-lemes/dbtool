@@ -10,6 +10,8 @@ environments.
 - Display and compare table contents
 - Copy tables between databases
 - Compare database schemas and structures
+- Remove tables from a database
+- Truncate all data from a table
 - SQL query execution support
 - Auto-completion for commands and arguments
 
@@ -160,6 +162,38 @@ Notes:
 - Uses difft for colored output showing differences
 - Can compare entire databases, single tables, or specific fields
 - Useful for checking schema consistency across environments
+
+### Remove Command (rm)
+
+Removes a table from a database.
+
+```bash
+# Remove users table
+db rm config1 users
+# Remove products table
+db rm config1 products
+```
+
+Notes:
+
+- Prompts for confirmation if table exists
+- Permanently deletes the table and all its data
+
+### Truncate Command (truncate)
+
+Truncates all data from a table, keeping its schema intact.
+
+```bash
+# Clear all data from users table
+db truncate config1 users
+# Clear all data from products table
+db truncate config1 products
+```
+
+Notes:
+
+- Prompts for confirmation if table exists
+- Removes all data but preserves table structure and indexes
 
 ## Versioning
 
