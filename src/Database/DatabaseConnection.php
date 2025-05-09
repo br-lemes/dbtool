@@ -155,4 +155,14 @@ class DatabaseConnection
             return null;
         }
     }
+
+    function truncateTable(string $table): void
+    {
+        try {
+            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->driver->truncateTable($table);
+        } catch (PDOException $e) {
+            $this->error("Error truncating table '$table'", $e);
+        }
+    }
 }

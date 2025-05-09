@@ -17,4 +17,5 @@ interface DatabaseDriver
     function query(string $sql): array;
     function streamTableData(string $table, callable $callback): void;
     function tableExists(string $table): bool;
+    function truncateTable(string $table): void;
 }

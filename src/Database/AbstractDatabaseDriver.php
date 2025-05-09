@@ -105,4 +105,5 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
     abstract function insertInto(string $table, array $data): void;
     abstract function streamTableData(string $table, callable $callback): void;
     abstract function tableExists(string $table): bool;
+    abstract function truncateTable(string $table): void;
 }

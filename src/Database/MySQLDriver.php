@@ -249,4 +249,9 @@ class MySQLDriver extends AbstractServerDriver
         $stmt->execute([':table' => $table]);
         return $stmt->rowCount() > 0;
     }
+
+    function truncateTable(string $table): void
+    {
+        $this->pdo->exec("TRUNCATE TABLE `$table`");
+    }
 }

@@ -418,4 +418,11 @@ class PgSQLDriver extends AbstractServerDriver
         ]);
         return $stmt->fetchColumn() === true;
     }
+
+    function truncateTable(string $table): void
+    {
+        $this->pdo->exec(
+            "TRUNCATE TABLE \"{$this->config['schema']}\".\"$table\"",
+        );
+    }
 }

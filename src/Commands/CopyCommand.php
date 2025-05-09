@@ -27,6 +27,9 @@ class CopyCommand extends BaseCommand
       - Source and destination can be different database types
     HELP;
 
+    private DatabaseConnection $db1;
+    private DatabaseConnection $db2;
+
     function complete(
         CompletionInput $input,
         CompletionSuggestions $suggestions,
@@ -77,21 +80,40 @@ class CopyCommand extends BaseCommand
         $destination = $input->getArgument('destination');
         $tableName = $input->getArgument('table');
 
-        $db1 = new DatabaseConnection($source, $output);
-        $db2 = new DatabaseConnection($destination, $output);
-        if ($db1->type !== $db2->type) {
-            $output->writeln(
-                'Source and destination databases must be of the same type.',
-            );
-            return Command::FAILURE;
-        }
+        $this->db1 = new DatabaseConnection($source, $output);
+        $this->db2 = new DatabaseConnection($destination, $output);
+        if ($this->db1->type === $this->db2->type) {
+            if ($this->db2->tableExists($tableName)) {
+                /** @var QuestionHelper $helper */
+                $helper = $this->getHelper('question');
+                $question = new ConfirmationQuestion(
+                    "Table '$tableName' already exists in the destination. " .
+                        'Do you want to overwrite it? (y/N) ',
+                    false,
+                );
 
-        if ($db2->tableExists($tableName)) {
+                if (!$helper->ask($input, $output, $question)) {
+                    $output->writeln('Operation cancelled.');
+                    return Command::FAILURE;
+                }
+
+                $this->db2->dropTable($tableName);
+            }
+
+            $schema = $this->db1->getTableSchema($tableName);
+            $this->db2->exec($schema);
+        } else {
+            if (!$this->hasCompatibleSchema($tableName)) {
+                $output->writeln(
+                    'Table schemas are not compatible (column names or order differ).',
+                );
+                return Command::FAILURE;
+            }
             /** @var QuestionHelper $helper */
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion(
-                "Table '$tableName' already exists in the destination. " .
-                    'Do you want to overwrite it? (y/N) ',
+                "Table '$tableName' may be incompatible. " .
+                    'Do you want to clear it? (y/N) ',
                 false,
             );
 
@@ -100,18 +122,27 @@ class CopyCommand extends BaseCommand
                 return Command::FAILURE;
             }
 
-            $db2->dropTable($tableName);
+            $this->db2->truncateTable($tableName);
         }
 
-        $schema = $db1->getTableSchema($tableName);
-        $db2->exec($schema);
-
-        $db1->streamTableData(
+        $this->db1->streamTableData(
             $tableName,
-            fn($batch) => $db2->insertInto($tableName, $batch),
+            fn($batch) => $this->db2->insertInto($tableName, $batch),
         );
 
         $output->writeln("Table '$tableName' copied successfully.");
         return Command::SUCCESS;
+    }
+
+    private function hasCompatibleSchema(string $table): bool
+    {
+        $columns1 = $this->db1->getColumns($table, 'native');
+        $columns2 = $this->db2->getColumns($table, 'native');
+        if ($columns1 === null || $columns2 === null) {
+            return false;
+        }
+        $names1 = array_column($columns1, 'COLUMN_NAME');
+        $names2 = array_column($columns2, 'COLUMN_NAME');
+        return $names1 === $names2;
     }
 }
