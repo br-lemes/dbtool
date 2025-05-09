@@ -33,7 +33,7 @@ class MySQLDriver extends AbstractServerDriver
         $this->pdo->exec("DROP TABLE IF EXISTS `$table`");
     }
 
-    function getColumns(string $table): array
+    function getColumns(string $table, string $order): array
     {
         $sql = <<<SQL
             SELECT
@@ -84,7 +84,9 @@ class MySQLDriver extends AbstractServerDriver
             ':table' => $table,
         ]);
         $columns = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        $columns = $this->sortColumns($columns);
+        if ($order === 'custom') {
+            $columns = $this->sortColumns($columns);
+        }
 
         $typeMap = [
             'bigint' => 'BIGINT',
@@ -115,7 +117,7 @@ class MySQLDriver extends AbstractServerDriver
         return $columns;
     }
 
-    function getKeys(string $table): array
+    function getKeys(string $table, string $order): array
     {
         $sql = <<<SQL
             SELECT
@@ -152,7 +154,11 @@ class MySQLDriver extends AbstractServerDriver
             ':database' => $this->config['database'],
             ':table' => $table,
         ]);
-        return $this->sortColumns($stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
+        $keys = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        if ($order === 'custom') {
+            return $this->sortColumns($keys);
+        }
+        return $keys;
     }
 
     function getTableData(string $table): array

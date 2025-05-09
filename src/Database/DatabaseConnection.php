@@ -58,22 +58,22 @@ class DatabaseConnection
         }
     }
 
-    function getColumns(string $table): ?array
+    function getColumns(string $table, string $order): ?array
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            return $this->driver->getColumns($table);
+            return $this->driver->getColumns($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
             return null;
         }
     }
 
-    function getKeys(string $table): ?array
+    function getKeys(string $table, string $order): ?array
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            return $this->driver->getKeys($table);
+            return $this->driver->getKeys($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
             return null;

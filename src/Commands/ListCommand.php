@@ -8,8 +8,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use DBTool\Database\DatabaseConnection;
+use InvalidArgumentException;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Input\InputOption;
 
 class ListCommand extends BaseCommand
 {
@@ -50,9 +52,15 @@ class ListCommand extends BaseCommand
             $db = new DatabaseConnection($config);
             $suggestions->suggestValues(
                 array_filter(
-                    array_column($db->getColumns($table), 'COLUMN_NAME'),
+                    array_column(
+                        $db->getColumns($table, 'custom'),
+                        'COLUMN_NAME',
+                    ),
                 ),
             );
+        }
+        if ($input->mustSuggestOptionValuesFor('column-order')) {
+            $suggestions->suggestValues(['custom', 'native']);
         }
     }
 
@@ -71,7 +79,14 @@ class ListCommand extends BaseCommand
                 InputArgument::OPTIONAL,
                 'Table to show the schema',
             )
-            ->addArgument('field', InputArgument::OPTIONAL, 'Field to show');
+            ->addArgument('field', InputArgument::OPTIONAL, 'Field to show')
+            ->addOption(
+                'column-order',
+                'o',
+                InputOption::VALUE_REQUIRED,
+                'Column order: custom or native',
+                'custom',
+            );
     }
 
     function exec(InputInterface $input, OutputInterface $output): int
@@ -79,12 +94,18 @@ class ListCommand extends BaseCommand
         $configFile = $input->getArgument('config');
         $tableName = $input->getArgument('table');
         $fieldName = $input->getArgument('field');
+        $order = $input->getOption('column-order');
+        if (!in_array($order, ['custom', 'native'])) {
+            throw new InvalidArgumentException(
+                "Invalid value for column order. Must be 'custom' or 'native', got '$order'.",
+            );
+        }
 
         $db = new DatabaseConnection($configFile, $output);
 
         if ($tableName) {
-            $columns = $db->getColumns($tableName);
-            $keys = $db->getKeys($tableName);
+            $columns = $db->getColumns($tableName, $order);
+            $keys = $db->getKeys($tableName, $order);
 
             if ($fieldName) {
                 $columns = array_values(

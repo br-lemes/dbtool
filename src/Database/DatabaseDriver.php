@@ -8,8 +8,8 @@ interface DatabaseDriver
     function connect(): void;
     function dropTable(string $table): void;
     function exec(string $sql): int|false;
-    function getColumns(string $table): array;
-    function getKeys(string $table): array;
+    function getColumns(string $table, string $order): array;
+    function getKeys(string $table, string $order): array;
     function getTableData(string $table): array;
     function getTableSchema(string $table): string;
     function getTables(): array;

@@ -50,8 +50,8 @@ abstract class AbstractServerDriver extends AbstractDatabaseDriver
     }
 
     abstract function dropTable(string $table): void;
-    abstract function getColumns(string $table): array;
-    abstract function getKeys(string $table): array;
+    abstract function getColumns(string $table, string $order): array;
+    abstract function getKeys(string $table, string $order): array;
     abstract function getTableData(string $table): array;
     abstract function getTableSchema(string $table): string;
     abstract function getTables(): array;

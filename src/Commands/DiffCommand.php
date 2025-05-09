@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace DBTool\Commands;
 
 use DBTool\Database\DatabaseConnection;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DiffCommand extends BaseCommand
@@ -33,6 +35,7 @@ class DiffCommand extends BaseCommand
     private DatabaseConnection $db2;
     private ?string $tableName = null;
     private ?string $fieldName = null;
+    private ?string $order = 'custom';
 
     function complete(
         CompletionInput $input,
@@ -60,9 +63,15 @@ class DiffCommand extends BaseCommand
             $db = new DatabaseConnection($config);
             $suggestions->suggestValues(
                 array_filter(
-                    array_column($db->getColumns($table), 'COLUMN_NAME'),
+                    array_column(
+                        $db->getColumns($table, 'custom'),
+                        'COLUMN_NAME',
+                    ),
                 ),
             );
+        }
+        if ($input->mustSuggestOptionValuesFor('column-order')) {
+            $suggestions->suggestValues(['custom', 'native']);
         }
     }
 
@@ -90,6 +99,13 @@ class DiffCommand extends BaseCommand
                 'field',
                 InputArgument::OPTIONAL,
                 'Field to compare schema',
+            )
+            ->addOption(
+                'column-order',
+                'o',
+                InputOption::VALUE_REQUIRED,
+                'Column order: custom or native',
+                'custom',
             );
     }
 
@@ -102,6 +118,12 @@ class DiffCommand extends BaseCommand
 
         $this->tableName = $input->getArgument('table');
         $this->fieldName = $input->getArgument('field');
+        $this->order = $input->getOption('column-order');
+        if (!in_array($this->order, ['custom', 'native'])) {
+            throw new InvalidArgumentException(
+                "Invalid value for column order. Must be 'custom' or 'native', got '$this->order'.",
+            );
+        }
 
         if ($this->tableName) {
             $this->diffTables($output);
@@ -118,15 +140,15 @@ class DiffCommand extends BaseCommand
         $a = "$path/.a.json";
         $b = "$path/.b.json";
 
-        $columns1 = $this->db1->getColumns($this->tableName);
+        $columns1 = $this->db1->getColumns($this->tableName, $this->order);
         $keys1 = array_map(
             fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
-            $this->db1->getKeys($this->tableName),
+            $this->db1->getKeys($this->tableName, $this->order),
         );
-        $columns2 = $this->db2->getColumns($this->tableName);
+        $columns2 = $this->db2->getColumns($this->tableName, $this->order);
         $keys2 = array_map(
             fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
-            $this->db2->getKeys($this->tableName),
+            $this->db2->getKeys($this->tableName, $this->order),
         );
 
         if ($this->fieldName) {
@@ -192,10 +214,10 @@ class DiffCommand extends BaseCommand
 
         foreach ($allKeys as $key) {
             if (isset($tables1[$key])) {
-                $columns = $this->db1->getColumns($key);
+                $columns = $this->db1->getColumns($key, $this->order);
                 $keys = array_map(
                     fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
-                    $this->db1->getKeys($key),
+                    $this->db1->getKeys($key, $this->order),
                 );
                 $json = json_encode(['columns' => $columns, 'keys' => $keys]);
                 $tables1[$key] = md5($json);
@@ -203,10 +225,10 @@ class DiffCommand extends BaseCommand
                 $tables1[$key] = '';
             }
             if (isset($tables2[$key])) {
-                $columns = $this->db2->getColumns($key);
+                $columns = $this->db2->getColumns($key, $this->order);
                 $keys = array_map(
                     fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
-                    $this->db2->getKeys($key),
+                    $this->db2->getKeys($key, $this->order),
                 );
                 $json = json_encode(['columns' => $columns, 'keys' => $keys]);
                 $tables2[$key] = md5($json);

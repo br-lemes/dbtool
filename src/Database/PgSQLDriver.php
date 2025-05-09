@@ -40,7 +40,7 @@ class PgSQLDriver extends AbstractServerDriver
         );
     }
 
-    function getColumns(string $table): array
+    function getColumns(string $table, string $order): array
     {
         $sql = <<<SQL
             SELECT
@@ -91,7 +91,9 @@ class PgSQLDriver extends AbstractServerDriver
             ':table' => $table,
         ]);
         $columns = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        $columns = $this->sortColumns($columns);
+        if ($order === 'custom') {
+            $columns = $this->sortColumns($columns);
+        }
 
         $typeMap = [
             'bigint' => 'BIGINT',
@@ -121,7 +123,7 @@ class PgSQLDriver extends AbstractServerDriver
         return $columns;
     }
 
-    function getKeys(string $table): array
+    function getKeys(string $table, string $order): array
     {
         $sql = <<<SQL
             SELECT
@@ -161,7 +163,11 @@ class PgSQLDriver extends AbstractServerDriver
             ':schema' => $this->config['schema'],
             ':table' => $table,
         ]);
-        return $this->sortColumns($stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
+        $keys = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        if ($order === 'custom') {
+            return $this->sortColumns($keys);
+        }
+        return $keys;
     }
 
     function getTableData(string $table): array
