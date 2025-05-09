@@ -107,7 +107,7 @@ Notes:
 
 ### Copy Command (cp)
 
-Copies a table including its schema and data to another database.
+Copies a table's data and schema (same-type databases) to another database.
 
 ```bash
 # Copy users table with all data from source to destination
@@ -119,9 +119,14 @@ db cp prod-db stage-db products
 
 Notes:
 
-- Will prompt for confirmation if table exists in destination
-- Copies both table structure (schema) and all data
-- Source and destination can be different database types
+- For same database types (e.g., MySQL to MySQL):
+  - Prompts for confirmation if table exists in destination
+  - Drops and recreates table with source schema and copies all data
+- For different database types (e.g., MySQL to PostgreSQL):
+  - Requires identical column names and order in destination table
+  - Prompts for confirmation to clear existing data
+  - Truncates existing data and copies data without altering table schema
+- Always transfers all data from source to destination
 
 ### Diff Command (diff)
 
