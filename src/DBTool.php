@@ -7,6 +7,7 @@ use DBTool\Commands\CatCommand;
 use DBTool\Commands\CopyCommand;
 use DBTool\Commands\DiffCommand;
 use DBTool\Commands\ListCommand;
+use DBTool\Commands\MoveCommand;
 use DBTool\Commands\RemoveCommand;
 use DBTool\Commands\TruncateCommand;
 use Symfony\Component\Console\Application;
@@ -20,6 +21,7 @@ class DBTool extends Application
         $this->add(new CopyCommand());
         $this->add(new DiffCommand());
         $this->add(new ListCommand());
+        $this->add(new MoveCommand());
         $this->add(new RemoveCommand());
         $this->add(new TruncateCommand());
     }

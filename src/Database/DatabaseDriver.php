@@ -15,6 +15,7 @@ interface DatabaseDriver
     function getTables(): array;
     function insertInto(string $table, array $data): void;
     function query(string $sql): array;
+    function renameTable(string $from, string $to): void;
     function streamTableData(string $table, callable $callback): void;
     function tableExists(string $table): bool;
     function truncateTable(string $table): void;

@@ -135,6 +135,17 @@ class DatabaseConnection
         }
     }
 
+    function renameTable(string $from, string $to): void
+    {
+        try {
+            $from = $this->sanitize($from, '/^[a-zA-Z0-9_]+$/', 'table');
+            $to = $this->sanitize($to, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->driver->renameTable($from, $to);
+        } catch (PDOException $e) {
+            $this->error("Error renaming table '$from' to '$to'", $e);
+        }
+    }
+
     function streamTableData(string $table, callable $callback): void
     {
         try {

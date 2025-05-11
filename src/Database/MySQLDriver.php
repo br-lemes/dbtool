@@ -214,6 +214,11 @@ class MySQLDriver extends AbstractServerDriver
         }
     }
 
+    function renameTable(string $from, string $to): void
+    {
+        $this->pdo->exec("ALTER TABLE `$from` RENAME TO `$to`");
+    }
+
     function streamTableData(string $table, callable $callback): void
     {
         $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM `$table`");

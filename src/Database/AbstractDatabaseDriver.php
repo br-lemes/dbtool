@@ -103,6 +103,7 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
     abstract function getTableSchema(string $table): string;
     abstract function getTables(): array;
     abstract function insertInto(string $table, array $data): void;
+    abstract function renameTable(string $from, string $to): void;
     abstract function streamTableData(string $table, callable $callback): void;
     abstract function tableExists(string $table): bool;
     abstract function truncateTable(string $table): void;

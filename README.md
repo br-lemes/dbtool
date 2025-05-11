@@ -1,14 +1,15 @@
 # DBTool
 
-A command-line utility for managing and comparing MySQL databases. BTool helps
-you inspect, compare and copy database structures and data across different
-environments.
+A command-line utility for managing and comparing MySQL and PostgreSQL
+databases. DBTool helps you inspect, compare, copy, move and remove database
+structures and data across different environments.
 
 ## Features
 
 - List database tables and schema information
 - Display and compare table contents
 - Copy tables between databases
+- Move or rename tables within or across databases
 - Compare database schemas and structures
 - Remove tables from a database
 - Truncate all data from a table
@@ -126,8 +127,37 @@ Notes:
   - Drops and recreates table with source schema and copies all data
 - For different database types (e.g., MySQL to PostgreSQL):
   - Requires identical column names and order in destination table
-  - Prompts for confirmation to clear existing data
+  - Verifies only column names and order, not column types
+  - Prompts for confirmation to clear existing data, but copy may fail if types
+    are incompatible
   - Truncates existing data and copies data without altering table schema
+- Always transfers all data from source to destination
+
+### Move Command (mv)
+
+Moves or renames a table within or across databases.
+
+```bash
+# Rename old_table to new_table in the same database
+db mv config1 old_table new_table
+# Move table from source to destination database
+db mv config1 config2 table
+```
+
+Notes:
+
+- Within same database:
+  - Prompts for confirmation if destination table exists
+  - Renames table, preserving schema and data
+- Across databases (same type, e.g., MySQL to MySQL):
+  - Prompts for confirmation if destination table exists
+  - Copies schema and data, then drops source table
+- Across databases (different types, e.g., MySQL to PostgreSQL):
+  - Requires identical column names and order in destination table
+  - Verifies only column names and order, not column types
+  - Prompts for confirmation to clear existing data, but copy may fail if types
+    are incompatible
+  - Copies data without altering destination schema, then drops source table
 - Always transfers all data from source to destination
 
 ### Diff Command (diff)
@@ -215,9 +245,9 @@ See `db completion --help` to see how to install and use.
 
 ## Requirements
 
-- PHP 8.2 or higher
+- PHP 8.1 or higher
 - Composer
-- MySQL/MariaDB
+- MySQL/MariaDB/PostgreSQL
 - difft (for comparison features)
 
 ## Contributing

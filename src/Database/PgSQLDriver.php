@@ -372,6 +372,13 @@ class PgSQLDriver extends AbstractServerDriver
         }
     }
 
+    function renameTable(string $from, string $to): void
+    {
+        $this->pdo->exec(
+            "ALTER TABLE \"{$this->config['schema']}\".\"$from\" RENAME TO \"$to\"",
+        );
+    }
+
     function streamTableData(string $table, callable $callback): void
     {
         $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
