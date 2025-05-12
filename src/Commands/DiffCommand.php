@@ -25,10 +25,17 @@ class DiffCommand extends BaseCommand
       <info>diff db1 db2 users</info>     Compare users table schema in detail
       <info>diff db1 db2 users id</info>  Compare just the id field definition
 
+    Options:
+      --column-order=<custom|native> Set column order (default: custom)
+      --ignore-length=<yes|no>       Ignore CHARACTER_MAXIMUM_LENGTH for TEXT
+        fields (default: yes for different database types, otherwise no)
+
     Notes:
       - Uses difft for colored output showing differences
       - Can compare entire databases, single tables, or specific fields
       - Useful for checking schema consistency across environments
+      - When comparing different database types (e.g., MySQL to PostgreSQL),
+        --ignore-length is enabled by default
     HELP;
 
     private DatabaseConnection $db1;
@@ -36,6 +43,7 @@ class DiffCommand extends BaseCommand
     private ?string $tableName = null;
     private ?string $fieldName = null;
     private ?string $order = 'custom';
+    private bool $ignoreLength = false;
 
     function complete(
         CompletionInput $input,
@@ -73,6 +81,9 @@ class DiffCommand extends BaseCommand
         if ($input->mustSuggestOptionValuesFor('column-order')) {
             $suggestions->suggestValues(['custom', 'native']);
         }
+        if ($input->mustSuggestOptionValuesFor('ignore-length')) {
+            $suggestions->suggestValues(['yes', 'no']);
+        }
     }
 
     protected function configure(): void
@@ -106,6 +117,12 @@ class DiffCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Column order: custom or native',
                 'custom',
+            )
+            ->addOption(
+                'ignore-length',
+                'l',
+                InputOption::VALUE_OPTIONAL,
+                'Ignore CHARACTER_MAXIMUM_LENGTH when comparing TEXT fields',
             );
     }
 
@@ -119,6 +136,16 @@ class DiffCommand extends BaseCommand
         $this->tableName = $input->getArgument('table');
         $this->fieldName = $input->getArgument('field');
         $this->order = $input->getOption('column-order');
+        $this->ignoreLength = $this->db1->type !== $this->db2->type;
+        $ignoreLengthOption = $input->getOption('ignore-length');
+        if ($ignoreLengthOption !== null) {
+            if (!in_array($ignoreLengthOption, ['yes', 'no'])) {
+                throw new InvalidArgumentException(
+                    "Invalid value for ignore-length. Must be 'yes' or 'no', got '$ignoreLengthOption'.",
+                );
+            }
+            $this->ignoreLength = $ignoreLengthOption === 'yes';
+        }
         if (!in_array($this->order, ['custom', 'native'])) {
             throw new InvalidArgumentException(
                 "Invalid value for column order. Must be 'custom' or 'native', got '$this->order'.",
@@ -140,12 +167,16 @@ class DiffCommand extends BaseCommand
         $a = "$path/.a.json";
         $b = "$path/.b.json";
 
-        $columns1 = $this->db1->getColumns($this->tableName, $this->order);
+        $columns1 = $this->normalizeColumns(
+            $this->db1->getColumns($this->tableName, $this->order),
+        );
         $keys1 = array_map(
             fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
             $this->db1->getKeys($this->tableName, $this->order),
         );
-        $columns2 = $this->db2->getColumns($this->tableName, $this->order);
+        $columns2 = $this->normalizeColumns(
+            $this->db2->getColumns($this->tableName, $this->order),
+        );
         $keys2 = array_map(
             fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
             $this->db2->getKeys($this->tableName, $this->order),
@@ -214,7 +245,9 @@ class DiffCommand extends BaseCommand
 
         foreach ($allKeys as $key) {
             if (isset($tables1[$key])) {
-                $columns = $this->db1->getColumns($key, $this->order);
+                $columns = $this->normalizeColumns(
+                    $this->db1->getColumns($key, $this->order),
+                );
                 $keys = array_map(
                     fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
                     $this->db1->getKeys($key, $this->order),
@@ -225,7 +258,9 @@ class DiffCommand extends BaseCommand
                 $tables1[$key] = '';
             }
             if (isset($tables2[$key])) {
-                $columns = $this->db2->getColumns($key, $this->order);
+                $columns = $this->normalizeColumns(
+                    $this->db2->getColumns($key, $this->order),
+                );
                 $keys = array_map(
                     fn(array $key) => array_diff_key($key, ['KEY_NAME' => '']),
                     $this->db2->getKeys($key, $this->order),
@@ -250,5 +285,16 @@ class DiffCommand extends BaseCommand
         );
 
         $output->write(shell_exec("difft --color always $a $b"));
+    }
+
+    private function normalizeColumns(array $columns): array
+    {
+        if (!$this->ignoreLength) {
+            return $columns;
+        }
+        foreach ($columns as &$column) {
+            $column['CHARACTER_MAXIMUM_LENGTH'] = null;
+        }
+        return $columns;
     }
 }

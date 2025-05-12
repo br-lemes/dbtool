@@ -192,6 +192,10 @@ Notes:
 - Uses difft for colored output showing differences
 - Can compare entire databases, single tables, or specific fields
 - Useful for checking schema consistency across environments
+- Use `--ignore-length=yes` to ignore `CHARACTER_MAXIMUM_LENGTH` for TEXT
+  fields, enabled by default when comparing different database types (e.g.,
+  MySQL to PostgreSQL)
+- Use `--ignore-length=no` to include `CHARACTER_MAXIMUM_LENGTH` in comparisons
 
 ### Remove Command (rm)
 
