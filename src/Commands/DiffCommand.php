@@ -293,6 +293,9 @@ class DiffCommand extends BaseCommand
             return $columns;
         }
         foreach ($columns as &$column) {
+            if ($column['DATA_TYPE'] !== 'TEXT') {
+                continue;
+            }
             $column['CHARACTER_MAXIMUM_LENGTH'] = null;
         }
         return $columns;

@@ -6,5 +6,6 @@
 /composer.lock
 /config
 /coverage
+/dbtool.txt
 /node_modules
 /vendor
