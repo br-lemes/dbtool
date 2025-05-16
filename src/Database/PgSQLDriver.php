@@ -33,6 +33,33 @@ class PgSQLDriver extends AbstractServerDriver
         return "pgsql:host=$host;port=$port;dbname=$database;options='--client_encoding=UTF8'";
     }
 
+    function buildDumpCommand(array $options = []): string
+    {
+        $path = realpath(__DIR__ . '/../../config');
+        $pgpassFile = "$path/{$this->config['configFile']}.pgpass";
+        $host = $this->config['host'];
+        $port = $this->config['port'] ?? 5432;
+        $user = $this->config['username'];
+        $password = $this->config['password'] ?? '';
+        $pgpassContent = "$host:$port:{$this->config['database']}:$user:$password";
+        file_put_contents($pgpassFile, $pgpassContent);
+        chmod($pgpassFile, 0600);
+
+        $host = escapeshellarg($host);
+        $port = escapeshellarg((string) $port);
+        $user = escapeshellarg($user);
+        $database = escapeshellarg($this->config['database']);
+        $schema = escapeshellarg($this->config['schema'] ?? 'public');
+        $schemaOnly = @$options['schemaOnly'] ? '-s' : '';
+        $tableName = @$options['tableName']
+            ? '-t ' . escapeshellarg($options['tableName'])
+            : '';
+        $command = 'PGPASSFILE=' . escapeshellarg($pgpassFile) . ' pg_dump ';
+        $command .= "-h $host -p $port -U $user -d $database -n $schema";
+        $command .= " $schemaOnly $tableName";
+        return $command;
+    }
+
     function dropTable(string $table): void
     {
         $this->pdo->exec(

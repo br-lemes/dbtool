@@ -29,6 +29,7 @@ class DatabaseConnection
             $this->error("Unsupported driver: $driver");
         }
 
+        $config['configFile'] = $configFile;
         $this->driver = new (self::DRIVERS[$driver])($config, $output);
         try {
             $this->driver->connect();
@@ -36,6 +37,11 @@ class DatabaseConnection
             $this->error('Error connecting to database', $e);
         }
         $this->type = $driver;
+    }
+
+    function buildDumpCommand(array $options = []): string
+    {
+        return $this->driver->buildDumpCommand($options);
     }
 
     function dropTable(string $table): void

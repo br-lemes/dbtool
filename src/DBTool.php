@@ -6,6 +6,7 @@ namespace DBTool;
 use DBTool\Commands\CatCommand;
 use DBTool\Commands\CopyCommand;
 use DBTool\Commands\DiffCommand;
+use DBTool\Commands\DumpCommand;
 use DBTool\Commands\ListCommand;
 use DBTool\Commands\MoveCommand;
 use DBTool\Commands\RemoveCommand;
@@ -20,6 +21,7 @@ class DBTool extends Application
         $this->add(new CatCommand());
         $this->add(new CopyCommand());
         $this->add(new DiffCommand());
+        $this->add(new DumpCommand());
         $this->add(new ListCommand());
         $this->add(new MoveCommand());
         $this->add(new RemoveCommand());
@@ -35,8 +37,10 @@ class DBTool extends Application
         $command = 'git log --pretty=format:%s 2>/dev/null';
         $output = [];
         $resultCode = 0;
+        $cwd = getcwd();
         chdir(__DIR__);
         exec($command, $output, $resultCode);
+        chdir($cwd);
         if ($resultCode !== 0) {
             return "$major.$minor.$patch";
         }

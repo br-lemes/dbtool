@@ -28,6 +28,40 @@ class MySQLDriver extends AbstractServerDriver
         return "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
     }
 
+    function buildDumpCommand(array $options = []): string
+    {
+        $path = realpath(__DIR__ . '/../../config');
+        $cnfFile = "$path/{$this->config['configFile']}.cnf";
+        $host = $this->config['host'];
+        $port = $this->config['port'] ?? 3306;
+        $user = $this->config['username'];
+        $password = $this->config['password'] ?? '';
+        $cnfContent = <<<END
+        [client]
+        host=$host
+        port=$port
+        user=$user
+        password=$password
+        END;
+        file_put_contents($cnfFile, $cnfContent);
+        chmod($cnfFile, 0600);
+
+        $defaultsFile = escapeshellarg($cnfFile);
+        $schemaOnly = @$options['schemaOnly'] ? '-d' : '';
+        $database = escapeshellarg($this->config['database']);
+        $tableName = @$options['tableName']
+            ? escapeshellarg($options['tableName'])
+            : '';
+        $isMariaDB =
+            strpos(
+                $this->pdo->query('SELECT VERSION()')->fetchColumn(),
+                'MariaDB',
+            ) !== false;
+        $command = $isMariaDB ? 'mariadb-dump' : 'mysqldump';
+        $command .= " --defaults-file=$defaultsFile $schemaOnly $database $tableName";
+        return $command;
+    }
+
     function dropTable(string $table): void
     {
         $this->pdo->exec("DROP TABLE IF EXISTS `$table`");

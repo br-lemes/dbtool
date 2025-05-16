@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 abstract class AbstractServerDriver extends AbstractDatabaseDriver
 {
     use UtilitiesTrait;
@@ -49,6 +47,7 @@ abstract class AbstractServerDriver extends AbstractDatabaseDriver
         );
     }
 
+    abstract function buildDumpCommand(array $options = []): string;
     abstract function dropTable(string $table): void;
     abstract function getColumns(string $table, string $order): array;
     abstract function getKeys(string $table, string $order): array;

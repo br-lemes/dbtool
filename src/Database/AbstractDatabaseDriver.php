@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DBTool\Database;
 
 use PDO;
+
 abstract class AbstractDatabaseDriver implements DatabaseDriver
 {
     use UtilitiesTrait;
@@ -96,6 +97,7 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
     }
 
     abstract function buildDSN(): string;
+    abstract function buildDumpCommand(array $options = []): string;
     abstract function dropTable(string $table): void;
     abstract function getColumns(string $table, string $order): array;
     abstract function getKeys(string $table, string $order): array;
