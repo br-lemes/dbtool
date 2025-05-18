@@ -99,12 +99,12 @@ class MySQLDriver extends AbstractServerDriver
                 END AS IS_UPDATE_TIMESTAMP,
                 CASE
                     WHEN DATA_TYPE IN ('decimal', 'numeric')
-                        THEN NUMERIC_PRECISION
+                        THEN CAST(NUMERIC_PRECISION AS SIGNED)
                         ELSE NULL
                 END AS NUMERIC_PRECISION,
                 CASE
                     WHEN DATA_TYPE IN ('decimal', 'numeric')
-                        THEN NUMERIC_SCALE
+                        THEN CAST(NUMERIC_SCALE AS SIGNED)
                         ELSE NULL
                 END AS NUMERIC_SCALE
             FROM
