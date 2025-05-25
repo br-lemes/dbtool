@@ -10,6 +10,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CatCommand extends BaseCommand
@@ -36,6 +37,7 @@ class CatCommand extends BaseCommand
     private ?DatabaseConnection $db2;
     private ?string $tableName;
     private ?string $query;
+    private ?string $order = 'custom';
 
     function complete(
         CompletionInput $input,
@@ -72,6 +74,9 @@ class CatCommand extends BaseCommand
         if ($input->mustSuggestArgumentValuesFor('argument3')) {
             $suggestions->suggestValues($last);
         }
+        if ($input->mustSuggestOptionValuesFor('column-order')) {
+            $suggestions->suggestValues(['custom', 'native']);
+        }
     }
 
     protected function configure(): void
@@ -95,6 +100,13 @@ class CatCommand extends BaseCommand
                 'argument3',
                 InputArgument::OPTIONAL,
                 'Table name or SQL query to execute when argument2 is a config',
+            )
+            ->addOption(
+                'column-order',
+                'o',
+                InputOption::VALUE_REQUIRED,
+                'Column order: custom or native',
+                'custom',
             );
     }
 
@@ -103,6 +115,12 @@ class CatCommand extends BaseCommand
         $config1 = $input->getArgument('config1');
         $config2 = $input->getArgument('argument2');
         $argument3 = $input->getArgument('argument3');
+        $this->order = $input->getOption('column-order');
+        if (!in_array($this->order, ['custom', 'native'])) {
+            throw new InvalidArgumentException(
+                "Invalid value for column order. Must be 'custom' or 'native', got '$this->order'.",
+            );
+        }
 
         $path = realpath(__DIR__ . '/../../config');
         if (file_exists("$path/$config2.php")) {
@@ -144,7 +162,7 @@ class CatCommand extends BaseCommand
         if ($this->query) {
             $data = $this->db1->query($this->query);
         } else {
-            $data = $this->db1->getTableData($this->tableName);
+            $data = $this->db1->getTableData($this->tableName, $this->order);
         }
         $output->writeln(
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
@@ -160,8 +178,8 @@ class CatCommand extends BaseCommand
             $data1 = $this->db1->query($this->query);
             $data2 = $this->db2->query($this->query);
         } else {
-            $data1 = $this->db1->getTableData($this->tableName);
-            $data2 = $this->db2->getTableData($this->tableName);
+            $data1 = $this->db1->getTableData($this->tableName, $this->order);
+            $data2 = $this->db2->getTableData($this->tableName, $this->order);
         }
         file_put_contents(
             $a,

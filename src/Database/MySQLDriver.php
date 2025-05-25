@@ -195,10 +195,26 @@ class MySQLDriver extends AbstractServerDriver
         return $keys;
     }
 
-    function getTableData(string $table): array
+    function getTableData(string $table, string $order): array
     {
         $stmt = $this->pdo->query("SELECT * FROM `$table` ORDER BY id");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        if ($order === 'custom' && !empty($data)) {
+            $keys = array_column(
+                $this->getColumns($table, 'custom'),
+                'COLUMN_NAME',
+            );
+            $sorted = [];
+            foreach ($data as $row) {
+                $sortedRow = [];
+                foreach ($keys as $key) {
+                    $sortedRow[$key] = $row[$key];
+                }
+                $sorted[] = $sortedRow;
+            }
+            return $sorted;
+        }
+        return $data;
     }
 
     function getTableSchema(string $table): string

@@ -86,11 +86,11 @@ class DatabaseConnection
         }
     }
 
-    function getTableData(string $table): ?array
+    function getTableData(string $table, string $order): ?array
     {
         try {
             $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
-            return $this->driver->getTableData($table);
+            return $this->driver->getTableData($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
             return null;

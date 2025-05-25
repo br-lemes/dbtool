@@ -11,7 +11,7 @@ interface DatabaseDriver
     function exec(string $sql): int|false;
     function getColumns(string $table, string $order): array;
     function getKeys(string $table, string $order): array;
-    function getTableData(string $table): array;
+    function getTableData(string $table, string $order): array;
     function getTableSchema(string $table): string;
     function getTables(): array;
     function insertInto(string $table, array $data): void;
