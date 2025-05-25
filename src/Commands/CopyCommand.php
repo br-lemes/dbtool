@@ -26,7 +26,7 @@ class CopyCommand extends BaseCommand
         - Prompts for confirmation if table exists in destination
         - Drops and recreates table with source schema and copies all data
       - For different database types (e.g., MySQL to PostgreSQL):
-        - Requires identical column names and order in destination table
+        - Requires identical column names in destination table
         - Prompts for confirmation to clear existing data
         - Truncates existing data and copies data without altering table schema
       - Always transfers all data from source to destination
@@ -110,7 +110,7 @@ class CopyCommand extends BaseCommand
         } else {
             if (!$this->hasCompatibleSchema($tableName)) {
                 $output->writeln(
-                    'Table schemas are not compatible (column names or order differ).',
+                    'Table schemas are not compatible (column names differ).',
                 );
                 return Command::FAILURE;
             }
@@ -148,6 +148,8 @@ class CopyCommand extends BaseCommand
         }
         $names1 = array_column($columns1, 'COLUMN_NAME');
         $names2 = array_column($columns2, 'COLUMN_NAME');
+        sort($names1);
+        sort($names2);
         return $names1 === $names2;
     }
 }

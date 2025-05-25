@@ -217,7 +217,18 @@ class MySQLDriver extends AbstractServerDriver
     function insertInto(string $table, array $data): void
     {
         $batchSize = $this->config['batchSize'];
-        $columns = array_map(fn($col) => "`$col`", array_keys($data[0]));
+        $destColumns = array_column(
+            $this->getColumns($table, 'native'),
+            'COLUMN_NAME',
+        );
+        $columns = array_map(fn($col) => "`$col`", $destColumns);
+        $reorderedData = array_map(function ($row) use ($destColumns) {
+            $reordered = [];
+            foreach ($destColumns as $col) {
+                $reordered[$col] = $row[$col] ?? null;
+            }
+            return $reordered;
+        }, $data);
         $singlePlaceholders =
             '(' . implode(', ', array_fill(0, count($columns), '?')) . ')';
         $batchPlaceholders = implode(
@@ -232,7 +243,7 @@ class MySQLDriver extends AbstractServerDriver
             $batchPlaceholders;
 
         $values = [];
-        foreach ($data as $row) {
+        foreach ($reorderedData as $row) {
             foreach ($row as $value) {
                 $values[] = $value;
             }

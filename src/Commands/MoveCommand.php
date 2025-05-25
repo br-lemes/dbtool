@@ -29,7 +29,7 @@ class MoveCommand extends BaseCommand
         - Prompts if destination table exists
         - Copies schema and data, then drops source table
       - Across databases (different types, e.g., MySQL to PostgreSQL):
-        - Requires identical column names and order in destination
+        - Requires identical column names in destination table
         - Prompts to clear destination data
         - Copies data without altering destination schema, then drops source
     HELP;
@@ -148,7 +148,7 @@ class MoveCommand extends BaseCommand
         } else {
             if (!$this->hasCompatibleSchema($db1, $db2, $argument3)) {
                 $output->writeln(
-                    'Table schemas are not compatible (column names or order differ).',
+                    'Table schemas are not compatible (column names differ).',
                 );
                 return Command::FAILURE;
             }
@@ -191,6 +191,8 @@ class MoveCommand extends BaseCommand
         }
         $names1 = array_column($columns1, 'COLUMN_NAME');
         $names2 = array_column($columns2, 'COLUMN_NAME');
+        sort($names1);
+        sort($names2);
         return $names1 === $names2;
     }
 }

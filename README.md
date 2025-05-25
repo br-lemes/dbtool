@@ -126,8 +126,8 @@ Notes:
   - Prompts for confirmation if table exists in destination
   - Drops and recreates table with source schema and copies all data
 - For different database types (e.g., MySQL to PostgreSQL):
-  - Requires identical column names and order in destination table
-  - Verifies only column names and order, not column types
+  - Requires identical column names in destination table
+  - Verifies only column names, not column types
   - Prompts for confirmation to clear existing data, but copy may fail if types
     are incompatible
   - Truncates existing data and copies data without altering table schema
@@ -153,8 +153,8 @@ Notes:
   - Prompts for confirmation if destination table exists
   - Copies schema and data, then drops source table
 - Across databases (different types, e.g., MySQL to PostgreSQL):
-  - Requires identical column names and order in destination table
-  - Verifies only column names and order, not column types
+  - Requires identical column names in destination table
+  - Verifies only column names, not column types
   - Prompts for confirmation to clear existing data, but copy may fail if types
     are incompatible
   - Copies data without altering destination schema, then drops source table
