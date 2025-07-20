@@ -229,6 +229,20 @@ Notes:
 - Prompts for confirmation if table exists
 - Removes all data but preserves table structure and indexes
 
+### Migration Command (migration)
+
+Generates a Phinx migration file for a table.
+
+```bash
+# Generate migration for users table
+db migration config1 users
+```
+
+Notes:
+
+- Generates a Phinx migration file with timestamped filename
+- Includes columns, timestamps, unique constraints, and indexes
+
 ## Versioning
 
 DBTool uses semantic versioning based on commit messages:
