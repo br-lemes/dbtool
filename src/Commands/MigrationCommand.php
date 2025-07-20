@@ -14,11 +14,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MigrationCommand extends BaseCommand
 {
     private string $help = <<<HELP
-    Generates a Phinx migration file for one or more tables.
+    Generates a Phinx migration file for a table.
 
     Usage examples:
       <info>migration config1 users</info>           Generate migration for users table
-      <info>migration config1 users products</info>  Generate migration for users and products tables
 
     Notes:
       - Generates a Phinx migration file with timestamped filename
@@ -41,7 +40,7 @@ class MigrationCommand extends BaseCommand
                 ),
             );
         }
-        if ($input->mustSuggestArgumentValuesFor('tables')) {
+        if ($input->mustSuggestArgumentValuesFor('table')) {
             $config = $input->getArgument('config');
             $db = new DatabaseConnection($config);
             $suggestions->suggestValues($db->getTables());
@@ -59,34 +58,32 @@ class MigrationCommand extends BaseCommand
                 'Configuration file with database credentials',
             )
             ->addArgument(
-                'tables',
-                InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-                'Name of the table(s) to generate migration for',
+                'table',
+                InputArgument::REQUIRED,
+                'Name of the table to generate migration for',
             );
     }
 
     function exec(InputInterface $input, OutputInterface $output): int
     {
         $config = $input->getArgument('config');
-        $tables = $input->getArgument('tables');
+        $table = $input->getArgument('table');
 
         $this->db = new DatabaseConnection($config, $output);
 
-        foreach ($tables as $table) {
-            if (!$this->db->tableExists($table)) {
-                $output->writeln("Table '$table' does not exist.");
-                continue;
-            }
-            $timestamp = date('YmdHis', time());
-            $this->className = implode(
-                '',
-                array_map('ucfirst', explode('_', $table)),
-            );
-            $fileName = "{$timestamp}_{$table}.php";
-            $this->tableName = $table;
-            file_put_contents($fileName, $this->generateMigrationContent());
-            $output->writeln("Migration file created successfully: $fileName");
+        if (!$this->db->tableExists($table)) {
+            $output->writeln("Table '$table' does not exist.");
+            return Command::FAILURE;
         }
+        $timestamp = date('YmdHis', time());
+        $this->className = implode(
+            '',
+            array_map('ucfirst', explode('_', $table)),
+        );
+        $fileName = "{$timestamp}_{$table}.php";
+        $this->tableName = $table;
+        file_put_contents($fileName, $this->generateMigrationContent());
+        $output->writeln("Migration file created successfully: $fileName");
         return Command::SUCCESS;
     }
 
