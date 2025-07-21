@@ -48,6 +48,16 @@ class DumpCommand extends BaseCommand
             $db = new DatabaseConnection($config);
             $suggestions->suggestValues($db->getTables());
         }
+        if ($input->mustSuggestOptionValuesFor('output')) {
+            $currentValue = $input->getCompletionValue();
+            $files = glob("$currentValue*");
+            foreach ($files as $file) {
+                if (is_dir($file)) {
+                    $file .= '/';
+                }
+                $suggestions->suggestValue($file);
+            }
+        }
     }
 
     protected function configure(): void
