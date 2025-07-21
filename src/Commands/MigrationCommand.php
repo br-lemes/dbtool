@@ -116,7 +116,11 @@ class MigrationCommand extends BaseCommand
             }
         }
         $this->tableName = $table;
-        file_put_contents($fileName, $this->generateMigrationContent());
+        $content = $this->generateMigrationContent();
+        if (file_put_contents($fileName, $content) === false) {
+            return Command::FAILURE;
+        }
+
         $output->writeln("Migration file created successfully: $fileName");
         return Command::SUCCESS;
     }
