@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class MigrationCommand extends BaseCommand
 {
@@ -100,6 +101,19 @@ class MigrationCommand extends BaseCommand
         $fileName = $input->getOption('output') ?: "{$timestamp}_{$table}.php";
         if (!str_ends_with($fileName, '.php')) {
             $fileName .= '.php';
+        }
+        if (file_exists($fileName)) {
+            /** @var QuestionHelper $helper */
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion(
+                "File '$fileName' already exists. Do you want to overwrite it? (y/N) ",
+                false,
+            );
+
+            if (!$helper->ask($input, $output, $question)) {
+                $output->writeln('Operation cancelled.');
+                return Command::FAILURE;
+            }
         }
         $this->tableName = $table;
         file_put_contents($fileName, $this->generateMigrationContent());

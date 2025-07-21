@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class DumpCommand extends BaseCommand
 {
@@ -103,6 +104,20 @@ class DumpCommand extends BaseCommand
         ]);
 
         if ($outputFile) {
+            if (file_exists($outputFile)) {
+                /** @var QuestionHelper $helper */
+                $helper = $this->getHelper('question');
+                $question = new ConfirmationQuestion(
+                    "File '$outputFile' already exists. Do you want to overwrite it? (y/N) ",
+                    false,
+                );
+
+                if (!$helper->ask($input, $output, $question)) {
+                    $output->writeln('Operation cancelled.');
+                    return Command::FAILURE;
+                }
+            }
+
             $command .= ' > ' . escapeshellarg($outputFile);
         }
 
