@@ -9,6 +9,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigrationCommand extends BaseCommand
@@ -61,6 +62,12 @@ class MigrationCommand extends BaseCommand
                 'table',
                 InputArgument::REQUIRED,
                 'Name of the table to generate migration for',
+            )
+            ->addOption(
+                'output',
+                'o',
+                InputOption::VALUE_REQUIRED,
+                'Output file for the migration (default: timestamp_table.php)',
             );
     }
 
@@ -80,7 +87,10 @@ class MigrationCommand extends BaseCommand
             '',
             array_map('ucfirst', explode('_', $table)),
         );
-        $fileName = "{$timestamp}_{$table}.php";
+        $fileName = $input->getOption('output') ?: "{$timestamp}_{$table}.php";
+        if (!str_ends_with($fileName, '.php')) {
+            $fileName .= '.php';
+        }
         $this->tableName = $table;
         file_put_contents($fileName, $this->generateMigrationContent());
         $output->writeln("Migration file created successfully: $fileName");
