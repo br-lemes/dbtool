@@ -4,8 +4,9 @@
 /bun.lock
 /bun.lockb
 /composer.lock
-/config
+/config/*
 /coverage
 /dbtool.txt
 /node_modules
 /vendor
+!/config/test-*.php

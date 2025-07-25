@@ -48,6 +48,7 @@ abstract class AbstractServerDriver extends AbstractDatabaseDriver
     }
 
     abstract function buildDumpCommand(array $options = []): string;
+    abstract function buildRunCommand(string $script): string;
     abstract function dropTable(string $table): void;
     abstract function getColumns(string $table, string $order): array;
     abstract function getKeys(string $table, string $order): array;

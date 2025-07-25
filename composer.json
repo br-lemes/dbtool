@@ -11,7 +11,17 @@
         "phpunit/phpunit": "^12.0"
     },
     "scripts": {
-        "coverage": "phpunit --coverage-html coverage",
-        "test": "phpunit"
+        "coverage": [
+            "@docker:up",
+            "phpunit --coverage-html coverage",
+            "@docker:down"
+        ],
+        "docker:down": "docker compose down",
+        "docker:up": "docker compose up -d",
+        "test": [
+            "@docker:up",
+            "phpunit",
+            "@docker:down"
+        ]
     }
 }

@@ -30,35 +30,24 @@ class MySQLDriver extends AbstractServerDriver
 
     function buildDumpCommand(array $options = []): string
     {
-        $path = realpath(__DIR__ . '/../../config');
-        $cnfFile = "$path/{$this->config['configFile']}.cnf";
-        $host = $this->config['host'];
-        $port = $this->config['port'] ?? 3306;
-        $user = $this->config['username'];
-        $password = $this->config['password'] ?? '';
-        $cnfContent = <<<END
-        [client]
-        host=$host
-        port=$port
-        user=$user
-        password=$password
-        END;
-        file_put_contents($cnfFile, $cnfContent);
-        chmod($cnfFile, 0600);
-
-        $defaultsFile = escapeshellarg($cnfFile);
+        $defaultsFile = escapeshellarg($this->generateCnf());
         $schemaOnly = @$options['schemaOnly'] ? '-d' : '';
         $database = escapeshellarg($this->config['database']);
         $tableName = @$options['tableName']
             ? escapeshellarg($options['tableName'])
             : '';
-        $isMariaDB =
-            strpos(
-                $this->pdo->query('SELECT VERSION()')->fetchColumn(),
-                'MariaDB',
-            ) !== false;
-        $command = $isMariaDB ? 'mariadb-dump' : 'mysqldump';
+        $command = $this->isMariaDB() ? 'mariadb-dump' : 'mysqldump';
         $command .= " --defaults-file=$defaultsFile $schemaOnly $database $tableName";
+        return $command;
+    }
+
+    function buildRunCommand(string $script): string
+    {
+        $defaultsFile = escapeshellarg($this->generateCnf());
+        $script = escapeshellarg($script);
+        $database = escapeshellarg($this->config['database']);
+        $command = $this->isMariaDB() ? 'mariadb' : 'mysql';
+        $command .= " --defaults-file=$defaultsFile $database < $script";
         return $command;
     }
 
@@ -319,5 +308,33 @@ class MySQLDriver extends AbstractServerDriver
     function truncateTable(string $table): void
     {
         $this->pdo->exec("TRUNCATE TABLE `$table`");
+    }
+
+    private function generateCnf(): string
+    {
+        $path = realpath(__DIR__ . '/../../config');
+        $cnfFile = "$path/{$this->config['configFile']}.cnf";
+        $host = $this->config['host'];
+        $port = $this->config['port'] ?? 3306;
+        $user = $this->config['username'];
+        $password = $this->config['password'] ?? '';
+        $cnfContent = <<<END
+        [client]
+        host=$host
+        port=$port
+        user=$user
+        password=$password
+        END;
+        file_put_contents($cnfFile, $cnfContent);
+        chmod($cnfFile, 0600);
+        return $cnfFile;
+    }
+
+    private function isMariaDB(): bool
+    {
+        return strpos(
+            $this->pdo->query('SELECT VERSION()')->fetchColumn(),
+            'MariaDB',
+        ) !== false;
     }
 }

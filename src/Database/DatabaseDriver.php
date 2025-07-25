@@ -6,6 +6,7 @@ namespace DBTool\Database;
 interface DatabaseDriver
 {
     function buildDumpCommand(array $options = []): string;
+    function buildRunCommand(string $script): string;
     function connect(): void;
     function dropTable(string $table): void;
     function exec(string $sql): int|false;

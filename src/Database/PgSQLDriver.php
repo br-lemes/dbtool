@@ -35,19 +35,10 @@ class PgSQLDriver extends AbstractServerDriver
 
     function buildDumpCommand(array $options = []): string
     {
-        $path = realpath(__DIR__ . '/../../config');
-        $pgpassFile = "$path/{$this->config['configFile']}.pgpass";
-        $host = $this->config['host'];
-        $port = $this->config['port'] ?? 5432;
-        $user = $this->config['username'];
-        $password = $this->config['password'] ?? '';
-        $pgpassContent = "$host:$port:{$this->config['database']}:$user:$password";
-        file_put_contents($pgpassFile, $pgpassContent);
-        chmod($pgpassFile, 0600);
-
-        $host = escapeshellarg($host);
-        $port = escapeshellarg((string) $port);
-        $user = escapeshellarg($user);
+        $pgpassFile = $this->generatePgpass();
+        $host = escapeshellarg($this->config['host']);
+        $port = escapeshellarg((string) $this->config['port'] ?? 5432);
+        $user = escapeshellarg($this->config['username']);
         $database = escapeshellarg($this->config['database']);
         $schema = escapeshellarg($this->config['schema'] ?? 'public');
         $schemaOnly = @$options['schemaOnly'] ? '-s' : '';
@@ -57,6 +48,19 @@ class PgSQLDriver extends AbstractServerDriver
         $command = 'PGPASSFILE=' . escapeshellarg($pgpassFile) . ' pg_dump ';
         $command .= "-h $host -p $port -U $user -d $database -n $schema";
         $command .= " $schemaOnly $tableName";
+        return $command;
+    }
+
+    function buildRunCommand(string $script): string
+    {
+        $pgpassFile = $this->generatePgpass();
+        $script = escapeshellarg($script);
+        $host = escapeshellarg($this->config['host']);
+        $port = escapeshellarg((string) $this->config['port'] ?? 5432);
+        $user = escapeshellarg($this->config['username']);
+        $database = escapeshellarg($this->config['database']);
+        $command = 'PGPASSFILE=' . escapeshellarg($pgpassFile) . ' psql ';
+        $command .= "-h $host -p $port -U $user -d $database -f $script";
         return $command;
     }
 
@@ -485,5 +489,19 @@ class PgSQLDriver extends AbstractServerDriver
         $this->pdo->exec(
             "TRUNCATE TABLE \"{$this->config['schema']}\".\"$table\"",
         );
+    }
+
+    private function generatePgpass(): string
+    {
+        $path = realpath(__DIR__ . '/../../config');
+        $pgpassFile = "$path/{$this->config['configFile']}.pgpass";
+        $host = $this->config['host'];
+        $port = $this->config['port'] ?? 5432;
+        $user = $this->config['username'];
+        $password = $this->config['password'] ?? '';
+        $pgpassContent = "$host:$port:{$this->config['database']}:$user:$password";
+        file_put_contents($pgpassFile, $pgpassContent);
+        chmod($pgpassFile, 0600);
+        return $pgpassFile;
     }
 }

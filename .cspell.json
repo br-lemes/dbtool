@@ -1,8 +1,6 @@
 {
     "language": "en,pt-br",
-    "ignorePaths": [
-        "config/*"
-    ],
+    "ignorePaths": ["config/*"],
     "ignoreRegExpList": [
         // cSpell: disable
         // cSpell: enable
@@ -28,6 +26,7 @@
         "mariadb",
         "mediumint",
         "mediumtext",
+        "mysql",
         "mysqldump",
         "nextval",
         "nspname",
@@ -36,6 +35,8 @@
         "PGPASSFILE",
         "phinx",
         "phpunit",
+        "postgres",
+        "psql",
         "relname",
         "relnamespace",
         "smallinteger",

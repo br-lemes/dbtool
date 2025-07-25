@@ -243,6 +243,22 @@ Notes:
 - Generates a Phinx migration file with timestamped filename
 - Includes columns, timestamps, unique constraints, and indexes
 
+### Run Command (run)
+
+Execute an SQL file (including dumps restores) on a database.
+
+```bash
+# Execute script.sql on the config1 database
+db run config1 script.sql
+# Execute (restore) dump.sql
+db run config1 dump.sql
+```
+
+Notes:
+
+- Requires mysql for MySQL or psql for PostgreSQL to be installed
+- The SQL file must be compatible with the target database
+
 ## Versioning
 
 DBTool uses semantic versioning based on commit messages:

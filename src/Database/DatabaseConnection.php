@@ -44,6 +44,11 @@ class DatabaseConnection
         return $this->driver->buildDumpCommand($options);
     }
 
+    function buildRunCommand(string $script): string
+    {
+        return $this->driver->buildRunCommand($script);
+    }
+
     function dropTable(string $table): void
     {
         try {
