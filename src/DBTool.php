@@ -11,6 +11,7 @@ use DBTool\Commands\ListCommand;
 use DBTool\Commands\MigrationCommand;
 use DBTool\Commands\MoveCommand;
 use DBTool\Commands\RemoveCommand;
+use DBTool\Commands\RmAllCommand;
 use DBTool\Commands\RunCommand;
 use DBTool\Commands\TruncateCommand;
 use Symfony\Component\Console\Application;
@@ -28,6 +29,7 @@ class DBTool extends Application
         $this->add(new MigrationCommand());
         $this->add(new MoveCommand());
         $this->add(new RemoveCommand());
+        $this->add(new RmAllCommand());
         $this->add(new RunCommand());
         $this->add(new TruncateCommand());
     }

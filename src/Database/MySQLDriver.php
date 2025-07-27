@@ -51,6 +51,13 @@ class MySQLDriver extends AbstractServerDriver
         return $command;
     }
 
+    function dropAll(): void
+    {
+        $database = $this->config['database'];
+        $this->pdo->exec("DROP DATABASE IF EXISTS `$database`");
+        $this->pdo->exec("CREATE DATABASE `$database`");
+    }
+
     function dropTable(string $table): void
     {
         $this->pdo->exec("DROP TABLE IF EXISTS `$table`");

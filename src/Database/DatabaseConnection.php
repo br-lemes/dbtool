@@ -49,6 +49,15 @@ class DatabaseConnection
         return $this->driver->buildRunCommand($script);
     }
 
+    function dropAll(): void
+    {
+        try {
+            $this->driver->dropAll();
+        } catch (PDOException $e) {
+            $this->error('Error dropping all tables', $e);
+        }
+    }
+
     function dropTable(string $table): void
     {
         try {

@@ -64,6 +64,13 @@ class PgSQLDriver extends AbstractServerDriver
         return $command;
     }
 
+    function dropAll(): void
+    {
+        $schema = $this->config['schema'];
+        $this->pdo->exec("DROP SCHEMA IF EXISTS \"$schema\" CASCADE");
+        $this->pdo->exec("CREATE SCHEMA \"$schema\"");
+    }
+
     function dropTable(string $table): void
     {
         $this->pdo->exec(

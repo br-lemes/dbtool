@@ -8,6 +8,7 @@ interface DatabaseDriver
     function buildDumpCommand(array $options = []): string;
     function buildRunCommand(string $script): string;
     function connect(): void;
+    function dropAll(): void;
     function dropTable(string $table): void;
     function exec(string $sql): int|false;
     function getColumns(string $table, string $order): array;

@@ -213,6 +213,20 @@ Notes:
 - Prompts for confirmation if table exists
 - Permanently deletes the table and all its data
 
+### Remove All Command (rm-all)
+
+Removes all tables from a database.
+
+```bash
+# Remove all tables from the database specified
+db rm-all config1
+```
+
+Notes:
+
+- Prompts for confirmation before removing tables
+- Permanently deletes all tables and their data
+
 ### Truncate Command (truncate)
 
 Truncates all data from a table, keeping its schema intact.
