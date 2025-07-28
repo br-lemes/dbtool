@@ -1,0 +1,25 @@
+{
+    "columns": [
+        {
+            "CHARACTER_MAXIMUM_LENGTH": null,
+            "COLUMN_DEFAULT": null,
+            "COLUMN_NAME": "id",
+            "DATA_TYPE": "BIGINT",
+            "IS_AUTO_INCREMENT": "YES",
+            "IS_DEFAULT_TIMESTAMP": "NO",
+            "IS_NULLABLE": "NO",
+            "IS_UPDATE_TIMESTAMP": "NO",
+            "NUMERIC_PRECISION": null,
+            "NUMERIC_SCALE": null
+        }
+    ],
+    "keys": [
+        {
+            "KEY_TYPE": "PRIMARY",
+            "KEY_NAME": "PRIMARY",
+            "COLUMN_NAME": "id",
+            "IS_COMPOSITE": "NO",
+            "KEY_POSITION": 1
+        }
+    ]
+}
