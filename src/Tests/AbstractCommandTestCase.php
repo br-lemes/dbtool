@@ -21,17 +21,21 @@ abstract class AbstractCommandTestCase extends KernelTestCase
 
         $test = $this->exec('rm-all', ['config' => 'test-mysql'], ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
         $test = $this->exec('run', [
             'config' => 'test-mysql',
-            'script' => 'test-mysql.sql',
+            'script' => __DIR__ . '/test-mysql.sql',
         ]);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
         $test = $this->exec('rm-all', ['config' => 'test-pgsql'], ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
         $test = $this->exec('run', [
             'config' => 'test-pgsql',
-            'script' => 'test-pgsql.sql',
+            'script' => __DIR__ . '/test-pgsql.sql',
         ]);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
     }
 
     function exec(string $name, array $args, array $inputs = []): CommandTester
