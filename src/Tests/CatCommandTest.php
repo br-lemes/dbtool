@@ -7,7 +7,7 @@ use Symfony\Component\Console\Command\Command;
 
 final class CatCommandTest extends AbstractCommandTestCase
 {
-    function testList(): void
+    function testCommand(): void
     {
         $args = ['config1' => 'test-mysql'];
         $sql =
