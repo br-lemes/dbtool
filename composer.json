@@ -8,8 +8,7 @@
         "symfony/console": "^7.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^12.0",
-        "symfony/framework-bundle": "^7.3"
+        "phpunit/phpunit": "^12.0"
     },
     "scripts": {
         "coverage": "phpunit --coverage-html coverage",

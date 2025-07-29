@@ -3,12 +3,13 @@
 namespace DBTool\Tests;
 
 use DBTool\DBTool;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
-abstract class AbstractCommandTestCase extends KernelTestCase
+abstract class AbstractCommandTestCase extends TestCase
 {
     protected Application $application;
 
@@ -16,8 +17,7 @@ abstract class AbstractCommandTestCase extends KernelTestCase
     {
         parent::setUp();
 
-        $kernel = static::createKernel();
-        $this->application = new DBTool($kernel);
+        $this->application = new DBTool();
 
         $test = $this->exec('rm-all', ['config' => 'test-mysql'], ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
