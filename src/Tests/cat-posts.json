@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "user_id": 1,
+        "content": "This is the content of my first post.",
+        "publish_date": "2025-07-24",
+        "title": "My First Post",
+        "created_at": "2025-07-24 09:10:00"
+    },
+    {
+        "id": 2,
+        "user_id": 1,
+        "content": "More content here.",
+        "publish_date": null,
+        "title": "Another Post",
+        "created_at": "2025-07-24 09:20:00"
+    },
+    {
+        "id": 3,
+        "user_id": 2,
+        "content": "Jane shares her thoughts.",
+        "publish_date": "2025-07-25",
+        "title": "Jane's Blog",
+        "created_at": "2025-07-24 09:25:00"
+    }
+]
