@@ -14,4 +14,9 @@ final class RmAllCommandTest extends AbstractCommandTestCase
         $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
         $this->assertTrue($cancel);
     }
+
+    function testComplete(): void
+    {
+        $this->assertCompleteDatabase('rm-all', ['']);
+    }
 }

@@ -38,6 +38,43 @@ abstract class AbstractCommandTestCase extends TestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
     }
 
+    function assertCompleteContains(
+        string $name,
+        array $input,
+        array $values,
+    ): void {
+        $actual = $this->complete($name, $input);
+        foreach ($values as $value) {
+            $this->assertContains($value, $actual);
+        }
+    }
+
+    function assertCompleteDatabase(string $name, array $input): void
+    {
+        $this->assertCompleteContains($name, $input, [
+            'test-mysql',
+            'test-pgsql',
+        ]);
+    }
+
+    function assertCompleteEquals(
+        string $name,
+        array $input,
+        array $values,
+    ): void {
+        $actual = $this->complete($name, $input);
+        $this->assertEquals($values, $actual);
+    }
+
+    function complete(string $name, array $input): array
+    {
+        $command = $this->application->find($name);
+        $command->setApplication($this->application);
+
+        $tester = new CommandCompletionTester($command);
+        return $tester->complete($input);
+    }
+
     function exec(string $name, array $args, array $inputs = []): CommandTester
     {
         $command = $this->application->find($name);

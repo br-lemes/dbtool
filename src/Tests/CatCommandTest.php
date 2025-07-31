@@ -52,4 +52,20 @@ final class CatCommandTest extends AbstractCommandTestCase
         $output = json_decode($test->getDisplay(), true);
         $this->assertEquals($catCompareQuery, $output);
     }
+
+    function testComplete(): void
+    {
+        $this->assertCompleteDatabase('cat', ['']);
+        $this->assertCompleteEquals('cat', ['-o', ''], ['custom', 'native']);
+        $this->assertCompleteContains(
+            'cat',
+            ['test-mysql', ''],
+            ['test-mysql', 'test-pgsql', 'posts', 'users'],
+        );
+        $this->assertCompleteEquals(
+            'cat',
+            ['test-mysql', 'test-pgsql', ''],
+            ['posts', 'users'],
+        );
+    }
 }

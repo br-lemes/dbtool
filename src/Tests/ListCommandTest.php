@@ -43,4 +43,20 @@ final class ListCommandTest extends AbstractCommandTestCase
         $output = json_decode($test->getDisplay(), true);
         $this->assertEquals($lsPostsId, $output);
     }
+
+    function testComplete(): void
+    {
+        $this->assertCompleteDatabase('ls', ['']);
+        $this->assertCompleteEquals('ls', ['-o', ''], ['custom', 'native']);
+        $this->assertCompleteEquals(
+            'ls',
+            ['test-mysql', ''],
+            ['posts', 'users'],
+        );
+        $this->assertCompleteEquals(
+            'ls',
+            ['test-mysql', 'posts', ''],
+            ['id', 'user_id', 'content', 'publish_date', 'title', 'created_at'],
+        );
+    }
 }
