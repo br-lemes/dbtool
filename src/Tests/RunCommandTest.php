@@ -15,8 +15,11 @@ final class RunCommandTest extends AbstractCommandTestCase
         );
         $this->assertCompleteEquals(
             'run',
-            ['test-mysql', 'src/Tests/'],
-            ['src/Tests/test-mysql.sql', 'src/Tests/test-pgsql.sql'],
+            ['test-mysql', 'src/Tests/fixture/'],
+            [
+                'src/Tests/fixture/test-mysql.sql',
+                'src/Tests/fixture/test-pgsql.sql',
+            ],
         );
     }
 }

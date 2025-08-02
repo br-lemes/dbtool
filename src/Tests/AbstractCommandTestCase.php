@@ -24,7 +24,7 @@ abstract class AbstractCommandTestCase extends TestCase
 
         $test = $this->exec('run', [
             'config' => 'test-mysql',
-            'script' => __DIR__ . '/test-mysql.sql',
+            'script' => __DIR__ . '/fixture/test-mysql.sql',
         ]);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
@@ -33,7 +33,7 @@ abstract class AbstractCommandTestCase extends TestCase
 
         $test = $this->exec('run', [
             'config' => 'test-pgsql',
-            'script' => __DIR__ . '/test-pgsql.sql',
+            'script' => __DIR__ . '/fixture/test-pgsql.sql',
         ]);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
     }

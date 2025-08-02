@@ -9,9 +9,9 @@ final class ListCommandTest extends AbstractCommandTestCase
 {
     function testCommand(): void
     {
-        $ls = __DIR__ . '/ls.json';
-        $lsPosts = __DIR__ . '/ls-posts.json';
-        $lsPostsId = __DIR__ . '/ls-posts-id.json';
+        $ls = __DIR__ . '/expected/ls.json';
+        $lsPosts = __DIR__ . '/expected/ls-posts.json';
+        $lsPostsId = __DIR__ . '/expected/ls-posts-id.json';
         $ls = file_get_contents($ls);
         $lsPosts = file_get_contents($lsPosts);
         $lsPostsId = file_get_contents($lsPostsId);

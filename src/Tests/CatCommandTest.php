@@ -13,10 +13,10 @@ final class CatCommandTest extends AbstractCommandTestCase
         $sql =
             'SELECT p.id, p.title, u.name FROM posts AS p JOIN users AS u ON p.user_id = u.id';
 
-        $catPosts = __DIR__ . '/cat-posts.json';
-        $catQuery = __DIR__ . '/cat-query.json';
-        $catComparePosts = __DIR__ . '/cat-compare-posts.json';
-        $catCompareQuery = __DIR__ . '/cat-compare-query.json';
+        $catPosts = __DIR__ . '/expected/cat-posts.json';
+        $catQuery = __DIR__ . '/expected/cat-query.json';
+        $catComparePosts = __DIR__ . '/expected/cat-compare-posts.json';
+        $catCompareQuery = __DIR__ . '/expected/cat-compare-query.json';
         $catPosts = file_get_contents($catPosts);
         $catQuery = file_get_contents($catQuery);
         $catComparePosts = file_get_contents($catComparePosts);
