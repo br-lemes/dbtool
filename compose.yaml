@@ -1,4 +1,16 @@
 services:
+    mariadb:
+        environment:
+            - MYSQL_DATABASE=test_db
+            - MYSQL_ROOT_PASSWORD=root_password
+        healthcheck:
+            interval: 10s
+            retries: 5
+            test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost']
+            timeout: 5s
+        image: mariadb:latest
+        ports:
+            - '13306:3306'
     mysql:
         environment:
             - MYSQL_DATABASE=test_db
@@ -10,7 +22,7 @@ services:
             timeout: 5s
         image: mysql:latest
         ports:
-            - '13306:3306'
+            - '23306:3306'
     postgres:
         environment:
             - POSTGRES_HOST=localhost

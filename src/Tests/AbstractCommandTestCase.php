@@ -18,22 +18,20 @@ abstract class AbstractCommandTestCase extends TestCase
         parent::setUp();
 
         $this->application = new DBTool();
+        foreach (['mariadb', 'mysql', 'pgsql'] as $database) {
+            $this->setupDatabases($database);
+        }
+    }
 
-        $test = $this->exec('rm-all', ['config' => 'test-mysql'], ['y']);
+    function setupDatabases(string $database): void
+    {
+        $test = $this->exec('rm-all', ['config' => "test-$database"], ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
+        $fixture = $database === 'pgsql' ? 'test-pgsql.sql' : 'test-mysql.sql';
         $test = $this->exec('run', [
-            'config' => 'test-mysql',
-            'script' => __DIR__ . '/fixture/test-mysql.sql',
-        ]);
-        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-
-        $test = $this->exec('rm-all', ['config' => 'test-pgsql'], ['y']);
-        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-
-        $test = $this->exec('run', [
-            'config' => 'test-pgsql',
-            'script' => __DIR__ . '/fixture/test-pgsql.sql',
+            'config' => "test-$database",
+            'script' => __DIR__ . "/fixture/$fixture",
         ]);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
     }
