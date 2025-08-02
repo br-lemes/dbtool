@@ -31,13 +31,15 @@ class MySQLDriver extends AbstractServerDriver
     function buildDumpCommand(array $options = []): string
     {
         $defaultsFile = escapeshellarg($this->generateCnf());
+        $compact = @$options['compact'] ? '--compact' : '';
         $schemaOnly = @$options['schemaOnly'] ? '-d' : '';
         $database = escapeshellarg($this->config['database']);
         $tableName = @$options['tableName']
             ? escapeshellarg($options['tableName'])
             : '';
         $command = $this->isMariaDB() ? 'mariadb-dump' : 'mysqldump';
-        $command .= " --defaults-file=$defaultsFile $schemaOnly $database $tableName";
+        $command .= " --defaults-file=$defaultsFile";
+        $command .= " $compact $schemaOnly $database $tableName";
         return $command;
     }
 

@@ -79,16 +79,22 @@ class DumpCommand extends BaseCommand
                 'Name of the table to dump',
             )
             ->addOption(
-                'schema-only',
-                's',
+                'compact',
+                'c',
                 InputOption::VALUE_NONE,
-                'Dump only the schema without data',
+                'Use --compact option for mysqldump',
             )
             ->addOption(
                 'output',
                 'o',
                 InputOption::VALUE_REQUIRED,
                 'Output file for the dump (default: stdout)',
+            )
+            ->addOption(
+                'schema-only',
+                's',
+                InputOption::VALUE_NONE,
+                'Dump only the schema without data',
             );
     }
 
@@ -99,8 +105,9 @@ class DumpCommand extends BaseCommand
         $outputFile = $input->getOption('output');
 
         $command = $db->buildDumpCommand([
-            'tableName' => $input->getArgument('table'),
+            'compact' => $input->getOption('compact'),
             'schemaOnly' => $input->getOption('schema-only'),
+            'tableName' => $input->getArgument('table'),
         ]);
 
         if ($outputFile) {
