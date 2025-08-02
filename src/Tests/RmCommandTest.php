@@ -7,7 +7,7 @@ use Symfony\Component\Console\Command\Command;
 
 final class RmCommandTest extends AbstractCommandTestCase
 {
-    public function testCommand(): void
+    function testCommand(): void
     {
         $args = ['config' => 'test-mysql', 'table' => 'uses'];
         $test = $this->exec('rm', $args);
