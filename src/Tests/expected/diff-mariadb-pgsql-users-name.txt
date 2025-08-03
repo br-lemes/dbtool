@@ -1,0 +1,17 @@
+[1m[93m/home/breno/src/dbtool/.b.json[39m[0m[2m --- JSON[0m
+[2m 3 [0m        {                                     [2m 3 [0m        {
+[2m 4 [0m            [95m"CHARACTER_MAXIMUM_LENGTH"[0m: 100,  [2m 4 [0m            [95m"CHARACTER_MAXIMUM_LENGTH"[0m: 100,
+[2m 5 [0m            [95m"COLUMN_DEFAULT"[0m: [1mnull[0m,           [2m 5 [0m            [95m"COLUMN_DEFAULT"[0m: [1mnull[0m,
+[2m 6 [0m            [95m"COLUMN_NAME"[0m: [95m"name"[0m,            [2m 6 [0m            [95m"COLUMN_NAME"[0m: [95m"name"[0m,
+[2m 7 [0m            [95m"DATA_TYPE"[0m: [95m"VARCHAR"[0m,           [2m 7 [0m            [95m"DATA_TYPE"[0m: [95m"VARCHAR"[0m,
+[2m 8 [0m            [95m"IS_AUTO_INCREMENT"[0m: [95m"NO"[0m,        [2m 8 [0m            [95m"IS_AUTO_INCREMENT"[0m: [95m"NO"[0m,
+[2m 9 [0m            [95m"IS_DEFAULT_TIMESTAMP"[0m: [95m"NO"[0m,     [2m 9 [0m            [95m"IS_DEFAULT_TIMESTAMP"[0m: [95m"NO"[0m,
+[91;1m10 [0m            [95m"IS_NULLABLE"[0m: [91m"YES"[0m,             [92;1m10 [0m            [95m"IS_NULLABLE"[0m: [92m"NO"[0m,
+[2m11 [0m            [95m"IS_UPDATE_TIMESTAMP"[0m: [95m"NO"[0m,      [2m11 [0m            [95m"IS_UPDATE_TIMESTAMP"[0m: [95m"NO"[0m,
+[2m12 [0m            [95m"NUMERIC_PRECISION"[0m: [1mnull[0m,        [2m12 [0m            [95m"NUMERIC_PRECISION"[0m: [1mnull[0m,
+[2m13 [0m            [95m"NUMERIC_SCALE"[0m: [1mnull[0m             [2m13 [0m            [95m"NUMERIC_SCALE"[0m: [1mnull[0m
+[2m14 [0m        }                                     [2m14 [0m        }
+[2m15 [0m    ],                                        [2m15 [0m    ],
+[2m16 [0m    [95m"keys"[0m: []                                [2m16 [0m    [95m"keys"[0m: []
+[2m17 [0m}                                             [2m17 [0m}
+
