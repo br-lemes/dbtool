@@ -23,7 +23,7 @@ abstract class AbstractCommandTestCase extends TestCase
         }
     }
 
-    function setupDatabases(string $database): void
+    private function setupDatabases(string $database): void
     {
         $test = $this->exec('rm-all', ['config' => "test-$database"], ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
