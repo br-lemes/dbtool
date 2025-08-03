@@ -83,17 +83,10 @@
         },
         {
             "KEY_TYPE": "INDEX",
-            "KEY_NAME": "posts_user_id_title_idx",
+            "KEY_NAME": "user_id",
             "COLUMN_NAME": "user_id",
-            "IS_COMPOSITE": "YES",
+            "IS_COMPOSITE": "NO",
             "KEY_POSITION": 1
-        },
-        {
-            "KEY_TYPE": "INDEX",
-            "KEY_NAME": "posts_user_id_title_idx",
-            "COLUMN_NAME": "title",
-            "IS_COMPOSITE": "YES",
-            "KEY_POSITION": 2
         }
     ]
 }

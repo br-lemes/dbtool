@@ -17,6 +17,7 @@ final class RunCommandTest extends AbstractCommandTestCase
             'run',
             ['test-mysql', 'src/Tests/fixture/'],
             [
+                'src/Tests/fixture/test-mariadb.sql',
                 'src/Tests/fixture/test-mysql.sql',
                 'src/Tests/fixture/test-pgsql.sql',
             ],

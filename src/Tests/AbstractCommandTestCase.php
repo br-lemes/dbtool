@@ -28,10 +28,9 @@ abstract class AbstractCommandTestCase extends TestCase
         $test = $this->exec('rm-all', ['config' => "test-$database"], ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
-        $fixture = $database === 'pgsql' ? 'test-pgsql.sql' : 'test-mysql.sql';
         $test = $this->exec('run', [
             'config' => "test-$database",
-            'script' => __DIR__ . "/fixture/$fixture",
+            'script' => __DIR__ . "/fixture/test-$database.sql",
         ]);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
     }

@@ -5,26 +5,23 @@ SET search_path TO public;
 CREATE TABLE public.users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    CONSTRAINT users_email_unique UNIQUE (email)
+    updated_at TIMESTAMP
 );
-
-CREATE INDEX users_name_idx ON public.users (name);
 
 -- Create table: posts
 CREATE TABLE public.posts (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES public.users(id),
+    user_id BIGINT NOT NULL,
     title VARCHAR(200) NOT NULL,
     content TEXT,
     publish_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX posts_user_id_title_idx ON public.posts (user_id, title);
+CREATE INDEX posts_user_id ON public.posts (user_id);
 
 -- Insert data into users
 INSERT INTO public.users (name, email, password_hash, created_at, updated_at) VALUES

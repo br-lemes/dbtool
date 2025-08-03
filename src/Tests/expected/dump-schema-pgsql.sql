@@ -66,11 +66,11 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- Name: users users_email_unique; Type: CONSTRAINT; Schema: public; Owner: test_user
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: test_user
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_email_unique UNIQUE (email);
+    ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
 --
@@ -79,13 +79,6 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
-
---
--- Name: users_name_idx; Type: INDEX; Schema: public; Owner: test_user
---
-
-CREATE INDEX users_name_idx ON public.users USING btree (name);
 
 
 --
