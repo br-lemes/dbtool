@@ -1,13 +1,20 @@
 {
-    "language": "en,pt-br",
-    "ignorePaths": ["config/*"],
+    "ignorePaths": [
+        "config/*",
+        "coverage/*",
+        "src/Tests/expected/*",
+        "vendor/*"
+    ],
     "ignoreRegExpList": [
         // cSpell: disable
         // cSpell: enable
     ],
+    "import": ["@cspell/dict-pt-br/cspell-ext.json"],
+    "language": "en,pt-br",
     "words": [
         "attname",
         "attnum",
+        "ATTR_ERRMODE",
         "attrelid",
         "autoload",
         "biginteger",
@@ -15,7 +22,7 @@
         "dbtool",
         "difft",
         "Difftastic",
-        "ERRMODE",
+        "ERRMODE_EXCEPTION",
         "healthcheck",
         "indexrelid",
         "indisprimary",
