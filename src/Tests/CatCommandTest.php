@@ -15,16 +15,14 @@ final class CatCommandTest extends AbstractCommandTestCase
 
         $catPosts = __DIR__ . '/expected/cat-posts.json';
         $catQuery = __DIR__ . '/expected/cat-query.json';
-        $catComparePosts = __DIR__ . '/expected/cat-compare-posts.json';
-        $catCompareQuery = __DIR__ . '/expected/cat-compare-query.json';
+        $catComparePosts = __DIR__ . '/expected/cat-compare-posts.txt';
+        $catCompareQuery = __DIR__ . '/expected/cat-compare-query.txt';
         $catPosts = file_get_contents($catPosts);
         $catQuery = file_get_contents($catQuery);
         $catComparePosts = file_get_contents($catComparePosts);
         $catCompareQuery = file_get_contents($catCompareQuery);
         $catPosts = json_decode($catPosts, true);
         $catQuery = json_decode($catQuery, true);
-        $catComparePosts = json_decode($catComparePosts, true);
-        $catCompareQuery = json_decode($catCompareQuery, true);
 
         $args['argument2'] = 'posts';
         $test = $this->exec('cat', $args);
@@ -43,14 +41,12 @@ final class CatCommandTest extends AbstractCommandTestCase
         $args['argument3'] = 'posts';
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($catComparePosts, $output);
+        $this->assertEquals($catComparePosts, $test->getDisplay());
 
         $args['argument3'] = $sql;
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($catCompareQuery, $output);
+        $this->assertEquals($catCompareQuery, $test->getDisplay());
     }
 
     function testComplete(): void
