@@ -193,7 +193,7 @@ class DiffCommand extends BaseCommand
             $keys1 = array_values(
                 array_filter(
                     $keys1,
-                    fn(array $key) => $key['KEY_NAME'] === $this->fieldName ||
+                    fn(array $key) => @$key['KEY_NAME'] === $this->fieldName ||
                         $key['COLUMN_NAME'] === $this->fieldName,
                 ),
             );
@@ -207,7 +207,7 @@ class DiffCommand extends BaseCommand
             $keys2 = array_values(
                 array_filter(
                     $keys2,
-                    fn(array $key) => $key['KEY_NAME'] === $this->fieldName ||
+                    fn(array $key) => @$key['KEY_NAME'] === $this->fieldName ||
                         $key['COLUMN_NAME'] === $this->fieldName,
                 ),
             );
