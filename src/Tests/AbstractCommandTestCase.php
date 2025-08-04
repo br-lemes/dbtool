@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace DBTool\Tests;
 
@@ -49,6 +50,7 @@ abstract class AbstractCommandTestCase extends TestCase
     function assertCompleteDatabase(string $name, array $input): void
     {
         $this->assertCompleteContains($name, $input, [
+            'test-mariadb',
             'test-mysql',
             'test-pgsql',
         ]);
