@@ -144,7 +144,7 @@ class DumpCommand extends BaseCommand
         if ($outputFile) {
             $output->writeln("Database dumped successfully to '$outputFile'.");
         } else {
-            $output->write(implode("\n", $commandOutput));
+            $output->write(implode("\n", $commandOutput) . "\n");
         }
         return Command::SUCCESS;
     }
