@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 
 final class DiffCommandTest extends AbstractCommandTestCase
@@ -44,6 +45,13 @@ final class DiffCommandTest extends AbstractCommandTestCase
         $test = $this->exec('diff', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertEquals($expected, $test->getDisplay());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            "Invalid value for column order. Must be 'custom' or 'native', got 'invalid'.",
+        );
+        $args['--column-order'] = 'invalid';
+        $this->exec('diff', $args);
     }
 
     function testComplete(): void
@@ -62,5 +70,16 @@ final class DiffCommandTest extends AbstractCommandTestCase
             ['test-mysql', 'test-pgsql', 'posts', ''],
             ['id', 'user_id', 'content', 'publish_date', 'title', 'created_at'],
         );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            "Invalid value for ignore-length. Must be 'yes' or 'no', got 'invalid'.",
+        );
+        $args = [
+            'config1' => 'test-mysql',
+            'config2' => 'test-pgsql',
+            '--ignore-length' => 'invalid',
+        ];
+        $this->exec('diff', $args);
     }
 }

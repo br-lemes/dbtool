@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 
 final class CatCommandTest extends AbstractCommandTestCase
@@ -47,6 +48,13 @@ final class CatCommandTest extends AbstractCommandTestCase
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertEquals($catCompareQuery, $test->getDisplay());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            "Invalid value for column order. Must be 'custom' or 'native', got 'invalid'.",
+        );
+        $args['--column-order'] = 'invalid';
+        $this->exec('cat', $args);
     }
 
     function testComplete(): void
@@ -63,5 +71,12 @@ final class CatCommandTest extends AbstractCommandTestCase
             ['test-mysql', 'test-pgsql', ''],
             ['posts', 'users'],
         );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'When argument2 is a config, argument3 is required',
+        );
+        $args = ['config1' => 'test-mysql', 'argument2' => 'test-pgsql'];
+        $this->exec('cat', $args);
     }
 }

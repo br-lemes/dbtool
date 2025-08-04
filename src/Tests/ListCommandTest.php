@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 
 final class ListCommandTest extends AbstractCommandTestCase
@@ -42,6 +43,14 @@ final class ListCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $output = json_decode($test->getDisplay(), true);
         $this->assertEquals($lsPostsId, $output);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            "Invalid value for column order. Must be 'custom' or 'native', got 'invalid'.",
+        );
+
+        $args = ['config' => 'test-pgsql', '--column-order' => 'invalid'];
+        $this->exec('ls', $args);
     }
 
     function testComplete(): void
