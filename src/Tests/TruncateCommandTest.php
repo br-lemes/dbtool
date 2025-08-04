@@ -14,7 +14,20 @@ final class TruncateCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertNotEquals('[]', $test->getDisplay());
 
-        $args = ['config' => 'test-mysql', 'table' => 'posts'];
+        $args = ['config' => 'test-mysql', 'table' => 'postagens'];
+        $test = $this->exec('truncate', $args);
+        $this->assertEquals(Command::FAILURE, $test->getStatusCode());
+        $this->assertEquals(
+            "Table 'postagens' does not exist.\n",
+            $test->getDisplay(),
+        );
+
+        $args['table'] = 'posts';
+        $test = $this->exec('truncate', $args);
+        $this->assertEquals(Command::FAILURE, $test->getStatusCode());
+        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $this->assertTrue($cancel);
+
         $test = $this->exec('truncate', $args, ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
