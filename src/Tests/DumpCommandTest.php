@@ -53,6 +53,16 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $actual = file_get_contents($dumpFile);
         $this->assertEquals($expected, $actual);
 
+        $test = $this->exec('dump', $args);
+        $this->assertEquals(Command::FAILURE, $test->getStatusCode());
+        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $this->assertTrue($cancel);
+
+        unset($args['--output']);
+        $test = $this->exec('dump', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $this->assertEquals($expected, $test->getDisplay());
+
         $dumpFile = __DIR__ . 'dump-pgsql.sql';
         $this->dumpFiles[] = $dumpFile;
 
