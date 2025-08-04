@@ -22,9 +22,17 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->migrationFile = __DIR__ . 'actual-migration.php';
         $args = [
             'config' => 'test-mysql',
-            'table' => 'posts',
+            'table' => 'postagens',
             '--output' => substr($this->migrationFile, 0, -4),
         ];
+        $test = $this->exec('migration', $args);
+        $this->assertEquals(Command::FAILURE, $test->getStatusCode());
+        $this->assertEquals(
+            "Table 'postagens' does not exist.\n",
+            $test->getDisplay(),
+        );
+
+        $args['table'] = 'posts';
         $test = $this->exec('migration', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($this->migrationFile);
@@ -32,6 +40,11 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $expected = file_get_contents(__DIR__ . '/expected/migration.php');
         $actual = file_get_contents($this->migrationFile);
         $this->assertEquals($expected, $actual);
+
+        $test = $this->exec('migration', $args);
+        $this->assertEquals(Command::FAILURE, $test->getStatusCode());
+        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $this->assertTrue($cancel);
     }
 
     function testComplete(): void
