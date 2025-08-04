@@ -22,6 +22,13 @@ final class DiffCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertEquals($expected, $test->getDisplay());
 
+        $expected = __DIR__ . '/expected/diff-mysql-pgsql-no.txt';
+        $expected = file_get_contents($expected);
+
+        $test = $this->exec('diff', array_merge($args, ['-l' => 'no']));
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $this->assertEquals($expected, $test->getDisplay());
+
         $expected = __DIR__ . '/expected/diff-mariadb-pgsql.txt';
         $expected = file_get_contents($expected);
 
