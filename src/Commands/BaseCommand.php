@@ -19,6 +19,13 @@ abstract class BaseCommand extends Command
         try {
             return $this->exec($input, $output);
         } catch (Exception $e) {
+            $isTest =
+                defined('PHPUNIT_COMPOSER_INSTALL') ||
+                defined('__PHPUNIT_PHAR__');
+            if ($isTest) {
+                throw $e;
+            }
+            // @codeCoverageIgnoreStart
             $errOutput =
                 $output instanceof ConsoleOutputInterface
                     ? $output->getErrorOutput()
@@ -33,6 +40,7 @@ abstract class BaseCommand extends Command
             );
             $errOutput->writeln(['', $formattedBlock, '']);
             exit(Command::FAILURE);
+            // @codeCoverageIgnoreEnd
         }
     }
 
