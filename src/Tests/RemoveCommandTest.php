@@ -5,7 +5,7 @@ namespace DBTool\Tests;
 
 use Symfony\Component\Console\Command\Command;
 
-final class RmCommandTest extends AbstractCommandTestCase
+final class RemoveCommandTest extends AbstractCommandTestCase
 {
     function testCommand(): void
     {
