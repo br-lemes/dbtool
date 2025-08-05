@@ -127,14 +127,22 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals("[]\n", $test->getDisplay());
 
-        $test = $this->exec('mv', [
+        $args = [
             'config1' => 'test-mariadb',
             'argument2' => 'posts',
             'argument3' => 'users',
-        ]);
+        ];
+        $test = $this->exec('mv', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
         $this->assertTrue($cancel);
+
+        $test = $this->exec('mv', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $test = $this->exec('ls', ['config' => 'test-mariadb']);
+        $output = json_decode($test->getDisplay(), true);
+        $this->assertEquals(['products', 'users'], $output);
     }
 
     function testComplete(): void
