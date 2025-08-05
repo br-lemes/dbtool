@@ -144,7 +144,7 @@ class CopyCommand extends BaseCommand
         $columns1 = $this->db1->getColumns($table, 'native');
         $columns2 = $this->db2->getColumns($table, 'native');
         if ($columns1 === null || $columns2 === null) {
-            return false;
+            return false; // @codeCoverageIgnore
         }
         $names1 = array_column($columns1, 'COLUMN_NAME');
         $names2 = array_column($columns2, 'COLUMN_NAME');

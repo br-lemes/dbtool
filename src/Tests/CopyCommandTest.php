@@ -14,6 +14,17 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $this->assertEquals(['products', 'users'], $output);
 
         $test = $this->exec('cp', [
+            'source' => 'test-pgsql',
+            'destination' => 'test-mariadb',
+            'table' => 'posts',
+        ]);
+        $this->assertEquals(Command::FAILURE, $test->getStatusCode());
+        $this->assertEquals(
+            "Table schemas are not compatible (column names differ).\n",
+            $test->getDisplay(),
+        );
+
+        $test = $this->exec('cp', [
             'source' => 'test-mysql',
             'destination' => 'test-mariadb',
             'table' => 'posts',
@@ -70,6 +81,15 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
         $this->assertTrue($cancel);
+
+        $test = $this->exec('cp', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $args = ['config1' => 'test-mysql', 'argument2' => 'posts'];
+        $test = $this->exec('cat', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $output = json_decode($test->getDisplay(), true);
+        $this->assertEquals($catPosts, $output);
     }
 
     function testComplete(): void
