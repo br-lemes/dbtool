@@ -43,7 +43,7 @@ final class TruncateCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'truncate',
             ['test-mysql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
     }
 }

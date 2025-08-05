@@ -1,6 +1,7 @@
 [1m[93m/home/breno/src/dbtool/.b.json[39m[0m[2m --- JSON[0m
-[2m1 [0m{                                                  [2m1 [0m{
-[91;1m2 [0m    [95m"posts"[0m: [91m"36d6110d7bec22a0ad824a5a8151aba3"[0m,   [92;1m2 [0m    [95m"posts"[0m: [92m"f0ff1c89f7bcb9385c8ec38a3e288bd0"[0m,
-[91;1m3 [0m    [95m"users"[0m: [91m"d04f166ffdcda1088db26ce633a96cd3"[0m    [92;1m3 [0m    [95m"users"[0m: [92m"0f109092051946e8ef11cf5a0d827f2a"[0m
-[2m4 [0m}                                                  [2m4 [0m}
+[2m1 [0m{                                                     [2m1 [0m{
+[91;1m2 [0m    [95m"posts"[0m: [91m"36d6110d7bec22a0ad824a5a8151aba3"[0m,      [92;1m2 [0m    [95m"posts"[0m: [92m"f0ff1c89f7bcb9385c8ec38a3e288bd0"[0m,
+[91;1m3 [0m    [95m"products"[0m: [91m"4579f3a88abdb40d93499f56825bda8d"[0m,   [92;1m3 [0m    [95m"products"[0m: [92m"46f03c0e9a4472b498023b951b021f8e"[0m,
+[91;1m4 [0m    [95m"users"[0m: [91m"d04f166ffdcda1088db26ce633a96cd3"[0m       [92;1m4 [0m    [95m"users"[0m: [92m"0f109092051946e8ef11cf5a0d827f2a"[0m
+[2m5 [0m}                                                     [2m5 [0m}
 

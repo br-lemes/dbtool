@@ -70,7 +70,7 @@ final class DiffCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'diff',
             ['test-mysql', 'test-pgsql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
         $this->assertCompleteEquals(
             'diff',

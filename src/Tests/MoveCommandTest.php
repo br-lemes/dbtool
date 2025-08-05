@@ -11,15 +11,15 @@ final class MoveCommandTest extends AbstractCommandTestCase
     {
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['users'], $output);
+        $this->assertEquals(['products', 'users'], $output);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'users'], $output);
+        $this->assertEquals(['posts', 'products', 'users'], $output);
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'users'], $output);
+        $this->assertEquals(['posts', 'products', 'users'], $output);
 
         $test = $this->exec('mv', [
             'config1' => 'test-mysql',
@@ -30,11 +30,11 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'users'], $output);
+        $this->assertEquals(['posts', 'products', 'users'], $output);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['users'], $output);
+        $this->assertEquals(['products', 'users'], $output);
 
         $args = [
             'config1' => 'test-pgsql',
@@ -52,7 +52,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts'], $output);
+        $this->assertEquals(['posts', 'products'], $output);
 
         $args['argument3'] = 'posts';
         $test = $this->exec('mv', $args);
@@ -71,7 +71,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['postagens'], $output);
+        $this->assertEquals(['postagens', 'products'], $output);
 
         $args = [
             'config1' => 'test-mysql',
@@ -87,9 +87,42 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $test = $this->exec('mv', $args, ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
+        $catSql = <<<SQL
+            SELECT
+                id,
+                description_long,
+                description_medium,
+                description_tiny,
+                ean,
+                name,
+                price,
+                sku,
+                status,
+                stock
+            FROM products
+        SQL;
+        $catArgs = ['config1' => 'test-pgsql', 'argument2' => $catSql];
+        $test = $this->exec('cat', $catArgs);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $this->assertEquals("[]\n", $test->getDisplay());
+
+        $args['argument2'] = 'test-pgsql';
+        $args['argument3'] = 'products';
+        $test = $this->exec('mv', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $catProducts = __DIR__ . '/expected/cat-products.json';
+        $catProducts = file_get_contents($catProducts);
+        $catProducts = json_decode($catProducts, true);
+
+        $test = $this->exec('cat', $catArgs);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $output = json_decode($test->getDisplay(), true);
+        $this->assertEquals($catProducts, $output);
+
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'users'], $output);
+        $this->assertEquals(['posts', 'products', 'users'], $output);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals("[]\n", $test->getDisplay());
@@ -115,7 +148,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'mv',
             ['test-mysql', 'test-pgsql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
     }
 }

@@ -69,7 +69,7 @@ final class CatCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'cat',
             ['test-mysql', 'test-pgsql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
 
         $this->expectException(InvalidArgumentException::class);

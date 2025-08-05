@@ -23,7 +23,10 @@ final class RemoveCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $this->assertEquals(['users'], json_decode($test->getDisplay(), true));
+        $this->assertEquals(
+            ['products', 'users'],
+            json_decode($test->getDisplay(), true),
+        );
     }
 
     function testComplete(): void
@@ -32,7 +35,7 @@ final class RemoveCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'rm',
             ['test-mysql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
     }
 }

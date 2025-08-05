@@ -21,6 +21,23 @@ CREATE TABLE public.posts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create table: products
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description_tiny TEXT,
+    description_medium TEXT,
+    description_long TEXT,
+    sku VARCHAR(100) NOT NULL,
+    ean VARCHAR(100) NOT NULL,
+    stock INT DEFAULT 0,
+    price DECIMAL(10, 2) DEFAULT 0.00,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    refresh_at TIMESTAMP,
+    UNIQUE (sku, ean)
+);
+
 CREATE INDEX posts_user_id ON public.posts (user_id);
 
 -- Insert data into users

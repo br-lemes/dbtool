@@ -60,7 +60,7 @@ final class ListCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'ls',
             ['test-mysql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
         $this->assertCompleteEquals(
             'ls',

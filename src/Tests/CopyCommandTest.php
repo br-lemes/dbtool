@@ -11,7 +11,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
     {
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['users'], $output);
+        $this->assertEquals(['products', 'users'], $output);
 
         $test = $this->exec('cp', [
             'source' => 'test-mysql',
@@ -22,7 +22,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'users'], $output);
+        $this->assertEquals(['posts', 'products', 'users'], $output);
 
         $args = ['config1' => 'test-pgsql', 'argument2' => 'posts'];
         $test = $this->exec('cat', $args);
@@ -79,7 +79,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $this->assertCompleteContains(
             'cp',
             ['test-mysql', 'test-pgsql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
     }
 }

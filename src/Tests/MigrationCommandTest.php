@@ -53,7 +53,7 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'migration',
             ['test-mysql', ''],
-            ['posts', 'users'],
+            ['posts', 'products', 'users'],
         );
         $this->assertCompleteContains(
             'migration',

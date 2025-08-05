@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "description_long": "Long Desc A",
+        "description_medium": "Medium Desc A",
+        "description_tiny": "Tiny Desc A",
+        "ean": "EAN-A-001",
+        "name": "Product A",
+        "price": "19.99",
+        "sku": "SKU-A-001",
+        "status": "active",
+        "stock": 100
+    },
+    {
+        "id": 2,
+        "description_long": "Long Desc B",
+        "description_medium": "Medium Desc B",
+        "description_tiny": "Tiny Desc B",
+        "ean": "EAN-B-002",
+        "name": "Product B",
+        "price": "29.99",
+        "sku": "SKU-B-002",
+        "status": "active",
+        "stock": 250
+    },
+    {
+        "id": 3,
+        "description_long": "Long Desc C",
+        "description_medium": "Medium Desc C",
+        "description_tiny": "Tiny Desc C",
+        "ean": "EAN-C-003",
+        "name": "Product C",
+        "price": "9.99",
+        "sku": "SKU-C-003",
+        "status": "active",
+        "stock": 50
+    }
+]
