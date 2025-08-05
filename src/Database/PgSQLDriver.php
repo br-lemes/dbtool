@@ -152,6 +152,13 @@ class PgSQLDriver extends AbstractServerDriver
             'tinyint' => 'SMALLINT',
         ];
         foreach ($columns as &$col) {
+            if (isset($col['COLUMN_DEFAULT'])) {
+                $col['COLUMN_DEFAULT'] = preg_replace(
+                    "/'(.*?)'::.*/",
+                    "$1",
+                    $col['COLUMN_DEFAULT'],
+                );
+            }
             if (!isset($col['DATA_TYPE'])) {
                 continue;
             }

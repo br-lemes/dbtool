@@ -75,7 +75,11 @@ class MySQLDriver extends AbstractServerDriver
                         THEN NULL
                     WHEN COLUMN_DEFAULT = 'NULL'
                         THEN NULL
-                        ELSE COLUMN_DEFAULT
+                        ELSE CASE
+                            WHEN LEFT(COLUMN_DEFAULT, 1) = "'" AND RIGHT(COLUMN_DEFAULT, 1) = "'"
+                                THEN SUBSTRING(COLUMN_DEFAULT, 2, CHAR_LENGTH(COLUMN_DEFAULT) - 2)
+                                ELSE COLUMN_DEFAULT
+                        END
                 END AS COLUMN_DEFAULT,
                 COLUMN_NAME,
                 DATA_TYPE,
@@ -137,6 +141,7 @@ class MySQLDriver extends AbstractServerDriver
             'time' => 'TIME',
             'timestamp' => 'TIMESTAMP',
             'tinyint' => 'SMALLINT',
+            'tinytext' => 'TEXT',
             'varchar' => 'VARCHAR',
         ];
         foreach ($columns as &$col) {

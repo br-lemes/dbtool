@@ -53,6 +53,7 @@
         "symfony",
         "testsuite",
         "testsuites",
-        "tinyint"
+        "tinyint",
+        "tinytext"
     ]
 }
