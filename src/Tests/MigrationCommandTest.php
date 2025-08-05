@@ -37,7 +37,8 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($this->migrationFile);
 
-        $expected = file_get_contents(__DIR__ . '/expected/migration.php');
+        $expected = __DIR__ . '/expected/migration_posts.php';
+        $expected = file_get_contents($expected);
         $actual = file_get_contents($this->migrationFile);
         $this->assertEquals($expected, $actual);
 
@@ -45,6 +46,15 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
         $this->assertTrue($cancel);
+
+        $expected = __DIR__ . '/expected/migration_products.php';
+        $expected = file_get_contents($expected);
+
+        $args['table'] = 'products';
+        $test = $this->exec('migration', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $actual = file_get_contents($this->migrationFile);
+        $this->assertEquals($expected, $actual);
     }
 
     function testComplete(): void
