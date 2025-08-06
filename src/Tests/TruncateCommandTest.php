@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class TruncateCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+
     function testCommand(): void
     {
         $args = ['config1' => 'test-mysql', 'argument2' => 'posts'];
@@ -18,7 +21,7 @@ final class TruncateCommandTest extends AbstractCommandTestCase
         $test = $this->exec('truncate', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $this->assertEquals(
-            "Table 'postagens' does not exist.\n",
+            sprintf(self::TABLE_DOES_NOT_EXIST, 'postagens') . "\n",
             $test->getDisplay(),
         );
 
@@ -43,7 +46,7 @@ final class TruncateCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'truncate',
             ['test-mysql', ''],
-            ['posts', 'products', 'users'],
+            self::TEST_TABLES,
         );
     }
 }

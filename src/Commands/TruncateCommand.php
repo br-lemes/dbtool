@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
+use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -14,6 +15,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class TruncateCommand extends BaseCommand
 {
+    use ConstTrait;
+
     private string $help = <<<HELP
     Truncates all data from a table, keeping its schema intact.
 
@@ -70,7 +73,7 @@ class TruncateCommand extends BaseCommand
         $db = new DatabaseConnection($config, $output);
 
         if (!$db->tableExists($tableName)) {
-            $output->writeln("Table '$tableName' does not exist.");
+            $output->writeln(sprintf(self::TABLE_DOES_NOT_EXIST, $tableName));
             return Command::FAILURE;
         }
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
+use DBTool\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ListCommand extends BaseCommand
 {
+    use ConstTrait;
+
     private string $help = <<<HELP
     List database structures at different levels.
 
@@ -60,7 +63,7 @@ class ListCommand extends BaseCommand
             );
         }
         if ($input->mustSuggestOptionValuesFor('column-order')) {
-            $suggestions->suggestValues(['custom', 'native']);
+            $suggestions->suggestValues(self::COLUMN_ORDER);
         }
     }
 
@@ -95,9 +98,9 @@ class ListCommand extends BaseCommand
         $tableName = $input->getArgument('table');
         $fieldName = $input->getArgument('field');
         $order = $input->getOption('column-order');
-        if (!in_array($order, ['custom', 'native'])) {
+        if (!in_array($order, self::COLUMN_ORDER)) {
             throw new InvalidArgumentException(
-                "Invalid value for column order. Must be 'custom' or 'native', got '$order'.",
+                sprintf(self::INVALID_COLUMN_ORDER, $order),
             );
         }
 

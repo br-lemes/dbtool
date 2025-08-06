@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class CopyCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+    use GetExpectedTrait;
+
     function testCommand(): void
     {
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
@@ -20,7 +24,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
         ]);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $this->assertEquals(
-            "Table schemas are not compatible (column names differ).\n",
+            self::SCHEMAS_NOT_COMPATIBLE . "\n",
             $test->getDisplay(),
         );
 
@@ -33,7 +37,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'products', 'users'], $output);
+        $this->assertEquals(self::TEST_TABLES, $output);
 
         $args = ['config1' => 'test-pgsql', 'argument2' => 'posts'];
         $test = $this->exec('cat', $args);
@@ -62,9 +66,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
         $this->assertTrue($cancel);
 
-        $catPosts = __DIR__ . '/expected/cat-posts.json';
-        $catPosts = file_get_contents($catPosts);
-        $catPosts = json_decode($catPosts, true);
+        $catPosts = $this->getExpectedJson('cat-posts.json');
 
         $args = ['config1' => 'test-pgsql', 'argument2' => 'posts'];
         $test = $this->exec('cat', $args);
@@ -99,7 +101,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $this->assertCompleteContains(
             'cp',
             ['test-mysql', 'test-pgsql', ''],
-            ['posts', 'products', 'users'],
+            self::TEST_TABLES,
         );
     }
 }

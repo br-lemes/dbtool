@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
+use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DiffCommand extends BaseCommand
 {
+    use ConstTrait;
+
     private string $help = <<<HELP
     Compare database structures at different levels.
 
@@ -79,7 +82,7 @@ class DiffCommand extends BaseCommand
             );
         }
         if ($input->mustSuggestOptionValuesFor('column-order')) {
-            $suggestions->suggestValues(['custom', 'native']);
+            $suggestions->suggestValues(self::COLUMN_ORDER);
         }
         if ($input->mustSuggestOptionValuesFor('ignore-length')) {
             $suggestions->suggestValues(['yes', 'no']);
@@ -141,14 +144,14 @@ class DiffCommand extends BaseCommand
         if ($ignoreLengthOption !== null) {
             if (!in_array($ignoreLengthOption, ['yes', 'no'])) {
                 throw new InvalidArgumentException(
-                    "Invalid value for ignore-length. Must be 'yes' or 'no', got '$ignoreLengthOption'.",
+                    sprintf(self::INVALID_IGNORE_LENGTH, $ignoreLengthOption),
                 );
             }
             $this->ignoreLength = $ignoreLengthOption === 'yes';
         }
-        if (!in_array($this->order, ['custom', 'native'])) {
+        if (!in_array($this->order, self::COLUMN_ORDER)) {
             throw new InvalidArgumentException(
-                "Invalid value for column order. Must be 'custom' or 'native', got '$this->order'.",
+                sprintf(self::INVALID_COLUMN_ORDER, $this->order),
             );
         }
 

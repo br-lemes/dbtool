@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
+use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CatCommand extends BaseCommand
 {
+    use ConstTrait;
+
     private string $help = <<<HELP
     Displays table contents or compares data between databases.
 
@@ -75,7 +78,7 @@ class CatCommand extends BaseCommand
             $suggestions->suggestValues($last);
         }
         if ($input->mustSuggestOptionValuesFor('column-order')) {
-            $suggestions->suggestValues(['custom', 'native']);
+            $suggestions->suggestValues(self::COLUMN_ORDER);
         }
     }
 
@@ -116,9 +119,9 @@ class CatCommand extends BaseCommand
         $config2 = $input->getArgument('argument2');
         $argument3 = $input->getArgument('argument3');
         $this->order = $input->getOption('column-order');
-        if (!in_array($this->order, ['custom', 'native'])) {
+        if (!in_array($this->order, self::COLUMN_ORDER)) {
             throw new InvalidArgumentException(
-                "Invalid value for column order. Must be 'custom' or 'native', got '$this->order'.",
+                sprintf(self::INVALID_COLUMN_ORDER, $this->order),
             );
         }
 

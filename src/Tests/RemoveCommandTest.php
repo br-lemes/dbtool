@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class RemoveCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+
     function testCommand(): void
     {
         $args = ['config' => 'test-mysql', 'table' => 'uses'];
@@ -35,7 +38,7 @@ final class RemoveCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'rm',
             ['test-mysql', ''],
-            ['posts', 'products', 'users'],
+            self::TEST_TABLES,
         );
     }
 }

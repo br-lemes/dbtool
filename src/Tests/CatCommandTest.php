@@ -3,27 +3,25 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 
 final class CatCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+    use GetExpectedTrait;
+
     function testCommand(): void
     {
         $args = ['config1' => 'test-mysql'];
         $sql =
             'SELECT p.id, p.title, u.name FROM posts AS p JOIN users AS u ON p.user_id = u.id';
 
-        $catPosts = __DIR__ . '/expected/cat-posts.json';
-        $catQuery = __DIR__ . '/expected/cat-query.json';
-        $catComparePosts = __DIR__ . '/expected/cat-compare-posts.txt';
-        $catCompareQuery = __DIR__ . '/expected/cat-compare-query.txt';
-        $catPosts = file_get_contents($catPosts);
-        $catQuery = file_get_contents($catQuery);
-        $catComparePosts = file_get_contents($catComparePosts);
-        $catCompareQuery = file_get_contents($catCompareQuery);
-        $catPosts = json_decode($catPosts, true);
-        $catQuery = json_decode($catQuery, true);
+        $catPosts = $this->getExpectedJson('cat-posts.json');
+        $catQuery = $this->getExpectedJson('cat-query.json');
+        $catComparePosts = $this->getExpected('cat-compare-posts.txt');
+        $catCompareQuery = $this->getExpected('cat-compare-query.txt');
 
         $args['argument2'] = 'posts';
         $test = $this->exec('cat', $args);
@@ -51,7 +49,7 @@ final class CatCommandTest extends AbstractCommandTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            "Invalid value for column order. Must be 'custom' or 'native', got 'invalid'.",
+            sprintf(self::INVALID_COLUMN_ORDER, 'invalid'),
         );
         $args['--column-order'] = 'invalid';
         $this->exec('cat', $args);
@@ -60,16 +58,16 @@ final class CatCommandTest extends AbstractCommandTestCase
     function testComplete(): void
     {
         $this->assertCompleteDatabase('cat', ['']);
-        $this->assertCompleteEquals('cat', ['-o', ''], ['custom', 'native']);
+        $this->assertCompleteEquals('cat', ['-o', ''], self::COLUMN_ORDER);
         $this->assertCompleteContains(
             'cat',
             ['test-mysql', ''],
-            ['test-mysql', 'test-pgsql', 'posts', 'users'],
+            array_merge(self::TEST_CONFIGS, self::TEST_TABLES),
         );
         $this->assertCompleteEquals(
             'cat',
             ['test-mysql', 'test-pgsql', ''],
-            ['posts', 'products', 'users'],
+            self::TEST_TABLES,
         );
 
         $this->expectException(InvalidArgumentException::class);

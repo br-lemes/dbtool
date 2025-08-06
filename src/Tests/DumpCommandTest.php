@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class DumpCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+    use GetExpectedTrait;
+
     private array $dumpFiles = [];
 
     function tearDown(): void
@@ -34,9 +38,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($dumpFile);
 
-        $expected = file_get_contents(__DIR__ . '/expected/dump-mysql.sql');
         $actual = file_get_contents($dumpFile);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($this->getExpected('dump-mysql.sql'), $actual);
 
         $dumpFile = __DIR__ . 'dump-schema-mysql.sql';
         $this->dumpFiles[] = $dumpFile;
@@ -47,10 +50,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($dumpFile);
 
-        $expected = file_get_contents(
-            __DIR__ . '/expected/dump-schema-mysql.sql',
-        );
         $actual = file_get_contents($dumpFile);
+        $expected = $this->getExpected('dump-schema-mysql.sql');
         $this->assertEquals($expected, $actual);
 
         $test = $this->exec('dump', $args);
@@ -61,6 +62,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
         unset($args['--output']);
         $test = $this->exec('dump', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $expected = $this->getExpected('dump-schema-mysql.sql');
         $this->assertEquals($expected, $test->getDisplay());
 
         $dumpFile = __DIR__ . 'dump-pgsql.sql';
@@ -73,9 +76,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($dumpFile);
 
-        $expected = file_get_contents(__DIR__ . '/expected/dump-pgsql.sql');
         $actual = file_get_contents($dumpFile);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($this->getExpected('dump-pgsql.sql'), $actual);
 
         $dumpFile = __DIR__ . 'dump-schema-pgsql.sql';
         $this->dumpFiles[] = $dumpFile;
@@ -86,20 +88,18 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($dumpFile);
 
-        $expected = file_get_contents(
-            __DIR__ . '/expected/dump-schema-pgsql.sql',
-        );
         $actual = file_get_contents($dumpFile);
+        $expected = $this->getExpected('dump-schema-pgsql.sql');
         $this->assertEquals($expected, $actual);
     }
 
     function testComplete(): void
     {
         $this->assertCompleteDatabase('dump', ['']);
-        $this->assertCompleteContains(
+        $this->assertCompleteEquals(
             'dump',
             ['test-mysql', ''],
-            ['posts', 'users'],
+            self::TEST_TABLES,
         );
         $this->assertCompleteContains(
             'dump',

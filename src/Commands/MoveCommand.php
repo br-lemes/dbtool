@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
+use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -14,6 +15,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class MoveCommand extends BaseCommand
 {
+    use ConstTrait;
+
     private string $help = <<<HELP
     Moves or renames a table within or across databases.
 
@@ -147,9 +150,7 @@ class MoveCommand extends BaseCommand
             $db2->exec($schema);
         } else {
             if (!$this->hasCompatibleSchema($db1, $db2, $argument3)) {
-                $output->writeln(
-                    'Table schemas are not compatible (column names differ).',
-                );
+                $output->writeln(self::SCHEMAS_NOT_COMPATIBLE);
                 return Command::FAILURE;
             }
             /** @var QuestionHelper $helper */

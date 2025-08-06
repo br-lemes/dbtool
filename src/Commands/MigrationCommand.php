@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
+use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class MigrationCommand extends BaseCommand
 {
+    use ConstTrait;
+
     private string $help = <<<HELP
     Generates a Phinx migration file for a table.
 
@@ -90,7 +93,7 @@ class MigrationCommand extends BaseCommand
         $this->db = new DatabaseConnection($config, $output);
 
         if (!$this->db->tableExists($table)) {
-            $output->writeln("Table '$table' does not exist.");
+            $output->writeln(sprintf(self::TABLE_DOES_NOT_EXIST, $table));
             return Command::FAILURE;
         }
         $timestamp = date('YmdHis', time());

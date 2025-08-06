@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class MigrationCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+    use GetExpectedTrait;
+
     private string $migrationFile = '';
 
     function tearDown(): void
@@ -28,7 +32,7 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $test = $this->exec('migration', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $this->assertEquals(
-            "Table 'postagens' does not exist.\n",
+            sprintf(self::TABLE_DOES_NOT_EXIST, 'postagens') . "\n",
             $test->getDisplay(),
         );
 
@@ -37,9 +41,8 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($this->migrationFile);
 
-        $expected = __DIR__ . '/expected/migration_posts.php';
-        $expected = file_get_contents($expected);
         $actual = file_get_contents($this->migrationFile);
+        $expected = $this->getExpected('migration_posts.php');
         $this->assertEquals($expected, $actual);
 
         $test = $this->exec('migration', $args);
@@ -47,13 +50,12 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
         $this->assertTrue($cancel);
 
-        $expected = __DIR__ . '/expected/migration_products.php';
-        $expected = file_get_contents($expected);
-
         $args['table'] = 'products';
         $test = $this->exec('migration', $args, ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
         $actual = file_get_contents($this->migrationFile);
+        $expected = $this->getExpected('migration_products.php');
         $this->assertEquals($expected, $actual);
     }
 
@@ -63,7 +65,7 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'migration',
             ['test-mysql', ''],
-            ['posts', 'products', 'users'],
+            self::TEST_TABLES,
         );
         $this->assertCompleteContains(
             'migration',

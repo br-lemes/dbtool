@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class MoveCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+    use GetExpectedTrait;
+
     function testCommand(): void
     {
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
@@ -15,11 +19,11 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'products', 'users'], $output);
+        $this->assertEquals(self::TEST_TABLES, $output);
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'products', 'users'], $output);
+        $this->assertEquals(self::TEST_TABLES, $output);
 
         $test = $this->exec('mv', [
             'config1' => 'test-mysql',
@@ -30,7 +34,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'products', 'users'], $output);
+        $this->assertEquals(self::TEST_TABLES, $output);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $output = json_decode($test->getDisplay(), true);
@@ -58,7 +62,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $test = $this->exec('mv', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $this->assertEquals(
-            "Table schemas are not compatible (column names differ).\n",
+            self::SCHEMAS_NOT_COMPATIBLE . "\n",
             $test->getDisplay(),
         );
 
@@ -111,9 +115,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $test = $this->exec('mv', $args, ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
-        $catProducts = __DIR__ . '/expected/cat-products.json';
-        $catProducts = file_get_contents($catProducts);
-        $catProducts = json_decode($catProducts, true);
+        $catProducts = $this->getExpectedJson('cat-products.json');
 
         $test = $this->exec('cat', $catArgs);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
@@ -122,7 +124,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'products', 'users'], $output);
+        $this->assertEquals(self::TEST_TABLES, $output);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals("[]\n", $test->getDisplay());
@@ -151,12 +153,12 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $this->assertCompleteContains(
             'mv',
             ['test-mysql', ''],
-            ['test-mariadb', 'test-mysql', 'test-pgsql', 'posts', 'users'],
+            array_merge(self::TEST_CONFIGS, self::TEST_TABLES),
         );
         $this->assertCompleteEquals(
             'mv',
             ['test-mysql', 'test-pgsql', ''],
-            ['posts', 'products', 'users'],
+            self::TEST_TABLES,
         );
     }
 }

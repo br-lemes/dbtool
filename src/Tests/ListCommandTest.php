@@ -3,22 +3,20 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\ConstTrait;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 
 final class ListCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+    use GetExpectedTrait;
+
     function testCommand(): void
     {
-        $ls = __DIR__ . '/expected/ls.json';
-        $lsPosts = __DIR__ . '/expected/ls-posts.json';
-        $lsPostsId = __DIR__ . '/expected/ls-posts-id.json';
-        $ls = file_get_contents($ls);
-        $lsPosts = file_get_contents($lsPosts);
-        $lsPostsId = file_get_contents($lsPostsId);
-        $ls = json_decode($ls, true);
-        $lsPosts = json_decode($lsPosts, true);
-        $lsPostsId = json_decode($lsPostsId, true);
+        $ls = $this->getExpectedJson('ls.json');
+        $lsPosts = $this->getExpectedJson('ls-posts.json');
+        $lsPostsId = $this->getExpectedJson('ls-posts-id.json');
 
         $args['config'] = 'test-pgsql';
         $test = $this->exec('ls', $args);
@@ -46,7 +44,7 @@ final class ListCommandTest extends AbstractCommandTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            "Invalid value for column order. Must be 'custom' or 'native', got 'invalid'.",
+            sprintf(self::INVALID_COLUMN_ORDER, 'invalid'),
         );
 
         $args = ['config' => 'test-pgsql', '--column-order' => 'invalid'];
@@ -56,16 +54,16 @@ final class ListCommandTest extends AbstractCommandTestCase
     function testComplete(): void
     {
         $this->assertCompleteDatabase('ls', ['']);
-        $this->assertCompleteEquals('ls', ['-o', ''], ['custom', 'native']);
+        $this->assertCompleteEquals('ls', ['-o', ''], self::COLUMN_ORDER);
         $this->assertCompleteEquals(
             'ls',
             ['test-mysql', ''],
-            ['posts', 'products', 'users'],
+            self::TEST_TABLES,
         );
         $this->assertCompleteEquals(
             'ls',
             ['test-mysql', 'posts', ''],
-            ['id', 'user_id', 'content', 'publish_date', 'title', 'created_at'],
+            self::TEST_POST_COLUMNS,
         );
     }
 }
