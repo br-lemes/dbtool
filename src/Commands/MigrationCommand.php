@@ -160,6 +160,34 @@ class MigrationCommand extends BaseCommand
     private function generateColumns(): string
     {
         $ignore = ['id', 'created_at', 'refresh_at', 'updated_at'];
+        $columns = $this->db->getColumns($this->tableName, 'custom');
+        $columnNames = array_column($columns, 'COLUMN_NAME');
+        $lines = [];
+        $timestamps = $this->getTimestampDefinition($columnNames);
+        foreach ($columns as $column) {
+            if (in_array($column['COLUMN_NAME'], $ignore)) {
+                continue;
+            }
+            if ($timestamps && $column['COLUMN_NAME'] === 'key_id') {
+                $lines[] = $timestamps;
+                $timestamps = '';
+            }
+            $phinxType = $this->getPhinxType($column['DATA_TYPE']);
+            $line = "->addColumn('{$column['COLUMN_NAME']}', '{$phinxType}'";
+            $options = $this->getColumnOptions($column);
+            if (!empty($options)) {
+                $line .= ', ' . $this->array_export($options);
+            }
+            $lines[] = $line . ')';
+        }
+        if ($timestamps) {
+            $lines[] = $timestamps;
+        }
+        return '            ' . implode("\n            ", $lines) . "\n";
+    }
+
+    private function getPhinxType(string $dataType): string
+    {
         $typeMap = [
             'BIGINT' => 'biginteger',
             'CHAR' => 'char',
@@ -174,72 +202,71 @@ class MigrationCommand extends BaseCommand
             'TIME' => 'time',
             'VARCHAR' => 'string',
         ];
+        return $typeMap[$dataType] ?? 'string';
+    }
 
-        $result = '';
-        $columns = $this->db->getColumns($this->tableName, 'custom');
-        $columnNames = array_column($columns, 'COLUMN_NAME');
-        $timestamps = false;
+    private function getTextLimitOption(int $maxLength): ?string
+    {
+        switch ($maxLength) {
+            case 255:
+                return 'TEXT_TINY';
+            case 16777215:
+                return 'TEXT_MEDIUM';
+            case 4294967295:
+                return 'TEXT_LONG';
+            default:
+                return null;
+        }
+    }
+
+    private function getDefaultValue(array $column): mixed
+    {
+        $int = ['BIGINT', 'INTEGER', 'SMALLINT'];
+        $float = ['DOUBLE PRECISION', 'NUMERIC', 'REAL'];
+        if (in_array($column['DATA_TYPE'], $int)) {
+            return (int) $column['COLUMN_DEFAULT'];
+        }
+        if (in_array($column['DATA_TYPE'], $float)) {
+            return (float) $column['COLUMN_DEFAULT'];
+        }
+        return $column['COLUMN_DEFAULT'];
+    }
+
+    private function getColumnOptions(array $column): array
+    {
+        $options = [];
+        if ($column['CHARACTER_MAXIMUM_LENGTH']) {
+            if ($column['DATA_TYPE'] === 'TEXT') {
+                $limit = $this->getTextLimitOption(
+                    $column['CHARACTER_MAXIMUM_LENGTH'],
+                );
+                if ($limit) {
+                    $options['limit'] = $limit;
+                }
+            } else {
+                $options['limit'] = $column['CHARACTER_MAXIMUM_LENGTH'];
+            }
+        }
+        if ($column['COLUMN_DEFAULT'] !== null) {
+            $options['default'] = $this->getDefaultValue($column);
+        }
+        if ($column['IS_NULLABLE'] === 'YES') {
+            $options['null'] = true;
+        }
+        return $options;
+    }
+
+    private function getTimestampDefinition(array $columnNames): string
+    {
         if (in_array('created_at', $columnNames)) {
             if (in_array('refresh_at', $columnNames)) {
-                $timestamps = '            ';
-                $timestamps .= "->addTimestamps('created_at', 'refresh_at')\n";
-            } elseif (in_array('updated_at', $columnNames)) {
-                $timestamps = "            ->addTimestamps()\n";
+                return "->addTimestamps('created_at', 'refresh_at')";
+            }
+            if (in_array('updated_at', $columnNames)) {
+                return '->addTimestamps()';
             }
         }
-        foreach ($columns as $column) {
-            if (in_array($column['COLUMN_NAME'], $ignore)) {
-                continue;
-            }
-            if ($timestamps && $column['COLUMN_NAME'] === 'key_id') {
-                $result .= $timestamps;
-                $timestamps = false;
-            }
-            $result .= '            ';
-            $result .= "->addColumn('{$column['COLUMN_NAME']}', ";
-            $result .= "'{$typeMap[$column['DATA_TYPE']]}'";
-            $options = [];
-            if ($column['CHARACTER_MAXIMUM_LENGTH']) {
-                if ($column['DATA_TYPE'] === 'TEXT') {
-                    switch ($column['CHARACTER_MAXIMUM_LENGTH']) {
-                        case 255:
-                            $options['limit'] = 'TEXT_TINY';
-                            break;
-                        case 16777215:
-                            $options['limit'] = 'TEXT_MEDIUM';
-                            break;
-                        case 4294967295:
-                            $options['limit'] = 'TEXT_LONG';
-                            break;
-                    }
-                } else {
-                    $options['limit'] = $column['CHARACTER_MAXIMUM_LENGTH'];
-                }
-            }
-            if ($column['COLUMN_DEFAULT'] !== null) {
-                $int = ['BIGINT', 'INTEGER', 'SMALLINT'];
-                $float = ['DOUBLE PRECISION', 'NUMERIC', 'REAL'];
-                if (in_array($column['DATA_TYPE'], $int)) {
-                    $options['default'] = (int) $column['COLUMN_DEFAULT'];
-                } elseif (in_array($column['DATA_TYPE'], $float)) {
-                    $options['default'] = (float) $column['COLUMN_DEFAULT'];
-                } else {
-                    $options['default'] = $column['COLUMN_DEFAULT'];
-                }
-            }
-            if ($column['IS_NULLABLE'] === 'YES') {
-                $options['null'] = true;
-            }
-            if (!empty($options)) {
-                $options = $this->array_export($options);
-                $result .= ", {$options}";
-            }
-            $result .= ")\n";
-        }
-        if ($timestamps) {
-            $result .= $timestamps;
-        }
-        return $result;
+        return '';
     }
 
     private function generateIndexes(): string
