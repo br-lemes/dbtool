@@ -11,7 +11,7 @@ final class MigrateCommandTest extends AbstractCommandTestCase
         $this->assertCompleteEquals(
             'migrate',
             ['test-mysql', ''],
-            ['20250807015231_posts', '20250807015232_products'],
+            ['20250807015231 Posts', '20250807015232 Products'],
         );
     }
 }

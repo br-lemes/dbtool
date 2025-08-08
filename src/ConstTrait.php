@@ -20,6 +20,7 @@ trait ConstTrait
     const INVALID_IGNORE_LENGTH =
         'Invalid value for ignore-length.' .
         " Must be 'yes' or 'no', got '%s'.";
+    const REQUIRED_PHINX = ['database', 'host', 'paths.migrations', 'username'];
     const SCHEMAS_NOT_COMPATIBLE = 'Table schemas are not compatible (column names differ).';
     const TABLE_DOES_NOT_EXIST = "Table '%s' does not exist.";
 

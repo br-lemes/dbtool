@@ -44,11 +44,6 @@ trait ConfigTrait
             return $config;
         }
 
-        $path = $config['paths']['migrations'];
-        if (!is_string($path) || !is_dir($path)) {
-            $this->error('Invalid migrations path');
-        }
-
         return $config;
     }
 

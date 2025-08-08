@@ -227,6 +227,15 @@ Notes:
 - Prompts for confirmation before removing tables
 - Permanently deletes all tables and their data
 
+### Status Command (status)
+
+Show migration status
+
+```bash
+# Show migration status
+db status config1
+```
+
 ### Truncate Command (truncate)
 
 Truncates all data from a table, keeping its schema intact.
