@@ -67,7 +67,7 @@
             "DATA_TYPE": "TIMESTAMP",
             "IS_AUTO_INCREMENT": "NO",
             "IS_DEFAULT_TIMESTAMP": "YES",
-            "IS_NULLABLE": "YES",
+            "IS_NULLABLE": "NO",
             "IS_UPDATE_TIMESTAMP": "NO",
             "NUMERIC_PRECISION": null,
             "NUMERIC_SCALE": null

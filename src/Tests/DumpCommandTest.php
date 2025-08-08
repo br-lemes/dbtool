@@ -23,7 +23,7 @@ final class DumpCommandTest extends AbstractCommandTestCase
         parent::tearDown();
     }
 
-    function testMySQL(): void
+    function testCommand(): void
     {
         $dumpFile = __DIR__ . 'dump-mysql.sql';
         $this->dumpFiles[] = $dumpFile;

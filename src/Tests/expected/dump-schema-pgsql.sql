@@ -30,7 +30,7 @@ CREATE TABLE public.users (
     email character varying(255) NOT NULL,
     name character varying(100) NOT NULL,
     password_hash text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp without time zone
 );
 

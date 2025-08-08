@@ -5,7 +5,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `name` varchar(100) NOT NULL,
   `password_hash` text NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)

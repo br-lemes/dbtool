@@ -7,7 +7,7 @@ CREATE TABLE public.users (
     email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     password_hash TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
 
@@ -18,7 +18,7 @@ CREATE TABLE public.posts (
     content TEXT,
     publish_date DATE,
     title VARCHAR(200) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create table: products
@@ -33,7 +33,7 @@ CREATE TABLE public.products (
     sku VARCHAR(100) NOT NULL,
     status VARCHAR(50) DEFAULT 'active',
     stock INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     refresh_at TIMESTAMP,
     UNIQUE (ean, sku)
 );
