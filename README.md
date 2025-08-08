@@ -243,6 +243,17 @@ Notes:
 - Prompts for confirmation if table exists
 - Removes all data but preserves table structure and indexes
 
+### Migrate Command (migrate)
+
+Executes Phinx migrations on a database.
+
+```bash
+# Execute migrations on the config database
+db migrate config
+# Execute a specific migration
+db migrate config migration_name
+```
+
 ### Migration Command (migration)
 
 Generates a Phinx migration file for a table.

@@ -42,7 +42,7 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->assertFileExists($this->migrationFile);
 
         $actual = file_get_contents($this->migrationFile);
-        $expected = $this->getExpected('migration_posts.php');
+        $expected = $this->getMigration('posts.php');
         $this->assertEquals($expected, $actual);
 
         $test = $this->exec('migration', $args);
@@ -55,7 +55,7 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
         $actual = file_get_contents($this->migrationFile);
-        $expected = $this->getExpected('migration_products.php');
+        $expected = $this->getMigration('products.php');
         $this->assertEquals($expected, $actual);
     }
 

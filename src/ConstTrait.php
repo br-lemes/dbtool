@@ -3,8 +3,16 @@ declare(strict_types=1);
 
 namespace DBTool;
 
+use DBTool\Database\MySQLDriver;
+use DBTool\Database\PgSQLDriver;
+
 trait ConstTrait
 {
+    const DRIVERS = [
+        'mysql' => MySQLDriver::class,
+        'pgsql' => PgSQLDriver::class,
+    ];
+
     const COLUMN_ORDER = ['custom', 'native'];
     const INVALID_COLUMN_ORDER =
         'Invalid value for column order.' .

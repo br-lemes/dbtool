@@ -8,6 +8,7 @@ use DBTool\Commands\CopyCommand;
 use DBTool\Commands\DiffCommand;
 use DBTool\Commands\DumpCommand;
 use DBTool\Commands\ListCommand;
+use DBTool\Commands\MigrateCommand;
 use DBTool\Commands\MigrationCommand;
 use DBTool\Commands\MoveCommand;
 use DBTool\Commands\RemoveCommand;
@@ -26,6 +27,7 @@ class DBTool extends Application
         $this->add(new DiffCommand());
         $this->add(new DumpCommand());
         $this->add(new ListCommand());
+        $this->add(new MigrateCommand());
         $this->add(new MigrationCommand());
         $this->add(new MoveCommand());
         $this->add(new RemoveCommand());

@@ -49,6 +49,7 @@
         "psql",
         "relname",
         "relnamespace",
+        "robmorgan",
         "smallinteger",
         "symfony",
         "testsuite",
