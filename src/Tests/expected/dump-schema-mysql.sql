@@ -2,8 +2,8 @@
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `name` varchar(100) NOT NULL,
   `password_hash` text NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,

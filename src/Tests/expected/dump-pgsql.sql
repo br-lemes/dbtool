@@ -27,8 +27,8 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.users (
     id bigint NOT NULL,
-    name character varying(100) NOT NULL,
     email character varying(255) NOT NULL,
+    name character varying(100) NOT NULL,
     password_hash text NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone
@@ -69,10 +69,10 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: test_user
 --
 
-COPY public.users (id, name, email, password_hash, created_at, updated_at) FROM stdin;
-1	John Doe	john.doe@example.com	$2y$10$abc123hashedPassword	2025-07-24 09:00:00	\N
-2	Jane Smith	jane.smith@example.com	$2y$10$xyz789hashedPassword	2025-07-24 09:15:00	2025-07-24 10:00:00
-3	Alice Brown	alice.brown@example.com	$2y$10$def456hashedPassword	2025-07-24 09:30:00	\N
+COPY public.users (id, email, name, password_hash, created_at, updated_at) FROM stdin;
+1	john.doe@example.com	John Doe	$2y$10$abc123hashedPassword	2025-07-24 09:00:00	\N
+2	jane.smith@example.com	Jane Smith	$2y$10$xyz789hashedPassword	2025-07-24 09:15:00	2025-07-24 10:00:00
+3	alice.brown@example.com	Alice Brown	$2y$10$def456hashedPassword	2025-07-24 09:30:00	\N
 \.
 
 

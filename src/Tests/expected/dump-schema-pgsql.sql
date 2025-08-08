@@ -27,8 +27,8 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.users (
     id bigint NOT NULL,
-    name character varying(100) NOT NULL,
     email character varying(255) NOT NULL,
+    name character varying(100) NOT NULL,
     password_hash text NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone
