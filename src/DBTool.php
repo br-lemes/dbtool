@@ -13,6 +13,7 @@ use DBTool\Commands\MigrationCommand;
 use DBTool\Commands\MoveCommand;
 use DBTool\Commands\RemoveCommand;
 use DBTool\Commands\RmAllCommand;
+use DBTool\Commands\RollbackCommand;
 use DBTool\Commands\RunCommand;
 use DBTool\Commands\StatusCommand;
 use DBTool\Commands\TruncateCommand;
@@ -33,6 +34,7 @@ class DBTool extends Application
         $this->add(new MoveCommand());
         $this->add(new RemoveCommand());
         $this->add(new RmAllCommand());
+        $this->add(new RollbackCommand());
         $this->add(new RunCommand());
         $this->add(new StatusCommand());
         $this->add(new TruncateCommand());

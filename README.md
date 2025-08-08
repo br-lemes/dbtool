@@ -277,6 +277,15 @@ Notes:
 - Generates a Phinx migration file with timestamped filename
 - Includes columns, timestamps, unique constraints, and indexes
 
+### Rollback Command (rollback)
+
+Rollback the last migration.
+
+```bash
+# Rollback the last migration
+db rollback config1
+```
+
 ### Run Command (run)
 
 Execute an SQL file (including dumps restores) on a database.
