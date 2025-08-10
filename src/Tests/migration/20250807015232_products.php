@@ -25,7 +25,7 @@ final class Products extends AbstractMigration
             ->addColumn('description_tiny', 'text', ['limit' => 'TEXT_TINY', 'null' => true])
             ->addColumn('ean', 'string', ['limit' => 100])
             ->addColumn('name', 'string', ['limit' => 255])
-            ->addColumn('price', 'decimal', ['default' => 0.0, 'null' => true])
+            ->addColumn('price', 'decimal', ['default' => 0.0, 'null' => true, 'precision' => 10, 'scale' => 2])
             ->addColumn('sku', 'string', ['limit' => 100])
             ->addColumn('status', 'string', ['limit' => 50, 'default' => 'active', 'null' => true])
             ->addColumn('stock', 'integer', ['default' => 0, 'null' => true])

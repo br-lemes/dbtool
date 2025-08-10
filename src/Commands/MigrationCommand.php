@@ -297,6 +297,12 @@ class MigrationCommand extends BaseCommand
         if ($column['IS_NULLABLE'] === 'YES') {
             $options['null'] = true;
         }
+        if (!in_array($column['NUMERIC_PRECISION'], [null, 0])) {
+            $options['precision'] = $column['NUMERIC_PRECISION'];
+        }
+        if (!in_array($column['NUMERIC_SCALE'], [null, 0])) {
+            $options['scale'] = $column['NUMERIC_SCALE'];
+        }
         return $options;
     }
 
