@@ -24,6 +24,7 @@ final class Posts extends AbstractMigration
             ->addColumn('content', 'text', ['null' => true])
             ->addColumn('publish_date', 'date', ['null' => true])
             ->addColumn('title', 'string', ['limit' => 200])
+            ->addTimestamps('created_at', false)
             ->addIndex('user_id')
             ->create();
     }

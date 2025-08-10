@@ -265,6 +265,10 @@ class MigrationCommand extends BaseCommand
             if (in_array('updated_at', $columnNames)) {
                 return '->addTimestamps()';
             }
+            return "->addTimestamps('created_at', false)";
+        }
+        if (in_array('updated_at', $columnNames)) {
+            return "->addTimestamps(false, 'updated_at')";
         }
         return '';
     }
