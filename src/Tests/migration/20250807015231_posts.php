@@ -19,7 +19,8 @@ final class Posts extends AbstractMigration
      */
     public function change(): void
     {
-        $this->table('posts')
+        $this->table('posts', ['id' => false, 'primary_key' => 'id'])
+            ->addColumn('id', 'biginteger', ['identity' => true])
             ->addColumn('user_id', 'biginteger')
             ->addColumn('content', 'text', ['null' => true])
             ->addColumn('publish_date', 'date', ['null' => true])

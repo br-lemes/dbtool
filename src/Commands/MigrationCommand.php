@@ -5,6 +5,7 @@ namespace DBTool\Commands;
 
 use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
+use DBTool\Database\UtilitiesTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -17,6 +18,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class MigrationCommand extends BaseCommand
 {
     use ConstTrait;
+    use UtilitiesTrait;
 
     private string $help = <<<HELP
     Generates a Phinx migration file for a table.
@@ -30,6 +32,8 @@ class MigrationCommand extends BaseCommand
     HELP;
 
     private DatabaseConnection $db;
+    private array $columns;
+    private array $indexes;
     private string $className;
     private string $tableName;
 
@@ -152,19 +156,56 @@ class MigrationCommand extends BaseCommand
              */
             public function change(): void
             {
-                \$this->table('{$this->tableName}')
 
         END;
+    }
+
+    private function generateTableDefinition(): string
+    {
+        $this->columns = $this->db->getColumns($this->tableName, 'custom');
+        $this->indexes = $this->db->getKeys($this->tableName, 'custom');
+        $result = '        ';
+        $pk = array_filter(
+            $this->indexes,
+            fn(array $key) => $key['KEY_TYPE'] === 'PRIMARY',
+        );
+        $pkCount = count($pk);
+        if ($pkCount === 0) {
+            return $result .
+                "\$this->table('{$this->tableName}', ['id' => false])\n";
+        }
+        if ($pkCount > 1) {
+            $this->error('Composite primary key is not supported'); // return
+        }
+        $pk = array_filter(
+            $this->columns,
+            fn(array $col) => $col['COLUMN_NAME'] === $pk[0]['COLUMN_NAME'],
+        )[0];
+        if ($pk['COLUMN_NAME'] === 'id') {
+            if ($pk['DATA_TYPE'] === 'INTEGER') {
+                return $result . "\$this->table('{$this->tableName}')\n";
+            }
+        }
+        $result .=
+            "\$this->table('{$this->tableName}', " .
+            "['id' => false, 'primary_key' => '{$pk['COLUMN_NAME']}'])\n";
+        $phinxType = $this->getPhinxType($pk['DATA_TYPE']);
+        $result .= '            ';
+        $result .= "->addColumn('{$pk['COLUMN_NAME']}', '{$phinxType}'";
+        $options = $this->getColumnOptions($pk);
+        if (!empty($options)) {
+            $result .= ', ' . $this->array_export($options);
+        }
+        $result .= ")\n";
+        return $result;
     }
 
     private function generateColumns(): string
     {
         $ignore = ['id', 'created_at', 'refresh_at', 'updated_at'];
-        $columns = $this->db->getColumns($this->tableName, 'custom');
-        $columnNames = array_column($columns, 'COLUMN_NAME');
         $lines = [];
-        $timestamps = $this->getTimestampDefinition($columnNames);
-        foreach ($columns as $column) {
+        $timestamps = $this->getTimestampDefinition();
+        foreach ($this->columns as $column) {
             if (in_array($column['COLUMN_NAME'], $ignore)) {
                 continue;
             }
@@ -250,24 +291,28 @@ class MigrationCommand extends BaseCommand
         if ($column['COLUMN_DEFAULT'] !== null) {
             $options['default'] = $this->getDefaultValue($column);
         }
+        if ($column['IS_AUTO_INCREMENT'] === 'YES') {
+            $options['identity'] = true;
+        }
         if ($column['IS_NULLABLE'] === 'YES') {
             $options['null'] = true;
         }
         return $options;
     }
 
-    private function getTimestampDefinition(array $columnNames): string
+    private function getTimestampDefinition(): string
     {
-        if (in_array('created_at', $columnNames)) {
-            if (in_array('refresh_at', $columnNames)) {
+        $names = array_column($this->columns, 'COLUMN_NAME');
+        if (in_array('created_at', $names)) {
+            if (in_array('refresh_at', $names)) {
                 return "->addTimestamps('created_at', 'refresh_at')";
             }
-            if (in_array('updated_at', $columnNames)) {
+            if (in_array('updated_at', $names)) {
                 return '->addTimestamps()';
             }
             return "->addTimestamps('created_at', false)";
         }
-        if (in_array('updated_at', $columnNames)) {
+        if (in_array('updated_at', $names)) {
             return "->addTimestamps(false, 'updated_at')";
         }
         return '';
@@ -276,9 +321,8 @@ class MigrationCommand extends BaseCommand
     private function generateIndexes(): string
     {
         $result = '';
-        $keys = $this->db->getKeys($this->tableName, 'custom');
         $composite = [];
-        foreach ($keys as $key) {
+        foreach ($this->indexes as $key) {
             if ($key['KEY_TYPE'] === 'PRIMARY') {
                 continue;
             }
@@ -339,6 +383,7 @@ class MigrationCommand extends BaseCommand
     private function generateMigrationContent(): string
     {
         return $this->generateHeader() .
+            $this->generateTableDefinition() .
             $this->generateColumns() .
             $this->generateIndexes() .
             $this->generateFooter();
