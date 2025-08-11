@@ -37,6 +37,15 @@ CREATE TABLE products (
     UNIQUE KEY `ean_sku` (`ean`, `sku`)
 );
 
+-- Create table: phinxlog
+CREATE TABLE phinxlog (
+    version BIGINT NOT NULL PRIMARY KEY,
+    migration_name VARCHAR(100) DEFAULT NULL,
+    start_time TIMESTAMP NULL DEFAULT NULL,
+    end_time TIMESTAMP NULL DEFAULT NULL,
+    break_point TINYINT NOT NULL DEFAULT 0
+);
+
 -- Insert data into users
 INSERT INTO users (email, name, password_hash, created_at, updated_at) VALUES
 ('john.doe@example.com', 'John Doe', '$2y$10$abc123hashedPassword', '2025-07-24 09:00:00', NULL),
@@ -54,3 +63,9 @@ INSERT INTO products (description_long, description_medium, description_tiny, ea
 ('Long Desc A', 'Medium Desc A', 'Tiny Desc A', 'EAN-A-001', 'Product A', 19.99, 'SKU-A-001', 'active', 100, NOW(), NOW()),
 ('Long Desc B', 'Medium Desc B', 'Tiny Desc B', 'EAN-B-002', 'Product B', 29.99, 'SKU-B-002', 'active', 250, NOW(), NOW()),
 ('Long Desc C', 'Medium Desc C', 'Tiny Desc C', 'EAN-C-003', 'Product C', 9.99, 'SKU-C-003', 'active', 50, NOW(), NOW());
+
+-- Insert data into phinxlog
+INSERT INTO phinxlog (version, migration_name, start_time, end_time, break_point) VALUES
+(20250807015230, 'Users', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0),
+(20250807015231, 'Posts', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0),
+(20250807015232, 'Products', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0);

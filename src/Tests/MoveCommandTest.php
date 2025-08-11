@@ -23,7 +23,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES, $output);
+        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
 
         $test = $this->exec('mv', [
             'config1' => 'test-mysql',
@@ -34,11 +34,11 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES, $output);
+        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['products', 'users'], $output);
+        $this->assertEquals(['phinxlog', 'products', 'users'], $output);
 
         $args = [
             'config1' => 'test-pgsql',
@@ -124,10 +124,11 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES, $output);
+        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
-        $this->assertEquals("[]\n", $test->getDisplay());
+        $output = json_decode($test->getDisplay(), true);
+        $this->assertEquals(['phinxlog'], $output);
 
         $args = [
             'config1' => 'test-mariadb',

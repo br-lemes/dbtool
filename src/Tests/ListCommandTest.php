@@ -28,7 +28,7 @@ final class ListCommandTest extends AbstractCommandTestCase
         $test = $this->exec('ls', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($ls, $output);
+        $this->assertEquals($this::TEST_TABLES, $output);
 
         $args['table'] = 'posts';
         $test = $this->exec('ls', $args);

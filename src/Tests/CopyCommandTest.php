@@ -37,7 +37,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
         $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES, $output);
+        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
 
         $args = ['config1' => 'test-pgsql', 'argument2' => 'posts'];
         $test = $this->exec('cat', $args);

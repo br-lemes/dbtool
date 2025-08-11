@@ -33,5 +33,6 @@ trait ConstTrait
         'title',
         'created_at',
     ];
-    const TEST_TABLES = ['posts', 'products', 'users'];
+    const TEST_TABLES = ['phinxlog', 'posts', 'products', 'users'];
+    const TEST_TABLES_NO_PHINXLOG = ['posts', 'products', 'users'];
 }

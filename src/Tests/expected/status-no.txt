@@ -1,0 +1,7 @@
+
+ Status  [Migration ID]  Started              Finished             Migration Name 
+----------------------------------------------------------------------------------
+   down  20250807015230                                            Users
+   down  20250807015231                                            Posts
+   down  20250807015232                                            Products
+
