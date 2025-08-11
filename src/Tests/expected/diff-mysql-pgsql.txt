@@ -1,6 +1,6 @@
 [1m[93m/home/breno/src/dbtool/.b.json[39m[0m[2m --- JSON[0m
 [2m1 [0m{                                                     [2m1 [0m{
-[91;1m2 [0m    [95m"phinxlog"[0m: [91m"da125ab0094005266a39fbf7069ef733"[0m,   [92;1m2 [0m    [95m"phinxlog"[0m: [92m""[0m,
+[91;1m2 [0m    [95m"phinxlog"[0m: [91m"1590192d9447aff60968a2f6fcc255ff"[0m,   [92;1m2 [0m    [95m"phinxlog"[0m: [92m""[0m,
 [2m3 [0m    [95m"posts"[0m: [95m"57dadced079da5bc1f51dcf60dc60ea0"[0m,      [2m3 [0m    [95m"posts"[0m: [95m"57dadced079da5bc1f51dcf60dc60ea0"[0m,
 [2m4 [0m    [95m"products"[0m: [95m"03371a3329883ea6b3c74f91f9f94825"[0m,   [2m4 [0m    [95m"products"[0m: [95m"03371a3329883ea6b3c74f91f9f94825"[0m,
 [2m5 [0m    [95m"users"[0m: [95m"9193ce41a00be68a3867278d01eb6175"[0m       [2m5 [0m    [95m"users"[0m: [95m"9193ce41a00be68a3867278d01eb6175"[0m
