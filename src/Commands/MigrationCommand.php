@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
-use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
-use DBTool\Database\UtilitiesTrait;
+use DBTool\Traits\ConstTrait;
+use DBTool\Traits\UtilitiesTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;

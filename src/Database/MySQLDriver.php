@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
+use DBTool\Traits\UtilitiesTrait;
 use PDO;
 use PDOException;
 use Symfony\Component\Console\Helper\ProgressBar;

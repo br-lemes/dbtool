@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace DBTool;
+namespace DBTool\Traits;
 
 use DBTool\Database\MySQLDriver;
 use DBTool\Database\PgSQLDriver;

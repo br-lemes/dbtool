@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\Traits\ExpectedTrait;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 

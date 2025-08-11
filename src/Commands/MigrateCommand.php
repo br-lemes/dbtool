@@ -2,7 +2,7 @@
 
 namespace DBTool\Commands;
 
-use DBTool\PhinxConfigTrait;
+use DBTool\Traits\PhinxConfigTrait;
 use Phinx\Migration\Manager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;

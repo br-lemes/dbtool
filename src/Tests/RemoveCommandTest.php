@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
-use DBTool\ConstTrait;
+use DBTool\Traits\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class RemoveCommandTest extends AbstractCommandTestCase

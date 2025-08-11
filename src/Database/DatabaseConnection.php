@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
+use DBTool\Traits\UtilitiesTrait;
 use PDOException;
 use Symfony\Component\Console\Output\OutputInterface;
 

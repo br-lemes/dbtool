@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace DBTool\Commands;
 
-use DBTool\ConstTrait;
 use DBTool\Database\DatabaseConnection;
+use DBTool\Traits\ConstTrait;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;

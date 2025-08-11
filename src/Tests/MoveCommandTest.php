@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
-use DBTool\ConstTrait;
+use DBTool\Traits\ConstTrait;
+use DBTool\Traits\ExpectedTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class MoveCommandTest extends AbstractCommandTestCase

@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
-use DBTool\ConstTrait;
+use DBTool\Traits\ConstTrait;
+use DBTool\Traits\ExpectedTrait;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 

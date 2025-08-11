@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace DBTool\Database;
+namespace DBTool\Traits;
 
 use Exception;
 use PDOException;

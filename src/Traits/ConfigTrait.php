@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace DBTool;
-
-use DBTool\Database\UtilitiesTrait;
+namespace DBTool\Traits;
 
 trait ConfigTrait
 {
@@ -12,7 +10,7 @@ trait ConfigTrait
 
     protected function getConfig(string $config, array $required = []): array
     {
-        $path = realpath(__DIR__ . '/../config');
+        $path = realpath(__DIR__ . '/../../config');
         $config = require "$path/$config.php";
 
         if (!is_array($config)) {

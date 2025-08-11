@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
+use DBTool\Traits\UtilitiesTrait;
+
 abstract class AbstractServerDriver extends AbstractDatabaseDriver
 {
     use UtilitiesTrait;
