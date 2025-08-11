@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
-trait GetExpectedTrait
+trait ExpectedTrait
 {
     protected function getExpected(string $filename): string
     {

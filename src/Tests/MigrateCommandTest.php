@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 
 final class MigrateCommandTest extends AbstractCommandTestCase
 {
-    use GetExpectedTrait;
+    use ExpectedTrait;
 
     function testCommand(): void
     {

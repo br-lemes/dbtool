@@ -10,7 +10,7 @@ use Symfony\Component\Console\Command\Command;
 final class CatCommandTest extends AbstractCommandTestCase
 {
     use ConstTrait;
-    use GetExpectedTrait;
+    use ExpectedTrait;
 
     function testCommand(): void
     {

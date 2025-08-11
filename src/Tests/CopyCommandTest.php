@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 final class CopyCommandTest extends AbstractCommandTestCase
 {
     use ConstTrait;
-    use GetExpectedTrait;
+    use ExpectedTrait;
 
     function testCommand(): void
     {

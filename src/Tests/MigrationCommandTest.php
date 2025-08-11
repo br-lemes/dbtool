@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 final class MigrationCommandTest extends AbstractCommandTestCase
 {
     use ConstTrait;
-    use GetExpectedTrait;
+    use ExpectedTrait;
 
     private string $migrationFile = '';
 

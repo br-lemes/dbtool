@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 final class DumpCommandTest extends AbstractCommandTestCase
 {
     use ConstTrait;
-    use GetExpectedTrait;
+    use ExpectedTrait;
 
     private array $dumpFiles = [];
 

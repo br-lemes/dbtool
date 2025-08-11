@@ -7,7 +7,7 @@ use Symfony\Component\Console\Command\Command;
 
 final class StatusCommandTest extends AbstractCommandTestCase
 {
-    use GetExpectedTrait;
+    use ExpectedTrait;
 
     function testCommand(): void
     {
