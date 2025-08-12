@@ -11,15 +11,16 @@ trait ConfigTrait
     protected function getConfig(string $config, array $required = []): array
     {
         $path = realpath(__DIR__ . '/../../config');
-        $config = require "$path/$config.php";
+        $file = "$path/$config.php";
+        $config = @include $file;
 
-        if (!is_array($config)) {
-            $this->error('Invalid configuration file');
+        if (!$config || !is_array($config)) {
+            $this->error(sprintf(self::FAILED_CONFIG, $file));
         }
 
         $config['driver'] = $config['driver'] ?? 'mysql';
         if (!array_key_exists($config['driver'], self::DRIVERS)) {
-            $this->error("Unsupported driver: {$config['driver']}");
+            $this->error(sprintf(self::UNSUPPORTED_DRIVER, $config['driver']));
         }
 
         switch ($config['driver']) {
@@ -33,13 +34,8 @@ trait ConfigTrait
 
         $missing = $this->getMissing($config, $required);
         if (!empty($missing)) {
-            $this->error(
-                'Missing required configuration: ' . implode(', ', $missing),
-            );
-        }
-
-        if (!in_array('paths.migrations', $required)) {
-            return $config;
+            $missing = implode(', ', $missing);
+            $this->error(sprintf(self::MISSING_REQUIRED, $missing));
         }
 
         return $config;
