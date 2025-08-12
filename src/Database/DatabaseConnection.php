@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
-use DBTool\Traits\UtilitiesTrait;
+use DBTool\Traits\ErrorTrait;
+use DBTool\Traits\SanitizeTrait;
 use PDOException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseConnection
 {
-    use UtilitiesTrait;
+    use ErrorTrait;
+    use SanitizeTrait;
 
     public string $type;
 

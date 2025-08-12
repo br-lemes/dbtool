@@ -6,7 +6,7 @@ namespace DBTool\Traits;
 trait ConfigTrait
 {
     use ConstTrait;
-    use UtilitiesTrait;
+    use ErrorTrait;
 
     protected function getConfig(string $config, array $required = []): array
     {

@@ -5,7 +5,7 @@ namespace DBTool\Commands;
 
 use DBTool\Database\DatabaseConnection;
 use DBTool\Traits\ConstTrait;
-use DBTool\Traits\UtilitiesTrait;
+use DBTool\Traits\ErrorTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class MigrationCommand extends BaseCommand
 {
     use ConstTrait;
-    use UtilitiesTrait;
+    use ErrorTrait;
 
     private string $help = <<<HELP
     Generates a Phinx migration file for a table.

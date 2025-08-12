@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
-use DBTool\Traits\UtilitiesTrait;
+use DBTool\Traits\ErrorTrait;
+use DBTool\Traits\SanitizeTrait;
 
 abstract class AbstractServerDriver extends AbstractDatabaseDriver
 {
-    use UtilitiesTrait;
+    use ErrorTrait;
+    use SanitizeTrait;
 
     protected int $defaultPort;
 

@@ -3,15 +3,9 @@ declare(strict_types=1);
 
 namespace DBTool\Traits;
 
-use Exception;
-use PDOException;
-
-trait UtilitiesTrait
+trait SanitizeTrait
 {
-    function error(string $message, ?PDOException $e = null): void
-    {
-        throw new Exception($e ? "$message: {$e->getMessage()}" : $message);
-    }
+    use ErrorTrait;
 
     private function sanitize(
         string $value,

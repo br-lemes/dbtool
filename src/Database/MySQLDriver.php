@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
-use DBTool\Traits\UtilitiesTrait;
 use PDO;
 use PDOException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -11,8 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MySQLDriver extends AbstractServerDriver
 {
-    use UtilitiesTrait;
-
     private ?OutputInterface $output;
 
     function __construct(array $config, ?OutputInterface $output)

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
-use DBTool\Traits\UtilitiesTrait;
+use DBTool\Traits\SanitizeTrait;
 use PDO;
 use PDOException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PgSQLDriver extends AbstractServerDriver
 {
-    use UtilitiesTrait;
+    use SanitizeTrait;
 
     private ?OutputInterface $output;
 
