@@ -20,10 +20,6 @@ trait ConfigTrait
         }
 
         $config = $config + ['batchSize' => 1000, 'driver' => 'mysql'];
-        if (!array_key_exists($config['driver'], self::DRIVERS)) {
-            $this->error(sprintf(self::UNSUPPORTED_DRIVER, $config['driver']));
-        }
-
         $reqSet = array_flip($required);
         switch ($config['driver']) {
             case 'mysql':
@@ -47,6 +43,10 @@ trait ConfigTrait
                     'username' => true,
                 ];
                 break;
+            default:
+                $this->error(
+                    sprintf(self::UNSUPPORTED_DRIVER, $config['driver']),
+                );
         }
 
         $required = array_keys($reqSet);
