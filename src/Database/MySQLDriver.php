@@ -8,14 +8,14 @@ use PDOException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MySQLDriver extends AbstractServerDriver
+class MySQLDriver extends AbstractDatabaseDriver
 {
     private ?OutputInterface $output;
 
     function __construct(array $config, ?OutputInterface $output)
     {
         $this->output = $output;
-        parent::__construct($config, 3306);
+        parent::__construct($config);
     }
 
     function buildDSN(): string

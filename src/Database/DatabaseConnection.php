@@ -3,36 +3,23 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
-use DBTool\Traits\ErrorTrait;
-use DBTool\Traits\SanitizeTrait;
+use DBTool\Traits\ConfigTrait;
 use PDOException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseConnection
 {
-    use ErrorTrait;
-    use SanitizeTrait;
+    use ConfigTrait;
 
     public string $type;
 
     private DatabaseDriver $driver;
 
-    private const DRIVERS = [
-        'mysql' => MySQLDriver::class,
-        'pgsql' => PgSQLDriver::class,
-    ];
-
     function __construct(string $configFile, ?OutputInterface $output = null)
     {
-        $path = realpath(__DIR__ . '/../../config');
-        $config = require "$path/$configFile.php";
-
-        $driver = $config['driver'] ?? 'mysql';
-        if (!array_key_exists($driver, self::DRIVERS)) {
-            $this->error("Unsupported driver: $driver");
-        }
-
+        $config = $this->getConfig($configFile);
         $config['configFile'] = $configFile;
+        $driver = $config['driver'];
         $this->driver = new (self::DRIVERS[$driver])($config, $output);
         try {
             $this->driver->connect();

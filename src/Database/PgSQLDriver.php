@@ -3,27 +3,19 @@ declare(strict_types=1);
 
 namespace DBTool\Database;
 
-use DBTool\Traits\SanitizeTrait;
 use PDO;
 use PDOException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PgSQLDriver extends AbstractServerDriver
+class PgSQLDriver extends AbstractDatabaseDriver
 {
-    use SanitizeTrait;
-
     private ?OutputInterface $output;
 
     function __construct(array $config, ?OutputInterface $output)
     {
         $this->output = $output;
-        parent::__construct($config, 5432);
-        $this->config['schema'] = $this->sanitize(
-            $this->config['schema'] ?? 'public',
-            '/^[a-zA-Z0-9_]+$/',
-            'schema',
-        );
+        parent::__construct($config);
     }
 
     function buildDSN(): string

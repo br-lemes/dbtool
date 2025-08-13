@@ -12,11 +12,7 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
 
     function __construct(array $config)
     {
-        $this->config = $config + [
-            'batchSize' => 1000,
-            'password' => null,
-            'username' => null,
-        ];
+        $this->config = $config;
     }
 
     function configureConnection(): void
