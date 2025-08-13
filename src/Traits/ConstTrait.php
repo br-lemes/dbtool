@@ -13,6 +13,7 @@ trait ConstTrait
         'pgsql' => PgSQLDriver::class,
     ];
 
+    const CANCELLED = 'Operation cancelled.';
     const COLUMN_ORDER = ['custom', 'native'];
     const FAILED_CONFIG = 'Failed to load configuration file: %s';
     const INVALID_COLUMN_ORDER =

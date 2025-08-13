@@ -37,6 +37,8 @@ class MigrationCommand extends BaseCommand
     private string $className;
     private string $tableName;
 
+    const INDENT = '            ';
+
     function complete(
         CompletionInput $input,
         CompletionSuggestions $suggestions,
@@ -118,7 +120,7 @@ class MigrationCommand extends BaseCommand
             );
 
             if (!$helper->ask($input, $output, $question)) {
-                $output->writeln('Operation cancelled.');
+                $output->writeln(self::CANCELLED);
                 return Command::FAILURE;
             }
         }
@@ -190,7 +192,7 @@ class MigrationCommand extends BaseCommand
             "\$this->table('{$this->tableName}', " .
             "['id' => false, 'primary_key' => '{$pk['COLUMN_NAME']}'])\n";
         $phinxType = $this->getPhinxType($pk['DATA_TYPE']);
-        $result .= '            ';
+        $result .= self::INDENT;
         $result .= "->addColumn('{$pk['COLUMN_NAME']}', '{$phinxType}'";
         $options = $this->getColumnOptions($pk);
         if (!empty($options)) {
@@ -224,7 +226,7 @@ class MigrationCommand extends BaseCommand
         if ($timestamps) {
             $lines[] = $timestamps;
         }
-        return '            ' . implode("\n            ", $lines) . "\n";
+        return self::INDENT . implode("\n" . self::INDENT, $lines) . "\n";
     }
 
     private function getPhinxType(string $dataType): string
@@ -338,7 +340,7 @@ class MigrationCommand extends BaseCommand
                     $key['KEY_TYPE'] === 'UNIQUE';
                 continue;
             }
-            $result .= '            ';
+            $result .= self::INDENT;
             $result .= "->addIndex('{$key['COLUMN_NAME']}'";
             if ($key['KEY_TYPE'] === 'UNIQUE') {
                 $result .= ", ['unique' => true]";
@@ -348,7 +350,7 @@ class MigrationCommand extends BaseCommand
         foreach ($composite as $_ => $columns) {
             $unique = $columns['unique'] ? ", ['unique' => true]" : '';
             unset($columns['unique']);
-            $result .= '            ';
+            $result .= self::INDENT;
             $result .= "->addIndex(['";
             $result .= implode("', '", $columns);
             $result .= "']$unique)\n";

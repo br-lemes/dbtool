@@ -49,7 +49,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('mv', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         $test = $this->exec('mv', $args, ['y']);
@@ -86,7 +86,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('mv', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         $test = $this->exec('mv', $args, ['y']);
@@ -138,7 +138,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
         ];
         $test = $this->exec('mv', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         $test = $this->exec('mv', $args, ['y']);

@@ -85,7 +85,7 @@ class TruncateCommand extends BaseCommand
         );
 
         if (!$helper->ask($input, $output, $question)) {
-            $output->writeln('Operation cancelled.');
+            $output->writeln(self::CANCELLED);
             return Command::FAILURE;
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DBTool\Commands;
 
 use DBTool\Database\DatabaseConnection;
+use DBTool\Traits\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class DumpCommand extends BaseCommand
 {
+    use ConstTrait;
+
     private string $help = <<<HELP
     Dumps the database or a specific table using mysqldump or pg_dump.
 
@@ -120,7 +123,7 @@ class DumpCommand extends BaseCommand
                 );
 
                 if (!$helper->ask($input, $output, $question)) {
-                    $output->writeln('Operation cancelled.');
+                    $output->writeln(self::CANCELLED);
                     return Command::FAILURE;
                 }
             }

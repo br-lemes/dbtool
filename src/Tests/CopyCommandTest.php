@@ -64,7 +64,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('cp', $args, ['n']);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         $catPosts = $this->getExpectedJson('cat-posts.json');
@@ -82,7 +82,7 @@ final class CopyCommandTest extends AbstractCommandTestCase
         ];
         $test = $this->exec('cp', $args, ['n']);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         $test = $this->exec('cp', $args, ['y']);

@@ -114,7 +114,7 @@ class MoveCommand extends BaseCommand
                 );
 
                 if (!$helper->ask($input, $output, $question)) {
-                    $output->writeln('Operation cancelled.');
+                    $output->writeln(self::CANCELLED);
                     return Command::FAILURE;
                 }
                 $db1->dropTable($argument3);
@@ -140,7 +140,7 @@ class MoveCommand extends BaseCommand
                 );
 
                 if (!$helper->ask($input, $output, $question)) {
-                    $output->writeln('Operation cancelled.');
+                    $output->writeln(self::CANCELLED);
                     return Command::FAILURE;
                 }
                 $db2->dropTable($argument3);

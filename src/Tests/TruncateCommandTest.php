@@ -28,7 +28,7 @@ final class TruncateCommandTest extends AbstractCommandTestCase
         $args['table'] = 'posts';
         $test = $this->exec('truncate', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         $test = $this->exec('truncate', $args, ['y']);

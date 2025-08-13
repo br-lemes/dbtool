@@ -57,7 +57,7 @@ final class DumpCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('dump', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         unset($args['--output']);

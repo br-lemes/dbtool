@@ -19,7 +19,7 @@ final class RemoveCommandTest extends AbstractCommandTestCase
         $args['table'] = 'posts';
         $test = $this->exec('rm', $args, ['n']);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
-        $cancel = str_ends_with($test->getDisplay(), "Operation cancelled.\n");
+        $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
         $test = $this->exec('rm', $args, ['y']);
