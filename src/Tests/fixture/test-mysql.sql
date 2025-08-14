@@ -1,3 +1,6 @@
+CREATE USER IF NOT EXISTS 'fail'@'%' IDENTIFIED BY 'fail';
+REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'fail'@'%';
+
 -- Create table: users
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -8,6 +11,9 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT NULL ON UPDATE current_timestamp(),
     UNIQUE KEY email (email)
 );
+
+GRANT SELECT ON test_db.users TO 'fail'@'%';
+FLUSH PRIVILEGES;
 
 -- Create table: posts
 CREATE TABLE posts (

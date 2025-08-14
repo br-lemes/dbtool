@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DBTool\Tests;
 
 use DBTool\Traits\ConstTrait;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 
 final class TruncateCommandTest extends AbstractCommandTestCase
@@ -47,6 +48,18 @@ final class TruncateCommandTest extends AbstractCommandTestCase
             'truncate',
             ['test-mysql', ''],
             self::TEST_TABLES,
+        );
+    }
+
+    function testError(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Error truncating table 'users':");
+
+        $this->exec(
+            'truncate',
+            ['config' => 'test-mysql-fail', 'table' => 'users'],
+            ['y'],
         );
     }
 }

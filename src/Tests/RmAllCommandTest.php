@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DBTool\Tests;
 
 use DBTool\Traits\ConstTrait;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 
 final class RmAllCommandTest extends AbstractCommandTestCase
@@ -21,5 +22,13 @@ final class RmAllCommandTest extends AbstractCommandTestCase
     function testComplete(): void
     {
         $this->assertCompleteDatabase('rm-all', ['']);
+    }
+
+    function testError(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Error dropping all tables:');
+
+        $this->exec('rm-all', ['config' => 'test-mysql-fail'], ['y']);
     }
 }

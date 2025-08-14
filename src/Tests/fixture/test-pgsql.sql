@@ -1,3 +1,9 @@
+CREATE ROLE fail LOGIN PASSWORD 'fail';
+REVOKE ALL ON SCHEMA public FROM fail;
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM fail;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM fail;
+GRANT CONNECT ON DATABASE test_db TO fail;
+
 -- Schema: public
 SET search_path TO public;
 

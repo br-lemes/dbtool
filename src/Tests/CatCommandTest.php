@@ -5,6 +5,7 @@ namespace DBTool\Tests;
 
 use DBTool\Traits\ConstTrait;
 use DBTool\Traits\ExpectedTrait;
+use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 
@@ -77,5 +78,27 @@ final class CatCommandTest extends AbstractCommandTestCase
         );
         $args = ['config1' => 'test-mysql', 'argument2' => 'test-pgsql'];
         $this->exec('cat', $args);
+    }
+
+    function testErrorQuery(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Error executing query:');
+
+        $this->exec('cat', [
+            'config1' => 'test-mysql-fail',
+            'argument2' => 'SELECT * FROM posts',
+        ]);
+    }
+
+    function testErrorTable(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Error querying table 'posts':");
+
+        $this->exec('cat', [
+            'config1' => 'test-mysql-fail',
+            'argument2' => 'posts',
+        ]);
     }
 }

@@ -5,6 +5,7 @@ namespace DBTool\Tests;
 
 use DBTool\Traits\ConstTrait;
 use DBTool\Traits\ExpectedTrait;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 
 final class MoveCommandTest extends AbstractCommandTestCase
@@ -161,6 +162,24 @@ final class MoveCommandTest extends AbstractCommandTestCase
             'mv',
             ['test-mysql', 'test-pgsql', ''],
             self::TEST_TABLES,
+        );
+    }
+
+    function testError(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage(
+            "Error renaming table 'users' to 'backup':",
+        );
+
+        $this->exec(
+            'mv',
+            [
+                'config1' => 'test-mysql-fail',
+                'argument2' => 'users',
+                'argument3' => 'backup',
+            ],
+            ['y'],
         );
     }
 }

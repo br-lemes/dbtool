@@ -8,4 +8,5 @@ return [
     'database' => 'test_db',
     'username' => 'test_user',
     'password' => 'test_password',
+    'paths' => ['migrations' => __DIR__ . '/../src/Tests/migration'],
 ];

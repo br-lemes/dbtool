@@ -5,6 +5,7 @@ namespace DBTool\Tests;
 
 use DBTool\Traits\ConstTrait;
 use DBTool\Traits\ExpectedTrait;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 
 final class CopyCommandTest extends AbstractCommandTestCase
@@ -103,6 +104,34 @@ final class CopyCommandTest extends AbstractCommandTestCase
             'cp',
             ['test-mysql', 'test-pgsql', ''],
             self::TEST_TABLES,
+        );
+    }
+
+    function testErrorInserting(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Error inserting into table 'posts':");
+
+        $this->exec('cp', [
+            'source' => 'test-mysql',
+            'destination' => 'test-mariadb-fail',
+            'table' => 'posts',
+        ]);
+    }
+
+    function testErrorStreaming(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Error streaming table 'users':");
+
+        $this->exec(
+            'cp',
+            [
+                'source' => 'test-pgsql-fail',
+                'destination' => 'test-pgsql',
+                'table' => 'users',
+            ],
+            ['y'],
         );
     }
 }

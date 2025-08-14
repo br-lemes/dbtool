@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DBTool\Tests;
 
 use DBTool\Traits\ConstTrait;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 
 final class RemoveCommandTest extends AbstractCommandTestCase
@@ -39,6 +40,18 @@ final class RemoveCommandTest extends AbstractCommandTestCase
             'rm',
             ['test-mysql', ''],
             self::TEST_TABLES,
+        );
+    }
+
+    function testError(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Error dropping table 'users':");
+
+        $this->exec(
+            'rm',
+            ['config' => 'test-mysql-fail', 'table' => 'users'],
+            ['y'],
         );
     }
 }

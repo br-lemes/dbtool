@@ -5,7 +5,7 @@ return [
     'host' => '127.0.0.1',
     'port' => 13306,
     'database' => 'test_db',
-    'username' => 'root',
-    'password' => 'root_password',
+    'username' => 'fail',
+    'password' => 'fail',
     'paths' => ['migrations' => __DIR__ . '/../src/Tests/migration'],
 ];

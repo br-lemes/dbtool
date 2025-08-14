@@ -64,7 +64,7 @@ class DatabaseConnection
             return $this->driver->exec($sql);
         } catch (PDOException $e) {
             $this->error('Error executing query', $e);
-            return false;
+            return false; // @codeCoverageIgnore
         }
     }
 
@@ -97,7 +97,7 @@ class DatabaseConnection
             return $this->driver->getTableData($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 
@@ -108,7 +108,7 @@ class DatabaseConnection
             return $this->driver->getTableSchema($table);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 
@@ -125,7 +125,7 @@ class DatabaseConnection
     function insertInto(string $table, array $data): void
     {
         if (empty($data)) {
-            return;
+            return; // @codeCoverageIgnore
         }
         try {
             $this->assertTable($table);
@@ -141,7 +141,7 @@ class DatabaseConnection
             return $this->driver->query($sql);
         } catch (PDOException $e) {
             $this->error('Error executing query', $e);
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 

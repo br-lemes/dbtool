@@ -54,7 +54,7 @@ class DBTool extends Application
         exec($command, $output, $resultCode);
         chdir($cwd);
         if ($resultCode !== 0) {
-            return "$major.$minor.$patch";
+            return "$major.$minor.$patch"; // @codeCoverageIgnore
         }
         foreach (array_reverse($output) as $line) {
             $line = trim($line);
