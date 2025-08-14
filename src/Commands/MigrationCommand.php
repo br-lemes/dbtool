@@ -183,10 +183,8 @@ class MigrationCommand extends BaseCommand
             $this->columns,
             fn(array $col) => $col['COLUMN_NAME'] === $pk[0]['COLUMN_NAME'],
         )[0];
-        if ($pk['COLUMN_NAME'] === 'id') {
-            if ($pk['DATA_TYPE'] === 'INTEGER') {
-                return $result . "\$this->table('{$this->tableName}')\n";
-            }
+        if ($pk['COLUMN_NAME'] === 'id' && $pk['DATA_TYPE'] === 'INTEGER') {
+            return $result . "\$this->table('{$this->tableName}')\n";
         }
         $result .=
             "\$this->table('{$this->tableName}', " .
@@ -196,7 +194,7 @@ class MigrationCommand extends BaseCommand
         $result .= "->addColumn('{$pk['COLUMN_NAME']}', '{$phinxType}'";
         $options = $this->getColumnOptions($pk);
         if (!empty($options)) {
-            $result .= ', ' . $this->array_export($options);
+            $result .= ', ' . $this->arrayExport($options);
         }
         $result .= ")\n";
         return $result;
@@ -219,7 +217,7 @@ class MigrationCommand extends BaseCommand
             $line = "->addColumn('{$column['COLUMN_NAME']}', '{$phinxType}'";
             $options = $this->getColumnOptions($column);
             if (!empty($options)) {
-                $line .= ', ' . $this->array_export($options);
+                $line .= ', ' . $this->arrayExport($options);
             }
             $lines[] = $line . ')';
         }
@@ -347,7 +345,7 @@ class MigrationCommand extends BaseCommand
             }
             $result .= ")\n";
         }
-        foreach ($composite as $_ => $columns) {
+        foreach ($composite as $columns) {
             $unique = $columns['unique'] ? ", ['unique' => true]" : '';
             unset($columns['unique']);
             $result .= self::INDENT;
@@ -368,7 +366,7 @@ class MigrationCommand extends BaseCommand
         END;
     }
 
-    private function array_export(array $array): string
+    private function arrayExport(array $array): string
     {
         if (!is_array($array)) {
             return '';
@@ -379,7 +377,7 @@ class MigrationCommand extends BaseCommand
         foreach ($array as $key => $value) {
             $item = $isAssoc ? (is_int($key) ? "$key => " : "'$key' => ") : '';
             if (is_array($value)) {
-                $item .= $this->array_export($value);
+                $item .= $this->arrayExport($value);
             } else {
                 $item .= var_export($value, true);
             }
