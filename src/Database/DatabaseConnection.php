@@ -51,7 +51,7 @@ class DatabaseConnection
     function dropTable(string $table): void
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             $this->driver->dropTable($table);
         } catch (PDOException $e) {
             $this->error("Error dropping table '$table'", $e);
@@ -71,7 +71,7 @@ class DatabaseConnection
     function getColumns(string $table, string $order): ?array
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             return $this->driver->getColumns($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
@@ -82,7 +82,7 @@ class DatabaseConnection
     function getKeys(string $table, string $order): ?array
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             return $this->driver->getKeys($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
@@ -93,7 +93,7 @@ class DatabaseConnection
     function getTableData(string $table, string $order): ?array
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             return $this->driver->getTableData($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
@@ -104,7 +104,7 @@ class DatabaseConnection
     function getTableSchema(string $table): ?string
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             return $this->driver->getTableSchema($table);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
@@ -128,7 +128,7 @@ class DatabaseConnection
             return;
         }
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             $this->driver->insertInto($table, $data);
         } catch (PDOException $e) {
             $this->error("Error inserting into table '$table'", $e);
@@ -148,8 +148,8 @@ class DatabaseConnection
     function renameTable(string $from, string $to): void
     {
         try {
-            $from = $this->sanitize($from, '/^[a-zA-Z0-9_]+$/', 'table');
-            $to = $this->sanitize($to, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($from);
+            $this->assertTable($to);
             $this->driver->renameTable($from, $to);
         } catch (PDOException $e) {
             $this->error("Error renaming table '$from' to '$to'", $e);
@@ -159,7 +159,7 @@ class DatabaseConnection
     function streamTableData(string $table, callable $callback): void
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             $this->driver->streamTableData($table, $callback);
         } catch (PDOException $e) {
             $this->error("Error streaming table '$table'", $e);
@@ -169,7 +169,7 @@ class DatabaseConnection
     function tableExists(string $table): ?bool
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             return $this->driver->tableExists($table);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
@@ -180,10 +180,15 @@ class DatabaseConnection
     function truncateTable(string $table): void
     {
         try {
-            $table = $this->sanitize($table, '/^[a-zA-Z0-9_]+$/', 'table');
+            $this->assertTable($table);
             $this->driver->truncateTable($table);
         } catch (PDOException $e) {
             $this->error("Error truncating table '$table'", $e);
         }
+    }
+
+    private function assertTable(string $table): void
+    {
+        $this->assertPattern($table, '/^[a-zA-Z0-9_]+$/', 'table');
     }
 }

@@ -3,18 +3,17 @@ declare(strict_types=1);
 
 namespace DBTool\Traits;
 
-trait SanitizeTrait
+trait AssertPatternTrait
 {
     use ErrorTrait;
 
-    private function sanitize(
+    private function assertPattern(
         string $value,
         string $pattern,
         string $name,
-    ): string {
+    ): void {
         if (!preg_match($pattern, $value)) {
             $this->error("Parameter '$name' contains invalid characters.");
         }
-        return $value;
     }
 }

@@ -5,9 +5,9 @@ namespace DBTool\Traits;
 
 trait ConfigTrait
 {
+    use AssertPatternTrait;
     use ConstTrait;
     use ErrorTrait;
-    use SanitizeTrait;
 
     protected function getConfig(string $config, array $required = []): array
     {
@@ -57,19 +57,19 @@ trait ConfigTrait
         }
 
         if (isset($reqSet['host'])) {
-            $this->sanitize($config['host'], '/^[a-zA-Z0-9.-]+$/', 'host');
+            $this->assertPattern($config['host'], '/^[a-zA-Z0-9.-]+$/', 'host');
         }
 
         $pattern = '/^[a-zA-Z0-9_]+$/';
 
         if (isset($reqSet['database'])) {
-            $this->sanitize($config['database'], $pattern, 'database');
+            $this->assertPattern($config['database'], $pattern, 'database');
         }
         if (isset($reqSet['username'])) {
-            $this->sanitize($config['username'], $pattern, 'username');
+            $this->assertPattern($config['username'], $pattern, 'username');
         }
         if (isset($reqSet['schema'])) {
-            $this->sanitize($config['schema'], $pattern, 'schema');
+            $this->assertPattern($config['schema'], $pattern, 'schema');
         }
         return $config;
     }
