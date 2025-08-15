@@ -43,6 +43,34 @@ final class ListCommandTest extends AbstractCommandTestCase
         $output = json_decode($test->getDisplay(), true);
         $this->assertEquals($lsPostsId, $output);
 
+        $args = ['config' => 'test-pgsql', 'table' => 'users'];
+        $test = $this->exec('ls', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $output = json_decode($test->getDisplay(), true);
+        $expected = $this->getExpectedJson('ls-pgsql-users-custom.json');
+        $this->assertEquals($expected, $output);
+
+        $args['-o'] = 'native';
+        $test = $this->exec('ls', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $output = json_decode($test->getDisplay(), true);
+        $expected = $this->getExpectedJson('ls-pgsql-users-native.json');
+        $this->assertEquals($expected, $output);
+
+        $args['config'] = 'test-mysql';
+        $test = $this->exec('ls', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $output = json_decode($test->getDisplay(), true);
+        $expected = $this->getExpectedJson('ls-mysql-users-native.json');
+        $this->assertEquals($expected, $output);
+
+        unset($args['-o']);
+        $test = $this->exec('ls', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $output = json_decode($test->getDisplay(), true);
+        $expected = $this->getExpectedJson('ls-mysql-users-custom.json');
+        $this->assertEquals($expected, $output);
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(self::INVALID_COLUMN_ORDER, 'invalid'),

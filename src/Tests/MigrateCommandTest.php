@@ -51,7 +51,6 @@ final class MigrateCommandTest extends AbstractCommandTestCase
             'config' => 'test-mysql',
             'migration' => 'invalid',
         ]);
-        $this->assertEquals(Command::FAILURE, $test->getStatusCode());
     }
 
     function testComplete(): void

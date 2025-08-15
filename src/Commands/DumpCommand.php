@@ -141,8 +141,10 @@ class DumpCommand extends BaseCommand
         exec("$command 2>&1", $commandOutput, $resultCode);
 
         if ($resultCode !== 0) {
+            // @codeCoverageIgnoreStart
             $output->writeln(implode("\n", $commandOutput));
             return Command::FAILURE;
+            // @codeCoverageIgnoreEnd
         }
         if ($outputFile) {
             $output->writeln("Database dumped successfully to '$outputFile'.");

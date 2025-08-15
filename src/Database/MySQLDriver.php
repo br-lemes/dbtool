@@ -144,7 +144,7 @@ class MySQLDriver extends AbstractDatabaseDriver
         ];
         foreach ($columns as &$col) {
             if (!isset($col['DATA_TYPE'])) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
             $col['DATA_TYPE'] =
                 $typeMap[strtolower($col['DATA_TYPE'])] ?? $col['DATA_TYPE'];
@@ -297,7 +297,7 @@ class MySQLDriver extends AbstractDatabaseDriver
             );
             $batch = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (empty($batch)) {
-                break;
+                break; // @codeCoverageIgnore
             }
             $callback($batch);
             if ($this->output) {

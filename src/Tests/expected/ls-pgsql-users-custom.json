@@ -1,0 +1,92 @@
+{
+    "columns": [
+        {
+            "CHARACTER_MAXIMUM_LENGTH": null,
+            "COLUMN_DEFAULT": null,
+            "COLUMN_NAME": "id",
+            "DATA_TYPE": "BIGINT",
+            "IS_AUTO_INCREMENT": "YES",
+            "IS_DEFAULT_TIMESTAMP": "NO",
+            "IS_NULLABLE": "NO",
+            "IS_UPDATE_TIMESTAMP": "NO",
+            "NUMERIC_PRECISION": null,
+            "NUMERIC_SCALE": null
+        },
+        {
+            "CHARACTER_MAXIMUM_LENGTH": 255,
+            "COLUMN_DEFAULT": null,
+            "COLUMN_NAME": "email",
+            "DATA_TYPE": "VARCHAR",
+            "IS_AUTO_INCREMENT": "NO",
+            "IS_DEFAULT_TIMESTAMP": "NO",
+            "IS_NULLABLE": "NO",
+            "IS_UPDATE_TIMESTAMP": "NO",
+            "NUMERIC_PRECISION": null,
+            "NUMERIC_SCALE": null
+        },
+        {
+            "CHARACTER_MAXIMUM_LENGTH": 100,
+            "COLUMN_DEFAULT": null,
+            "COLUMN_NAME": "name",
+            "DATA_TYPE": "VARCHAR",
+            "IS_AUTO_INCREMENT": "NO",
+            "IS_DEFAULT_TIMESTAMP": "NO",
+            "IS_NULLABLE": "NO",
+            "IS_UPDATE_TIMESTAMP": "NO",
+            "NUMERIC_PRECISION": null,
+            "NUMERIC_SCALE": null
+        },
+        {
+            "CHARACTER_MAXIMUM_LENGTH": null,
+            "COLUMN_DEFAULT": null,
+            "COLUMN_NAME": "password_hash",
+            "DATA_TYPE": "TEXT",
+            "IS_AUTO_INCREMENT": "NO",
+            "IS_DEFAULT_TIMESTAMP": "NO",
+            "IS_NULLABLE": "NO",
+            "IS_UPDATE_TIMESTAMP": "NO",
+            "NUMERIC_PRECISION": null,
+            "NUMERIC_SCALE": null
+        },
+        {
+            "CHARACTER_MAXIMUM_LENGTH": null,
+            "COLUMN_DEFAULT": null,
+            "COLUMN_NAME": "created_at",
+            "DATA_TYPE": "TIMESTAMP",
+            "IS_AUTO_INCREMENT": "NO",
+            "IS_DEFAULT_TIMESTAMP": "YES",
+            "IS_NULLABLE": "NO",
+            "IS_UPDATE_TIMESTAMP": "NO",
+            "NUMERIC_PRECISION": null,
+            "NUMERIC_SCALE": null
+        },
+        {
+            "CHARACTER_MAXIMUM_LENGTH": null,
+            "COLUMN_DEFAULT": null,
+            "COLUMN_NAME": "updated_at",
+            "DATA_TYPE": "TIMESTAMP",
+            "IS_AUTO_INCREMENT": "NO",
+            "IS_DEFAULT_TIMESTAMP": "NO",
+            "IS_NULLABLE": "YES",
+            "IS_UPDATE_TIMESTAMP": "YES",
+            "NUMERIC_PRECISION": null,
+            "NUMERIC_SCALE": null
+        }
+    ],
+    "keys": [
+        {
+            "KEY_TYPE": "PRIMARY",
+            "KEY_NAME": "users_pkey",
+            "COLUMN_NAME": "id",
+            "IS_COMPOSITE": "NO",
+            "KEY_POSITION": 1
+        },
+        {
+            "KEY_TYPE": "UNIQUE",
+            "KEY_NAME": "users_email_key",
+            "COLUMN_NAME": "email",
+            "IS_COMPOSITE": "NO",
+            "KEY_POSITION": 1
+        }
+    ]
+}

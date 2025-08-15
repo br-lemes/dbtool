@@ -37,19 +37,27 @@ final class MigrationCommandTest extends AbstractCommandTestCase
             $test->getDisplay(),
         );
 
-        $args['table'] = 'posts';
+        $args['table'] = 'users';
         $test = $this->exec('migration', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($this->migrationFile);
 
         $actual = file_get_contents($this->migrationFile);
-        $expected = $this->getMigration('20250807015231_posts.php');
+        $expected = $this->getMigration('20250807015230_users.php');
         $this->assertEquals($expected, $actual);
 
         $test = $this->exec('migration', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());
         $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
+
+        $args['table'] = 'posts';
+        $test = $this->exec('migration', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $actual = file_get_contents($this->migrationFile);
+        $expected = $this->getMigration('20250807015231_posts.php');
+        $this->assertEquals($expected, $actual);
 
         $args['table'] = 'products';
         $test = $this->exec('migration', $args, ['y']);

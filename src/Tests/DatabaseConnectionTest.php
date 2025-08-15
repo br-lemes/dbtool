@@ -15,6 +15,17 @@ class DatabaseConnectionTest extends TestCase
 {
     use ConfigTrait;
 
+    function testAssertPatternFails(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage(
+            "Parameter 'table' contains invalid characters.",
+        );
+
+        $db = new DatabaseConnection('test-mysql');
+        $db->getColumns('invalid-table', 'custom');
+    }
+
     function testConnectionFails(): void
     {
         $this->expectException(Exception::class);

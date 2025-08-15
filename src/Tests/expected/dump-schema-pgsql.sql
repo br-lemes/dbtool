@@ -17,9 +17,99 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: test_user
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO test_user;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: posts; Type: TABLE; Schema: public; Owner: test_user
+--
+
+CREATE TABLE public.posts (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    content text,
+    publish_date date,
+    title character varying(200) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.posts OWNER TO test_user;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: test_user
+--
+
+CREATE SEQUENCE public.posts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.posts_id_seq OWNER TO test_user;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test_user
+--
+
+ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
+
+
+--
+-- Name: products; Type: TABLE; Schema: public; Owner: test_user
+--
+
+CREATE TABLE public.products (
+    id integer NOT NULL,
+    description_long text,
+    description_medium text,
+    description_tiny text,
+    ean character varying(100) NOT NULL,
+    name character varying(255) NOT NULL,
+    price numeric(10,2) DEFAULT 0.00,
+    sku character varying(100) NOT NULL,
+    status character varying(50) DEFAULT 'active'::character varying,
+    stock integer DEFAULT 0,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    refresh_at timestamp without time zone
+);
+
+
+ALTER TABLE public.products OWNER TO test_user;
+
+--
+-- Name: products_id_seq; Type: SEQUENCE; Schema: public; Owner: test_user
+--
+
+CREATE SEQUENCE public.products_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.products_id_seq OWNER TO test_user;
+
+--
+-- Name: products_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test_user
+--
+
+ALTER SEQUENCE public.products_id_seq OWNED BY public.products.id;
+
 
 --
 -- Name: users; Type: TABLE; Schema: public; Owner: test_user
@@ -59,10 +149,48 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
+-- Name: posts id; Type: DEFAULT; Schema: public; Owner: test_user
+--
+
+ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_id_seq'::regclass);
+
+
+--
+-- Name: products id; Type: DEFAULT; Schema: public; Owner: test_user
+--
+
+ALTER TABLE ONLY public.products ALTER COLUMN id SET DEFAULT nextval('public.products_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: test_user
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: test_user
+--
+
+ALTER TABLE ONLY public.posts
+    ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: products products_ean_sku_key; Type: CONSTRAINT; Schema: public; Owner: test_user
+--
+
+ALTER TABLE ONLY public.products
+    ADD CONSTRAINT products_ean_sku_key UNIQUE (ean, sku);
+
+
+--
+-- Name: products products_pkey; Type: CONSTRAINT; Schema: public; Owner: test_user
+--
+
+ALTER TABLE ONLY public.products
+    ADD CONSTRAINT products_pkey PRIMARY KEY (id);
 
 
 --
@@ -79,6 +207,20 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: posts_user_id; Type: INDEX; Schema: public; Owner: test_user
+--
+
+CREATE INDEX posts_user_id ON public.posts USING btree (user_id);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: test_user
+--
+
+REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 
 
 --

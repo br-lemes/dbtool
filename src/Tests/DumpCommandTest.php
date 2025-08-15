@@ -45,6 +45,7 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $dumpFile = __DIR__ . 'dump-schema-mysql.sql';
         $this->dumpFiles[] = $dumpFile;
 
+        unset($args['table']);
         $args['--output'] = $dumpFile;
         $args['--schema-only'] = true;
         $test = $this->exec('dump', $args);
@@ -71,6 +72,7 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $this->dumpFiles[] = $dumpFile;
 
         $args['config'] = 'test-pgsql';
+        $args['table'] = 'users';
         $args['--output'] = $dumpFile;
         $args['--schema-only'] = false;
         $test = $this->exec('dump', $args);
@@ -83,6 +85,7 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $dumpFile = __DIR__ . 'dump-schema-pgsql.sql';
         $this->dumpFiles[] = $dumpFile;
 
+        unset($args['table']);
         $args['--output'] = $dumpFile;
         $args['--schema-only'] = true;
         $test = $this->exec('dump', $args);
