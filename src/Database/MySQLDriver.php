@@ -111,6 +111,7 @@ class MySQLDriver extends AbstractDatabaseDriver
                 INFORMATION_SCHEMA.COLUMNS
             WHERE
                 TABLE_SCHEMA = :database AND TABLE_NAME = :table
+            ORDER BY ORDINAL_POSITION
         SQL;
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
