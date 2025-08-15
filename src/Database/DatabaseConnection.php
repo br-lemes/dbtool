@@ -75,7 +75,7 @@ class DatabaseConnection
             return $this->driver->getColumns($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 
@@ -86,7 +86,7 @@ class DatabaseConnection
             return $this->driver->getKeys($table, $order);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 
@@ -118,7 +118,7 @@ class DatabaseConnection
             return $this->driver->getTables();
         } catch (PDOException $e) {
             $this->error('Error querying tables', $e);
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 
@@ -173,7 +173,7 @@ class DatabaseConnection
             return $this->driver->tableExists($table);
         } catch (PDOException $e) {
             $this->error("Error querying table '$table'", $e);
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 
