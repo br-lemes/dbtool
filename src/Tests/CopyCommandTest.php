@@ -16,8 +16,9 @@ final class CopyCommandTest extends AbstractCommandTestCase
     function testCommand(): void
     {
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['products', 'users'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog', 'posts']);
+        $this->assertEquals($expected, $actual);
 
         $test = $this->exec('cp', [
             'source' => 'test-pgsql',
@@ -38,8 +39,9 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog']);
+        $this->assertEquals($expected, $actual);
 
         $args = ['config1' => 'test-pgsql', 'argument2' => 'posts'];
         $test = $this->exec('cat', $args);
@@ -73,8 +75,8 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $args = ['config1' => 'test-pgsql', 'argument2' => 'posts'];
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($catPosts, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $this->assertEquals($catPosts, $actual);
 
         $args = [
             'source' => 'test-mariadb',
@@ -92,8 +94,8 @@ final class CopyCommandTest extends AbstractCommandTestCase
         $args = ['config1' => 'test-mysql', 'argument2' => 'posts'];
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($catPosts, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $this->assertEquals($catPosts, $actual);
     }
 
     function testComplete(): void

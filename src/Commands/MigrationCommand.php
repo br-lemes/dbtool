@@ -34,6 +34,7 @@ class MigrationCommand extends BaseCommand
     private DatabaseConnection $db;
     private array $columns;
     private array $indexes;
+    private bool $ignoreIdColumn;
     private string $className;
     private string $tableName;
 
@@ -164,6 +165,8 @@ class MigrationCommand extends BaseCommand
 
     private function generateTableDefinition(): string
     {
+        $this->ignoreIdColumn = true;
+
         $this->columns = $this->db->getColumns($this->tableName, 'custom');
         $this->indexes = $this->db->getKeys($this->tableName, 'custom');
         $result = '        ';
@@ -177,7 +180,13 @@ class MigrationCommand extends BaseCommand
                 "\$this->table('{$this->tableName}', ['id' => false])\n";
         }
         if ($pkCount > 1) {
-            $this->error('Composite primary key is not supported'); // return
+            $this->ignoreIdColumn = false;
+            $pkColumns = array_map(fn(array $key) => $key['COLUMN_NAME'], $pk);
+            return $result .
+                "\$this->table('{$this->tableName}', " .
+                "['id' => false, 'primary_key' => ['" .
+                implode("', '", $pkColumns) .
+                "']])\n";
         }
         $pk = array_filter(
             $this->columns,
@@ -186,23 +195,18 @@ class MigrationCommand extends BaseCommand
         if ($pk['COLUMN_NAME'] === 'id' && $pk['DATA_TYPE'] === 'INTEGER') {
             return $result . "\$this->table('{$this->tableName}')\n";
         }
-        $result .=
+        $this->ignoreIdColumn = false;
+        return $result .
             "\$this->table('{$this->tableName}', " .
             "['id' => false, 'primary_key' => '{$pk['COLUMN_NAME']}'])\n";
-        $phinxType = $this->getPhinxType($pk['DATA_TYPE']);
-        $result .= self::INDENT;
-        $result .= "->addColumn('{$pk['COLUMN_NAME']}', '{$phinxType}'";
-        $options = $this->getColumnOptions($pk);
-        if (!empty($options)) {
-            $result .= ', ' . $this->arrayExport($options);
-        }
-        $result .= ")\n";
-        return $result;
     }
 
     private function generateColumns(): string
     {
-        $ignore = ['id', 'created_at', 'refresh_at', 'updated_at'];
+        $ignore = ['created_at', 'refresh_at', 'updated_at'];
+        if ($this->ignoreIdColumn) {
+            $ignore[] = 'id';
+        }
         $lines = [];
         $timestamps = $this->getTimestampDefinition();
         foreach ($this->columns as $column) {
@@ -317,6 +321,9 @@ class MigrationCommand extends BaseCommand
                 return '->addTimestamps()';
             }
             return "->addTimestamps('created_at', false)";
+        }
+        if (in_array('refresh_at', $names)) {
+            return "->addTimestamps(false, 'refresh_at')";
         }
         if (in_array('updated_at', $names)) {
             return "->addTimestamps(false, 'updated_at')";

@@ -210,8 +210,14 @@ class PgSQLDriver extends AbstractDatabaseDriver
 
     function getTableData(string $table, string $order): array
     {
+        $orderColumns = $this->getBestOrderColumns($table);
+        $orderClause = '';
+        if (!empty($orderColumns)) {
+            $quotedColumns = array_map(fn($col) => "\"$col\"", $orderColumns);
+            $orderClause = ' ORDER BY ' . implode(', ', $quotedColumns);
+        }
         $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
-        $sql = "SELECT * FROM $schemaTable ORDER BY id";
+        $sql = "SELECT * FROM $schemaTable $orderClause";
         $stmt = $this->pdo->query($sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         if ($order === 'custom' && !empty($data)) {

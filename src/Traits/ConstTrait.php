@@ -37,6 +37,16 @@ trait ConstTrait
         'title',
         'created_at',
     ];
-    const TEST_TABLES = ['phinxlog', 'posts', 'products', 'users'];
-    const TEST_TABLES_NO_PHINXLOG = ['posts', 'products', 'users'];
+    const TEST_TABLES = [
+        'phinxlog',
+        'posts',
+        'products',
+        'user_groups',
+        'users',
+    ];
+
+    function pruneTestTables(array $remove)
+    {
+        return array_values(array_diff(self::TEST_TABLES, $remove));
+    }
 }

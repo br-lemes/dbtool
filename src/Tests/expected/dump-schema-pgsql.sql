@@ -112,6 +112,20 @@ ALTER SEQUENCE public.products_id_seq OWNED BY public.products.id;
 
 
 --
+-- Name: user_groups; Type: TABLE; Schema: public; Owner: test_user
+--
+
+CREATE TABLE public.user_groups (
+    id integer NOT NULL,
+    user_id bigint NOT NULL,
+    updated_at timestamp without time zone,
+    key_id integer
+);
+
+
+ALTER TABLE public.user_groups OWNER TO test_user;
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: test_user
 --
 
@@ -194,6 +208,14 @@ ALTER TABLE ONLY public.products
 
 
 --
+-- Name: user_groups user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: test_user
+--
+
+ALTER TABLE ONLY public.user_groups
+    ADD CONSTRAINT user_groups_pkey PRIMARY KEY (id, user_id);
+
+
+--
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: test_user
 --
 
@@ -214,6 +236,13 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE INDEX posts_user_id ON public.posts USING btree (user_id);
+
+
+--
+-- Name: user_groups_key_id; Type: INDEX; Schema: public; Owner: test_user
+--
+
+CREATE INDEX user_groups_key_id ON public.user_groups USING btree (key_id);
 
 
 --

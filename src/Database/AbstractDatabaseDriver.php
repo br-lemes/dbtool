@@ -36,6 +36,43 @@ abstract class AbstractDatabaseDriver implements DatabaseDriver
         return $this->pdo->exec($sql);
     }
 
+    function getBestOrderColumns(string $table): array
+    {
+        $result = [];
+
+        $keys = $this->getKeys($table, 'native');
+        foreach ($keys as $key) {
+            if ($key['KEY_TYPE'] === 'PRIMARY') {
+                $result[] = $key['COLUMN_NAME'];
+            }
+        }
+
+        if (!empty($result)) {
+            return $result;
+        }
+
+        foreach ($keys as $key) {
+            if ($key['KEY_TYPE'] === 'UNIQUE') {
+                $keyName = $key['KEY_NAME'];
+                if (!isset($result[$keyName])) {
+                    $result[$keyName] = [];
+                }
+                $result[$keyName][] = $key['COLUMN_NAME'];
+            }
+        }
+
+        if (!empty($result)) {
+            return reset($result);
+        }
+
+        $columns = $this->getColumns($table, 'native');
+        if (!empty($columns)) {
+            $result[] = $columns[0]['COLUMN_NAME'];
+        }
+
+        return $result;
+    }
+
     function query(string $sql): array
     {
         $stmt = $this->pdo->query($sql);

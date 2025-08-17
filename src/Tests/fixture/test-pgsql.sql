@@ -46,6 +46,17 @@ CREATE TABLE public.products (
 
 CREATE INDEX posts_user_id ON public.posts (user_id);
 
+-- Create table: user_groups
+CREATE TABLE user_groups (
+    id INT NOT NULL,
+    user_id BIGINT NOT NULL,
+    updated_at TIMESTAMP,
+    key_id INT,
+    PRIMARY KEY (id, user_id)
+);
+
+CREATE INDEX user_groups_key_id ON public.user_groups (key_id);
+
 -- Insert data into users
 INSERT INTO public.users (email, name, password_hash, created_at, updated_at) VALUES
 ('john.doe@example.com', 'John Doe', '$2y$10$abc123hashedPassword', '2025-07-24 09:00:00', NULL),
@@ -57,3 +68,6 @@ INSERT INTO public.posts (user_id, content, publish_date, title, created_at) VAL
 (1, 'This is the content of my first post.', '2025-07-24', 'My First Post', '2025-07-24 09:10:00'),
 (1, 'More content here.', NULL, 'Another Post', '2025-07-24 09:20:00'),
 (2, 'Jane shares her thoughts.', '2025-07-25', 'Jane''s Blog', '2025-07-24 09:25:00');
+
+-- Insert data into user_groups
+INSERT INTO public.user_groups (id, user_id) VALUES (3, 2), (1, 1), (2, 1), (1, 2);

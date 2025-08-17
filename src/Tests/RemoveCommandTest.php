@@ -27,10 +27,9 @@ final class RemoveCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $this->assertEquals(
-            ['phinxlog', 'products', 'users'],
-            json_decode($test->getDisplay(), true),
-        );
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['posts']);
+        $this->assertEquals($expected, $actual);
     }
 
     function testComplete(): void

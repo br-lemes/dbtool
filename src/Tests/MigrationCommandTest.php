@@ -24,7 +24,7 @@ final class MigrationCommandTest extends AbstractCommandTestCase
 
     function testCommand(): void
     {
-        $this->migrationFile = __DIR__ . 'actual-migration.php';
+        $this->migrationFile = __DIR__ . '/actual-migration.php';
         $args = [
             'config' => 'test-mysql',
             'table' => 'postagens',
@@ -65,6 +65,14 @@ final class MigrationCommandTest extends AbstractCommandTestCase
 
         $actual = file_get_contents($this->migrationFile);
         $expected = $this->getMigration('20250807015232_products.php');
+        $this->assertEquals($expected, $actual);
+
+        $args['table'] = 'user_groups';
+        $test = $this->exec('migration', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $actual = file_get_contents($this->migrationFile);
+        $expected = $this->getMigration('20250807015233_user_groups.php');
         $this->assertEquals($expected, $actual);
     }
 

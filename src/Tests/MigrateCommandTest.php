@@ -35,8 +35,8 @@ final class MigrateCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['phinxlog', 'products'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $this->assertEquals(['phinxlog', 'products'], $actual);
 
         $test = $this->exec('migrate', ['config' => 'test-mysql']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
@@ -63,6 +63,7 @@ final class MigrateCommandTest extends AbstractCommandTestCase
                 '20250807015230 Users',
                 '20250807015231 Posts',
                 '20250807015232 Products',
+                '20250807015233 UserGroups',
             ],
         );
     }

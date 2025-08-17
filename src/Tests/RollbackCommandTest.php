@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace DBTool\Tests;
 
+use DBTool\Traits\ConstTrait;
 use Symfony\Component\Console\Command\Command;
 
 final class RollbackCommandTest extends AbstractCommandTestCase
 {
+    use ConstTrait;
+
     function testCommand(): void
     {
         $test = $this->exec('rollback', ['config' => 'test-mysql']);
@@ -14,8 +17,9 @@ final class RollbackCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['phinxlog', 'posts', 'users'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['user_groups']);
+        $this->assertEquals($expected, $actual);
     }
 
     function testComplete(): void

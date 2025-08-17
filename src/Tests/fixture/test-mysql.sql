@@ -43,6 +43,16 @@ CREATE TABLE products (
     UNIQUE KEY `ean_sku` (`ean`, `sku`)
 );
 
+-- Create table: user_groups
+CREATE TABLE user_groups (
+    id INT NOT NULL,
+    user_id BIGINT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NULL ON UPDATE current_timestamp(),
+    key_id INT,
+    PRIMARY KEY (id, user_id),
+    KEY key_id (key_id)
+);
+
 -- Create table: phinxlog
 CREATE TABLE phinxlog (
     version BIGINT NOT NULL PRIMARY KEY,
@@ -70,8 +80,12 @@ INSERT INTO products (description_long, description_medium, description_tiny, ea
 ('Long Desc B', 'Medium Desc B', 'Tiny Desc B', 'EAN-B-002', 'Product B', 29.99, 'SKU-B-002', 'active', 250, NOW(), NOW()),
 ('Long Desc C', 'Medium Desc C', 'Tiny Desc C', 'EAN-C-003', 'Product C', 9.99, 'SKU-C-003', 'active', 50, NOW(), NOW());
 
+-- Insert data into user_groups
+INSERT INTO user_groups (id, user_id) VALUES (3, 2), (1, 1), (2, 1), (1, 2);
+
 -- Insert data into phinxlog
 INSERT INTO phinxlog (version, migration_name, start_time, end_time, breakpoint) VALUES
 (20250807015230, 'Users', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0),
 (20250807015231, 'Posts', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0),
-(20250807015232, 'Products', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0);
+(20250807015232, 'Products', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0),
+(20250807015233, 'UserGroups', '2025-08-11 02:33:47', '2025-08-11 02:33:47', 0);

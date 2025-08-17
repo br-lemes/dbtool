@@ -16,16 +16,18 @@ final class MoveCommandTest extends AbstractCommandTestCase
     function testCommand(): void
     {
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['products', 'users'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog', 'posts']);
+        $this->assertEquals($expected, $actual);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $this->assertEquals(self::TEST_TABLES, $actual);
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog']);
+        $this->assertEquals($expected, $actual);
 
         $test = $this->exec('mv', [
             'config1' => 'test-mysql',
@@ -35,12 +37,14 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog']);
+        $this->assertEquals($expected, $actual);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['phinxlog', 'products', 'users'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['posts']);
+        $this->assertEquals($expected, $actual);
 
         $args = [
             'config1' => 'test-pgsql',
@@ -57,8 +61,9 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['posts', 'products'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog', 'users']);
+        $this->assertEquals($expected, $actual);
 
         $args['argument3'] = 'posts';
         $test = $this->exec('mv', $args);
@@ -76,8 +81,10 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['postagens', 'products'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog', 'posts', 'users']);
+        array_unshift($expected, 'postagens');
+        $this->assertEquals($expected, $actual);
 
         $args = [
             'config1' => 'test-mysql',
@@ -121,16 +128,18 @@ final class MoveCommandTest extends AbstractCommandTestCase
 
         $test = $this->exec('cat', $catArgs);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($catProducts, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $this->assertEquals($catProducts, $actual);
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(self::TEST_TABLES_NO_PHINXLOG, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog']);
+        $this->assertEquals($expected, $actual);
 
         $test = $this->exec('ls', ['config' => 'test-mysql']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['phinxlog'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['posts', 'products', 'users']);
+        $this->assertEquals($expected, $actual);
 
         $args = [
             'config1' => 'test-mariadb',
@@ -146,8 +155,9 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
         $test = $this->exec('ls', ['config' => 'test-mariadb']);
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals(['products', 'users'], $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->pruneTestTables(['phinxlog', 'posts']);
+        $this->assertEquals($expected, $actual);
     }
 
     function testComplete(): void

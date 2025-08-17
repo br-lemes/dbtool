@@ -33,6 +33,16 @@ CREATE TABLE products (
     UNIQUE KEY `ean_sku` (`ean`, `sku`)
 );
 
+-- Create table: user_groups
+CREATE TABLE user_groups (
+    id INT NOT NULL,
+    user_id BIGINT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NULL ON UPDATE current_timestamp(),
+    key_id INT,
+    PRIMARY KEY (id, user_id),
+    KEY key_id (key_id)
+);
+
 -- Insert data into users
 INSERT INTO users (name, email, password_hash, created_at, updated_at) VALUES
 ('John Doe', 'john.doe@example.com', '$2y$10$abc123hashedPassword', '2025-07-24 09:00:00', NULL),
@@ -44,3 +54,6 @@ INSERT INTO products (description_long, description_medium, description_tiny, ea
 ('Long Desc A', 'Medium Desc A', 'Tiny Desc A', 'EAN-A-001', 'Product A', 19.99, 'SKU-A-001', 'active', 100, NOW(), NOW()),
 ('Long Desc B', 'Medium Desc B', 'Tiny Desc B', 'EAN-B-002', 'Product B', 29.99, 'SKU-B-002', 'active', 250, NOW(), NOW()),
 ('Long Desc C', 'Medium Desc C', 'Tiny Desc C', 'EAN-C-003', 'Product C', 9.99, 'SKU-C-003', 'active', 50, NOW(), NOW());
+
+-- Insert data into user_groups
+INSERT INTO user_groups (id, user_id) VALUES (3, 2), (1, 1), (2, 1), (1, 2);

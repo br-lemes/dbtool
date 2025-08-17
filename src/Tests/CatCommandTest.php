@@ -20,34 +20,46 @@ final class CatCommandTest extends AbstractCommandTestCase
         $sql =
             'SELECT p.id, p.title, u.name FROM posts AS p JOIN users AS u ON p.user_id = u.id';
 
-        $catPosts = $this->getExpectedJson('cat-posts.json');
-        $catQuery = $this->getExpectedJson('cat-query.json');
-        $catComparePosts = $this->getExpected('cat-compare-posts.txt');
-        $catCompareQuery = $this->getExpected('cat-compare-query.txt');
-
         $args['argument2'] = 'posts';
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($catPosts, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->getExpectedJson('cat-posts.json');
+        $this->assertEquals($expected, $actual);
 
         $args['argument2'] = $sql;
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $output = json_decode($test->getDisplay(), true);
-        $this->assertEquals($catQuery, $output);
+        $actual = json_decode($test->getDisplay(), true);
+        $expected = $this->getExpectedJson('cat-query.json');
+        $this->assertEquals($expected, $actual);
 
         $args['argument2'] = 'test-pgsql';
 
         $args['argument3'] = 'posts';
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $this->assertEquals($catComparePosts, $test->getDisplay());
+        $expected = $this->getExpected('cat-compare-posts.txt');
+        $this->assertEquals($expected, $test->getDisplay());
 
         $args['argument3'] = $sql;
         $test = $this->exec('cat', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $this->assertEquals($catCompareQuery, $test->getDisplay());
+        $expected = $this->getExpected('cat-compare-query.txt');
+        $this->assertEquals($expected, $test->getDisplay());
+
+        $args['argument2'] = 'user_groups';
+        unset($args['argument3']);
+        $test = $this->exec('cat', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $expected = $this->getExpectedJson('cat-user_groups.json');
+        $this->assertEquals($expected, json_decode($test->getDisplay(), true));
+
+        $args['config1'] = 'test-pgsql';
+        $test = $this->exec('cat', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $expected = $this->getExpectedJson('cat-user_groups.json');
+        $this->assertEquals($expected, json_decode($test->getDisplay(), true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

@@ -199,7 +199,13 @@ class MySQLDriver extends AbstractDatabaseDriver
 
     function getTableData(string $table, string $order): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM `$table` ORDER BY id");
+        $orderColumns = $this->getBestOrderColumns($table);
+        $orderClause = '';
+        if (!empty($orderColumns)) {
+            $quotedColumns = array_map(fn($col) => "`$col`", $orderColumns);
+            $orderClause = ' ORDER BY ' . implode(', ', $quotedColumns);
+        }
+        $stmt = $this->pdo->query("SELECT * FROM `$table` $orderClause");
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         if ($order === 'custom' && !empty($data)) {
             $keys = array_column(
