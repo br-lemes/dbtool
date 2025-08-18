@@ -83,7 +83,7 @@ final class MoveCommandTest extends AbstractCommandTestCase
         $test = $this->exec('ls', ['config' => 'test-pgsql']);
         $actual = json_decode($test->getDisplay(), true);
         $expected = $this->pruneTestTables(['phinxlog', 'posts', 'users']);
-        array_unshift($expected, 'postagens');
+        array_splice($expected, 1, 0, 'postagens');
         $this->assertEquals($expected, $actual);
 
         $args = [

@@ -39,8 +39,10 @@ trait ConstTrait
     ];
     const TEST_TABLES = [
         'phinxlog',
+        'post_tags',
         'posts',
         'products',
+        'tags',
         'user_groups',
         'users',
     ];

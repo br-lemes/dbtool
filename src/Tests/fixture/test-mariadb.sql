@@ -30,7 +30,7 @@ CREATE TABLE products (
     stock INT DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     refresh_at TIMESTAMP DEFAULT NULL ON UPDATE current_timestamp(),
-    UNIQUE KEY `ean_sku` (`ean`, `sku`)
+    UNIQUE KEY ean_sku (ean, sku)
 );
 
 -- Create table: user_groups
@@ -41,6 +41,21 @@ CREATE TABLE user_groups (
     key_id INT,
     PRIMARY KEY (id, user_id),
     KEY key_id (key_id)
+);
+
+-- Create table: tags
+CREATE TABLE tags (
+    id INT,
+    description TEXT,
+    name VARCHAR(100)
+);
+
+-- Create table: post_tags
+CREATE TABLE post_tags (
+    post_id BIGINT NOT NULL,
+    tag_id INT NOT NULL,
+    refresh_at TIMESTAMP DEFAULT NULL ON UPDATE current_timestamp(),
+    UNIQUE KEY post_tag (post_id, tag_id)
 );
 
 -- Insert data into users
@@ -57,3 +72,12 @@ INSERT INTO products (description_long, description_medium, description_tiny, ea
 
 -- Insert data into user_groups
 INSERT INTO user_groups (id, user_id) VALUES (3, 2), (1, 1), (2, 1), (1, 2);
+
+-- Insert data into tags
+INSERT INTO tags (id, name, description) VALUES
+(1, 'Electronics', 'Devices and gadgets'),
+(2, 'Books', 'Printed and digital books'),
+(3, 'Clothing', 'Apparel and accessories');
+
+-- Insert data into post_tags
+INSERT INTO post_tags (post_id, tag_id) VALUES (3, 2), (1, 1), (2, 1), (1, 2);

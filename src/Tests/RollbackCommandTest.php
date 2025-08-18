@@ -18,7 +18,7 @@ final class RollbackCommandTest extends AbstractCommandTestCase
         $test = $this->exec('ls', ['config' => 'test-mysql']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $actual = json_decode($test->getDisplay(), true);
-        $expected = $this->pruneTestTables(['user_groups']);
+        $expected = $this->pruneTestTables(['post_tags']);
         $this->assertEquals($expected, $actual);
     }
 

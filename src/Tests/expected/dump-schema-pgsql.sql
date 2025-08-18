@@ -31,6 +31,19 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: post_tags; Type: TABLE; Schema: public; Owner: test_user
+--
+
+CREATE TABLE public.post_tags (
+    post_id bigint NOT NULL,
+    tag_id integer NOT NULL,
+    refresh_at timestamp without time zone
+);
+
+
+ALTER TABLE public.post_tags OWNER TO test_user;
+
+--
 -- Name: posts; Type: TABLE; Schema: public; Owner: test_user
 --
 
@@ -112,6 +125,19 @@ ALTER SEQUENCE public.products_id_seq OWNED BY public.products.id;
 
 
 --
+-- Name: tags; Type: TABLE; Schema: public; Owner: test_user
+--
+
+CREATE TABLE public.tags (
+    id integer,
+    description text,
+    name character varying(100)
+);
+
+
+ALTER TABLE public.tags OWNER TO test_user;
+
+--
 -- Name: user_groups; Type: TABLE; Schema: public; Owner: test_user
 --
 
@@ -181,6 +207,14 @@ ALTER TABLE ONLY public.products ALTER COLUMN id SET DEFAULT nextval('public.pro
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Name: post_tags post_tags_post_tag; Type: CONSTRAINT; Schema: public; Owner: test_user
+--
+
+ALTER TABLE ONLY public.post_tags
+    ADD CONSTRAINT post_tags_post_tag UNIQUE (post_id, tag_id);
 
 
 --

@@ -74,6 +74,22 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $actual = file_get_contents($this->migrationFile);
         $expected = $this->getMigration('20250807015233_user_groups.php');
         $this->assertEquals($expected, $actual);
+
+        $args['table'] = 'tags';
+        $test = $this->exec('migration', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $actual = file_get_contents($this->migrationFile);
+        $expected = $this->getMigration('20250807015234_tags.php');
+        $this->assertEquals($expected, $actual);
+
+        $args['table'] = 'post_tags';
+        $test = $this->exec('migration', $args, ['y']);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+
+        $actual = file_get_contents($this->migrationFile);
+        $expected = $this->getMigration('20250807015235_post_tags.php');
+        $this->assertEquals($expected, $actual);
     }
 
     function testComplete(): void

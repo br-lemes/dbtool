@@ -61,6 +61,18 @@ final class CatCommandTest extends AbstractCommandTestCase
         $expected = $this->getExpectedJson('cat-user_groups.json');
         $this->assertEquals($expected, json_decode($test->getDisplay(), true));
 
+        $args['argument2'] = 'tags';
+        $test = $this->exec('cat', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $expected = $this->getExpectedJson('cat-tags.json');
+        $this->assertEquals($expected, json_decode($test->getDisplay(), true));
+
+        $args['argument2'] = 'post_tags';
+        $test = $this->exec('cat', $args);
+        $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
+        $expected = $this->getExpectedJson('cat-post_tags.json');
+        $this->assertEquals($expected, json_decode($test->getDisplay(), true));
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             sprintf(self::INVALID_COLUMN_ORDER, 'invalid'),

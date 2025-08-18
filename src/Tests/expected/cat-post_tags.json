@@ -1,0 +1,22 @@
+[
+    {
+        "post_id": 1,
+        "tag_id": 1,
+        "refresh_at": null
+    },
+    {
+        "post_id": 1,
+        "tag_id": 2,
+        "refresh_at": null
+    },
+    {
+        "post_id": 2,
+        "tag_id": 1,
+        "refresh_at": null
+    },
+    {
+        "post_id": 3,
+        "tag_id": 2,
+        "refresh_at": null
+    }
+]

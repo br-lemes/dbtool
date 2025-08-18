@@ -64,6 +64,8 @@ final class MigrateCommandTest extends AbstractCommandTestCase
                 '20250807015231 Posts',
                 '20250807015232 Products',
                 '20250807015233 UserGroups',
+                '20250807015234 Tags',
+                '20250807015235 PostTags',
             ],
         );
     }

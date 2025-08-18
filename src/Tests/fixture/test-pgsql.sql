@@ -57,6 +57,21 @@ CREATE TABLE user_groups (
 
 CREATE INDEX user_groups_key_id ON public.user_groups (key_id);
 
+-- Create table: tags
+CREATE TABLE public.tags (
+    id INT,
+    description TEXT,
+    name VARCHAR(100)
+);
+
+-- Create table: post_tags
+CREATE TABLE public.post_tags (
+    post_id BIGINT NOT NULL,
+    tag_id INT NOT NULL,
+    refresh_at TIMESTAMP,
+    CONSTRAINT post_tags_post_tag UNIQUE (post_id, tag_id)
+);
+
 -- Insert data into users
 INSERT INTO public.users (email, name, password_hash, created_at, updated_at) VALUES
 ('john.doe@example.com', 'John Doe', '$2y$10$abc123hashedPassword', '2025-07-24 09:00:00', NULL),
@@ -71,3 +86,12 @@ INSERT INTO public.posts (user_id, content, publish_date, title, created_at) VAL
 
 -- Insert data into user_groups
 INSERT INTO public.user_groups (id, user_id) VALUES (3, 2), (1, 1), (2, 1), (1, 2);
+
+-- Insert data into tags
+INSERT INTO public.tags (id, name, description) VALUES
+(1, 'Electronics', 'Devices and gadgets'),
+(2, 'Books', 'Printed and digital books'),
+(3, 'Clothing', 'Apparel and accessories');
+
+-- Insert data into post_tags
+INSERT INTO post_tags (post_id, tag_id) VALUES (3, 2), (1, 1), (2, 1), (1, 2);
