@@ -243,28 +243,7 @@ class PgSQLDriver extends AbstractDatabaseDriver
         $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
         $sqlParts = ["CREATE TABLE $schemaTable ("];
 
-        $columnsSql = <<<SQL
-            SELECT
-                column_name,
-                data_type,
-                character_maximum_length,
-                numeric_precision,
-                numeric_scale,
-                is_nullable,
-                column_default
-            FROM
-                information_schema.columns
-            WHERE
-                table_schema = :schema AND table_name = :table
-            ORDER BY
-                ordinal_position
-        SQL;
-        $stmt = $this->pdo->prepare($columnsSql);
-        $stmt->execute([
-            ':schema' => $this->config['schema'],
-            ':table' => $table,
-        ]);
-        $columns = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $columns = $this->getSchemaColumns($table);
 
         $columnDefs = [];
         foreach ($columns as $col) {
@@ -295,37 +274,7 @@ class PgSQLDriver extends AbstractDatabaseDriver
             $columnDefs[] = $def;
         }
 
-        $constraintsSql = <<<SQL
-            SELECT
-                CASE
-                    WHEN i.indisprimary
-                        THEN 'PRIMARY KEY'
-                    WHEN i.indisunique
-                        THEN 'UNIQUE'
-                        ELSE NULL
-                END AS key_type,
-                array_agg(a.attname) AS column_names
-            FROM
-                pg_index i
-            JOIN
-                pg_class t ON t.oid = i.indrelid
-            JOIN
-                pg_attribute a ON a.attrelid = t.oid
-                    AND a.attnum = ANY(i.indkey)
-            WHERE
-                t.relname = :table
-                    AND t.relnamespace =
-                        (SELECT oid FROM pg_namespace WHERE nspname = :schema)
-                    AND (i.indisprimary OR i.indisunique)
-            GROUP BY
-                i.indisprimary, i.indisunique
-        SQL;
-        $stmt = $this->pdo->prepare($constraintsSql);
-        $stmt->execute([
-            ':schema' => $this->config['schema'],
-            ':table' => $table,
-        ]);
-        $keys = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $keys = $this->getSchemaKeys($table);
 
         foreach ($keys as $key) {
             $columnNames = explode(',', trim($key['column_names'], '{}'));
@@ -344,33 +293,7 @@ class PgSQLDriver extends AbstractDatabaseDriver
         $sqlParts[] = implode(",\n", $columnDefs);
         $sqlParts[] = ');';
 
-        $indexesSql = <<<SQL
-            SELECT
-                ic.relname AS index_name,
-                array_agg(a.attname) AS column_names
-            FROM
-                pg_index i
-            JOIN
-                pg_class t ON t.oid = i.indrelid
-            JOIN
-                pg_class ic ON ic.oid = i.indexrelid
-            JOIN
-                pg_attribute a ON a.attrelid = t.oid
-                    AND a.attnum = ANY(i.indkey)
-            WHERE
-                t.relname = :table
-                    AND t.relnamespace =
-                        (SELECT oid FROM pg_namespace WHERE nspname = :schema)
-                    AND NOT i.indisprimary AND NOT i.indisunique
-            GROUP BY
-                ic.relname
-        SQL;
-        $stmt = $this->pdo->prepare($indexesSql);
-        $stmt->execute([
-            ':schema' => $this->config['schema'],
-            ':table' => $table,
-        ]);
-        $indexes = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $indexes = $this->getSchemaIndexes($table);
 
         foreach ($indexes as $index) {
             $columnNames = explode(',', trim($index['column_names'], '{}'));
@@ -516,5 +439,97 @@ class PgSQLDriver extends AbstractDatabaseDriver
         file_put_contents($pgpassFile, $pgpassContent);
         chmod($pgpassFile, 0600);
         return $pgpassFile;
+    }
+
+    private function getSchemaColumns(string $table): array
+    {
+        $columnsSql = <<<SQL
+            SELECT
+                column_name,
+                data_type,
+                character_maximum_length,
+                numeric_precision,
+                numeric_scale,
+                is_nullable,
+                column_default
+            FROM
+                information_schema.columns
+            WHERE
+                table_schema = :schema AND table_name = :table
+            ORDER BY
+                ordinal_position
+        SQL;
+        $stmt = $this->pdo->prepare($columnsSql);
+        $stmt->execute([
+            ':schema' => $this->config['schema'],
+            ':table' => $table,
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    private function getSchemaIndexes(string $table): array
+    {
+        $indexesSql = <<<SQL
+            SELECT
+                ic.relname AS index_name,
+                array_agg(a.attname) AS column_names
+            FROM
+                pg_index i
+            JOIN
+                pg_class t ON t.oid = i.indrelid
+            JOIN
+                pg_class ic ON ic.oid = i.indexrelid
+            JOIN
+                pg_attribute a ON a.attrelid = t.oid
+                    AND a.attnum = ANY(i.indkey)
+            WHERE
+                t.relname = :table
+                    AND t.relnamespace =
+                        (SELECT oid FROM pg_namespace WHERE nspname = :schema)
+                    AND NOT i.indisprimary AND NOT i.indisunique
+            GROUP BY
+                ic.relname
+        SQL;
+        $stmt = $this->pdo->prepare($indexesSql);
+        $stmt->execute([
+            ':schema' => $this->config['schema'],
+            ':table' => $table,
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    function getSchemaKeys(string $table): array
+    {
+        $constraintsSql = <<<SQL
+            SELECT
+                CASE
+                    WHEN i.indisprimary
+                        THEN 'PRIMARY KEY'
+                    WHEN i.indisunique
+                        THEN 'UNIQUE'
+                        ELSE NULL
+                END AS key_type,
+                array_agg(a.attname) AS column_names
+            FROM
+                pg_index i
+            JOIN
+                pg_class t ON t.oid = i.indrelid
+            JOIN
+                pg_attribute a ON a.attrelid = t.oid
+                    AND a.attnum = ANY(i.indkey)
+            WHERE
+                t.relname = :table
+                    AND t.relnamespace =
+                        (SELECT oid FROM pg_namespace WHERE nspname = :schema)
+                    AND (i.indisprimary OR i.indisunique)
+            GROUP BY
+                i.indisprimary, i.indisunique
+        SQL;
+        $stmt = $this->pdo->prepare($constraintsSql);
+        $stmt->execute([
+            ':schema' => $this->config['schema'],
+            ':table' => $table,
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 }
