@@ -16,6 +16,7 @@ trait ConstTrait
     const CANCELLED = 'Operation cancelled.';
     const COLUMN_ORDER = ['custom', 'native'];
     const FAILED_CONFIG = 'Failed to load configuration file: %s';
+    const ERROR_QUERY_TABLE = "Error querying table '%s'";
     const INVALID_COLUMN_ORDER =
         'Invalid value for column order.' .
         " Must be 'custom' or 'native', got '%s'.";

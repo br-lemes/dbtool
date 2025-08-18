@@ -118,7 +118,9 @@ final class CatCommandTest extends AbstractCommandTestCase
     function testErrorTable(): void
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error querying table 'posts':");
+        $this->expectExceptionMessage(
+            sprintf(self::ERROR_QUERY_TABLE, 'posts'),
+        );
 
         $this->exec('cat', [
             'config1' => 'test-mysql-fail',

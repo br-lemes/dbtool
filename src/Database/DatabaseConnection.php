@@ -74,7 +74,7 @@ class DatabaseConnection
             $this->assertTable($table);
             return $this->driver->getColumns($table, $order);
         } catch (PDOException $e) {
-            $this->error("Error querying table '$table'", $e);
+            $this->error(sprintf(self::ERROR_QUERY_TABLE, $table), $e);
             return null; // @codeCoverageIgnore
         }
     }
@@ -85,7 +85,7 @@ class DatabaseConnection
             $this->assertTable($table);
             return $this->driver->getKeys($table, $order);
         } catch (PDOException $e) {
-            $this->error("Error querying table '$table'", $e);
+            $this->error(sprintf(self::ERROR_QUERY_TABLE, $table), $e);
             return null; // @codeCoverageIgnore
         }
     }
@@ -96,7 +96,7 @@ class DatabaseConnection
             $this->assertTable($table);
             return $this->driver->getTableData($table, $order);
         } catch (PDOException $e) {
-            $this->error("Error querying table '$table'", $e);
+            $this->error(sprintf(self::ERROR_QUERY_TABLE, $table), $e);
             return null; // @codeCoverageIgnore
         }
     }
@@ -107,7 +107,7 @@ class DatabaseConnection
             $this->assertTable($table);
             return $this->driver->getTableSchema($table);
         } catch (PDOException $e) {
-            $this->error("Error querying table '$table'", $e);
+            $this->error(sprintf(self::ERROR_QUERY_TABLE, $table), $e);
             return null; // @codeCoverageIgnore
         }
     }
@@ -172,7 +172,7 @@ class DatabaseConnection
             $this->assertTable($table);
             return $this->driver->tableExists($table);
         } catch (PDOException $e) {
-            $this->error("Error querying table '$table'", $e);
+            $this->error(sprintf(self::ERROR_QUERY_TABLE, $table), $e);
             return null; // @codeCoverageIgnore
         }
     }

@@ -13,12 +13,17 @@ final class MigrateCommandTest extends AbstractCommandTestCase
 
     function testCommand(): void
     {
-        $diffArgs = ['config1' => 'test-mysql', 'config2' => 'test-pgsql'];
+        $diffArgs = [
+            '-i' => true,
+            'config1' => 'test-mysql',
+            'config2' => 'test-pgsql',
+        ];
         $diffMysqlPgsql = $this->getExpected('diff-mysql-pgsql.txt');
 
         $test = $this->exec('diff', $diffArgs);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
-        $this->assertEquals($diffMysqlPgsql, $test->getDisplay());
+        $expected = $this->getExpected('diff-mysql-pgsql.txt');
+        $this->assertEquals($expected, $test->getDisplay());
 
         $test = $this->exec('rm-all', ['config' => 'test-mysql'], ['y']);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
@@ -47,7 +52,7 @@ final class MigrateCommandTest extends AbstractCommandTestCase
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("Migration 'invalid' not found");
-        $test = $this->exec('migrate', [
+        $this->exec('migrate', [
             'config' => 'test-mysql',
             'migration' => 'invalid',
         ]);

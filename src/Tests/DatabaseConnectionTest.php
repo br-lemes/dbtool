@@ -46,7 +46,9 @@ class DatabaseConnectionTest extends TestCase
     function testGetColumnsFails(): void
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error querying table 'users':");
+        $this->expectExceptionMessage(
+            sprintf(self::ERROR_QUERY_TABLE, 'users'),
+        );
 
         $db = new DatabaseConnection('test-mysql');
         $this->mockDriver($db, 'getColumns');
@@ -56,7 +58,9 @@ class DatabaseConnectionTest extends TestCase
     function testGetKeysFails(): void
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error querying table 'users':");
+        $this->expectExceptionMessage(
+            sprintf(self::ERROR_QUERY_TABLE, 'users'),
+        );
 
         $db = new DatabaseConnection('test-mysql');
         $this->mockDriver($db, 'getKeys');
@@ -66,8 +70,9 @@ class DatabaseConnectionTest extends TestCase
     function testGetTableSchemaFails(): void
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error querying table 'posts':");
-
+        $this->expectExceptionMessage(
+            sprintf(self::ERROR_QUERY_TABLE, 'posts'),
+        );
         $db = new DatabaseConnection('test-mysql-fail');
         $db->getTableSchema('posts');
     }
@@ -85,7 +90,9 @@ class DatabaseConnectionTest extends TestCase
     function testTableExistsFails(): void
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error querying table 'users':");
+        $this->expectExceptionMessage(
+            sprintf(self::ERROR_QUERY_TABLE, 'users'),
+        );
 
         $db = new DatabaseConnection('test-mysql');
         $this->mockDriver($db, 'tableExists');
