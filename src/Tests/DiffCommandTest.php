@@ -16,6 +16,7 @@ final class DiffCommandTest extends AbstractCommandTestCase
     function testCommand(): void
     {
         $args = [
+            '-i' => true,
             'config1' => 'test-mysql',
             'config2' => 'test-pgsql',
         ];
@@ -52,7 +53,7 @@ final class DiffCommandTest extends AbstractCommandTestCase
         $this->expectExceptionMessage(
             sprintf(self::INVALID_COLUMN_ORDER, 'invalid'),
         );
-        $args['--column-order'] = 'invalid';
+        $args['-c'] = 'invalid';
         $this->exec('diff', $args);
     }
 
@@ -60,7 +61,7 @@ final class DiffCommandTest extends AbstractCommandTestCase
     {
         $this->assertCompleteDatabase('diff', ['']);
         $this->assertCompleteDatabase('diff', ['test-mysql', '']);
-        $this->assertCompleteEquals('diff', ['-o', ''], self::COLUMN_ORDER);
+        $this->assertCompleteEquals('diff', ['-c', ''], self::COLUMN_ORDER);
         $this->assertCompleteEquals('diff', ['-l', ''], ['yes', 'no']);
         $this->assertCompleteEquals(
             'diff',
@@ -80,7 +81,7 @@ final class DiffCommandTest extends AbstractCommandTestCase
         $args = [
             'config1' => 'test-mysql',
             'config2' => 'test-pgsql',
-            '--ignore-length' => 'invalid',
+            '-l' => 'invalid',
         ];
         $this->exec('diff', $args);
     }

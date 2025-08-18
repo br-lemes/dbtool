@@ -49,7 +49,7 @@ final class ListCommandTest extends AbstractCommandTestCase
         $expected = $this->getExpectedJson('ls-pgsql-users-custom.json');
         $this->assertEquals($expected, $actual);
 
-        $args['-o'] = 'native';
+        $args['-c'] = 'native';
         $test = $this->exec('ls', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $actual = json_decode($test->getDisplay(), true);
@@ -63,7 +63,7 @@ final class ListCommandTest extends AbstractCommandTestCase
         $expected = $this->getExpectedJson('ls-mysql-users-native.json');
         $this->assertEquals($expected, $actual);
 
-        unset($args['-o']);
+        unset($args['-c']);
         $test = $this->exec('ls', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $actual = json_decode($test->getDisplay(), true);
@@ -75,14 +75,14 @@ final class ListCommandTest extends AbstractCommandTestCase
             sprintf(self::INVALID_COLUMN_ORDER, 'invalid'),
         );
 
-        $args = ['config' => 'test-pgsql', '--column-order' => 'invalid'];
+        $args = ['config' => 'test-pgsql', '-c' => 'invalid'];
         $this->exec('ls', $args);
     }
 
     function testComplete(): void
     {
         $this->assertCompleteDatabase('ls', ['']);
-        $this->assertCompleteEquals('ls', ['-o', ''], self::COLUMN_ORDER);
+        $this->assertCompleteEquals('ls', ['-c', ''], self::COLUMN_ORDER);
         $this->assertCompleteEquals(
             'ls',
             ['test-mysql', ''],

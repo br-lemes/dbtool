@@ -28,7 +28,7 @@ final class MigrationCommandTest extends AbstractCommandTestCase
         $args = [
             'config' => 'test-mysql',
             'table' => 'postagens',
-            '--output' => substr($this->migrationFile, 0, -4),
+            '-o' => substr($this->migrationFile, 0, -4),
         ];
         $test = $this->exec('migration', $args);
         $this->assertEquals(Command::FAILURE, $test->getStatusCode());

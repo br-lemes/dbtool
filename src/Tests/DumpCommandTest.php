@@ -32,8 +32,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $args = [
             'config' => 'test-mysql',
             'table' => 'users',
-            '--compact' => true,
-            '--output' => $dumpFile,
+            '-c' => true,
+            '-o' => $dumpFile,
         ];
         $test = $this->exec('dump', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
@@ -46,8 +46,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $this->dumpFiles[] = $dumpFile;
 
         unset($args['table']);
-        $args['--output'] = $dumpFile;
-        $args['--schema-only'] = true;
+        $args['-o'] = $dumpFile;
+        $args['-s'] = true;
         $test = $this->exec('dump', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($dumpFile);
@@ -61,7 +61,7 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $cancel = str_ends_with($test->getDisplay(), self::CANCELLED . "\n");
         $this->assertTrue($cancel);
 
-        unset($args['--output']);
+        unset($args['-o']);
         $test = $this->exec('dump', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
 
@@ -73,8 +73,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
 
         $args['config'] = 'test-pgsql';
         $args['table'] = 'users';
-        $args['--output'] = $dumpFile;
-        $args['--schema-only'] = false;
+        $args['-o'] = $dumpFile;
+        $args['-s'] = false;
         $test = $this->exec('dump', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($dumpFile);
@@ -86,8 +86,8 @@ final class DumpCommandTest extends AbstractCommandTestCase
         $this->dumpFiles[] = $dumpFile;
 
         unset($args['table']);
-        $args['--output'] = $dumpFile;
-        $args['--schema-only'] = true;
+        $args['-o'] = $dumpFile;
+        $args['-s'] = true;
         $test = $this->exec('dump', $args);
         $this->assertEquals(Command::SUCCESS, $test->getStatusCode());
         $this->assertFileExists($dumpFile);

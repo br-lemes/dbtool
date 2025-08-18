@@ -16,7 +16,7 @@ final class CatCommandTest extends AbstractCommandTestCase
 
     function testCommand(): void
     {
-        $args = ['config1' => 'test-mysql'];
+        $args = ['-i' => true, 'config1' => 'test-mysql'];
         $sql =
             'SELECT p.id, p.title, u.name FROM posts AS p JOIN users AS u ON p.user_id = u.id';
 
@@ -77,14 +77,14 @@ final class CatCommandTest extends AbstractCommandTestCase
         $this->expectExceptionMessage(
             sprintf(self::INVALID_COLUMN_ORDER, 'invalid'),
         );
-        $args['--column-order'] = 'invalid';
+        $args['-c'] = 'invalid';
         $this->exec('cat', $args);
     }
 
     function testComplete(): void
     {
         $this->assertCompleteDatabase('cat', ['']);
-        $this->assertCompleteEquals('cat', ['-o', ''], self::COLUMN_ORDER);
+        $this->assertCompleteEquals('cat', ['-c', ''], self::COLUMN_ORDER);
         $this->assertCompleteContains(
             'cat',
             ['test-mysql', ''],

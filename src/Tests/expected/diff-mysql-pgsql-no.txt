@@ -1,11 +1,14 @@
-[1m[93m/home/breno/src/dbtool/.b.json[39m[0m[2m --- JSON[0m
-[2m1 [0m{                                                      [2m1 [0m{
-[91;1m2 [0m    [95m"phinxlog"[0m: [91m"1590192d9447aff60968a2f6fcc255ff"[0m,    [92;1m2 [0m    [95m"phinxlog"[0m: [92m""[0m,
-[2m3 [0m    [95m"post_tags"[0m: [95m"2397d7b93ae3d99f480c8faa6f5ef4d9"[0m,   [2m3 [0m    [95m"post_tags"[0m: [95m"2397d7b93ae3d99f480c8faa6f5ef4d9"[0m,
-[91;1m4 [0m    [95m"posts"[0m: [91m"05f1b7fd2c910cdffcebfadddc05a8c5"[0m,       [92;1m4 [0m    [95m"posts"[0m: [92m"57dadced079da5bc1f51dcf60dc60ea0"[0m,
-[91;1m5 [0m    [95m"products"[0m: [91m"971b9c076ef84c310b3280b646900074"[0m,    [92;1m5 [0m    [95m"products"[0m: [92m"03371a3329883ea6b3c74f91f9f94825"[0m,
-[91;1m6 [0m    [95m"tags"[0m: [91m"e4116b2c10a1b44a0d2fab9722f80dcf"[0m,        [92;1m6 [0m    [95m"tags"[0m: [92m"af10083d5cc11b94361014bbb9aa984d"[0m,
-[2m7 [0m    [95m"user_groups"[0m: [95m"5627d512eaba634f44554729c7ea1828"[0m, [2m7 [0m    [95m"user_groups"[0m: [95m"5627d512eaba634f44554729c7ea1828"[0m,
-[91;1m8 [0m    [95m"users"[0m: [91m"46afdc62319f957a6d97546503a33236"[0m        [92;1m8 [0m    [95m"users"[0m: [92m"9193ce41a00be68a3867278d01eb6175"[0m
-[2m9 [0m}                                                      [2m9 [0m}
+/home/breno/src/dbtool/.b.json --- JSON
+1    {
+2        "phinxlog": "1590192d9447aff60968a2f6fcc255ff",
+4        "posts": "05f1b7fd2c910cdffcebfadddc05a8c5",
+5        "products": "971b9c076ef84c310b3280b646900074",
+6        "tags": "e4116b2c10a1b44a0d2fab9722f80dcf",
+8        "users": "46afdc62319f957a6d97546503a33236"
+   2     "phinxlog": "",
+   4     "posts": "57dadced079da5bc1f51dcf60dc60ea0",
+   5     "products": "03371a3329883ea6b3c74f91f9f94825",
+   6     "tags": "af10083d5cc11b94361014bbb9aa984d",
+   8     "users": "9193ce41a00be68a3867278d01eb6175"
+   9 }
 

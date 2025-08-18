@@ -1,17 +1,16 @@
-[1m[93m/home/breno/src/dbtool/.b.json[39m[0m[2m --- JSON[0m
-[2m27 [0m        {                                      [2m27 [0m        {
-[2m28 [0m            [95m"CHARACTER_MAXIMUM_LENGTH"[0m: 100,   [2m28 [0m            [95m"CHARACTER_MAXIMUM_LENGTH"[0m: 100,
-[2m29 [0m            [95m"COLUMN_DEFAULT"[0m: [1mnull[0m,            [2m29 [0m            [95m"COLUMN_DEFAULT"[0m: [1mnull[0m,
-[2m30 [0m            [95m"COLUMN_NAME"[0m: [95m"name"[0m,             [2m30 [0m            [95m"COLUMN_NAME"[0m: [95m"name"[0m,
-[2m31 [0m            [95m"DATA_TYPE"[0m: [95m"VARCHAR"[0m,            [2m31 [0m            [95m"DATA_TYPE"[0m: [95m"VARCHAR"[0m,
-[2m32 [0m            [95m"IS_AUTO_INCREMENT"[0m: [95m"NO"[0m,         [2m32 [0m            [95m"IS_AUTO_INCREMENT"[0m: [95m"NO"[0m,
-[2m33 [0m            [95m"IS_DEFAULT_TIMESTAMP"[0m: [95m"NO"[0m,      [2m33 [0m            [95m"IS_DEFAULT_TIMESTAMP"[0m: [95m"NO"[0m,
-[91;1m34 [0m            [95m"IS_NULLABLE"[0m: [91m"YES"[0m,              [92;1m34 [0m            [95m"IS_NULLABLE"[0m: [92m"NO"[0m,
-[2m35 [0m            [95m"IS_UPDATE_TIMESTAMP"[0m: [95m"NO"[0m,       [2m35 [0m            [95m"IS_UPDATE_TIMESTAMP"[0m: [95m"NO"[0m,
-[2m36 [0m            [95m"NUMERIC_PRECISION"[0m: [1mnull[0m,         [2m36 [0m            [95m"NUMERIC_PRECISION"[0m: [1mnull[0m,
-[2m37 [0m            [95m"NUMERIC_SCALE"[0m: [1mnull[0m              [2m37 [0m            [95m"NUMERIC_SCALE"[0m: [1mnull[0m
-[2m38 [0m        },                                     [2m38 [0m        },
-[2m39 [0m        {                                      [2m39 [0m        {
-[2m40 [0m            [95m"CHARACTER_MAXIMUM_LENGTH"[0m: [1mnull[0m,  [2m40 [0m            [95m"CHARACTER_MAXIMUM_LENGTH"[0m: [1mnull[0m,
-[2m41 [0m            [95m"COLUMN_DEFAULT"[0m: [1mnull[0m,            [2m41 [0m            [95m"COLUMN_DEFAULT"[0m: [1mnull[0m,
+/home/breno/src/dbtool/.b.json --- JSON
+30                "COLUMN_NAME": "name",
+31                "DATA_TYPE": "VARCHAR",
+32                "IS_AUTO_INCREMENT": "NO",
+33                "IS_DEFAULT_TIMESTAMP": "NO",
+34                "IS_NULLABLE": "YES",
+   34             "IS_NULLABLE": "NO",
+   35             "IS_UPDATE_TIMESTAMP": "NO",
+   36             "NUMERIC_PRECISION": null,
+   37             "NUMERIC_SCALE": null
+   38         },
+   39         {
+   40             "CHARACTER_MAXIMUM_LENGTH": null,
+   41             "COLUMN_DEFAULT": null,
+   42             "COLUMN_NAME": "password_hash",
 
