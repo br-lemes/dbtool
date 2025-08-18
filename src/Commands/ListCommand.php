@@ -85,7 +85,7 @@ class ListCommand extends BaseCommand
             ->addArgument('field', InputArgument::OPTIONAL, 'Field to show')
             ->addOption(
                 'column-order',
-                'o',
+                'c',
                 InputOption::VALUE_REQUIRED,
                 'Column order: custom or native',
                 'custom',

@@ -43,10 +43,11 @@ class DiffCommand extends BaseCommand
 
     private DatabaseConnection $db1;
     private DatabaseConnection $db2;
-    private ?string $tableName = null;
     private ?string $fieldName = null;
     private ?string $order = 'custom';
+    private ?string $tableName = null;
     private bool $ignoreLength = false;
+    private bool $inline = false;
 
     function complete(
         CompletionInput $input,
@@ -116,10 +117,16 @@ class DiffCommand extends BaseCommand
             )
             ->addOption(
                 'column-order',
-                'o',
+                'c',
                 InputOption::VALUE_REQUIRED,
                 'Column order: custom or native',
                 'custom',
+            )
+            ->addOption(
+                'inline',
+                'i',
+                InputOption::VALUE_NONE,
+                'Inline display mode for difft output',
             )
             ->addOption(
                 'ignore-length',
@@ -138,6 +145,7 @@ class DiffCommand extends BaseCommand
 
         $this->tableName = $input->getArgument('table');
         $this->fieldName = $input->getArgument('field');
+        $this->inline = $input->getOption('inline');
         $this->order = $input->getOption('column-order');
         $this->ignoreLength = $this->db1->type !== $this->db2->type;
         $ignoreLengthOption = $input->getOption('ignore-length');
@@ -231,7 +239,9 @@ class DiffCommand extends BaseCommand
             ),
         );
 
-        $output->write(shell_exec("difft --context 7 --color always $a $b"));
+        $color = $output->isDecorated() ? '--color always' : '';
+        $inline = $this->inline ? '--display inline' : '';
+        $output->write(shell_exec("difft --context 7 $color $inline $a $b"));
     }
 
     private function diffDatabases(OutputInterface $output): void
@@ -287,7 +297,9 @@ class DiffCommand extends BaseCommand
             json_encode($tables2, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
         );
 
-        $output->write(shell_exec("difft --color always $a $b"));
+        $color = $output->isDecorated() ? '--color always' : '';
+        $inline = $this->inline ? '--display inline' : '';
+        $output->write(shell_exec("difft $color $inline $a $b"));
     }
 
     private function normalizeColumns(array $columns): array

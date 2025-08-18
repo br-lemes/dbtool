@@ -38,9 +38,10 @@ class CatCommand extends BaseCommand
 
     private DatabaseConnection $db1;
     private ?DatabaseConnection $db2;
-    private ?string $tableName;
-    private ?string $query;
     private ?string $order = 'custom';
+    private ?string $query;
+    private ?string $tableName;
+    private bool $inline = false;
 
     function complete(
         CompletionInput $input,
@@ -106,10 +107,16 @@ class CatCommand extends BaseCommand
             )
             ->addOption(
                 'column-order',
-                'o',
+                'c',
                 InputOption::VALUE_REQUIRED,
                 'Column order: custom or native',
                 'custom',
+            )
+            ->addOption(
+                'inline',
+                'i',
+                InputOption::VALUE_NONE,
+                'Inline display mode for difft output',
             );
     }
 
@@ -119,6 +126,7 @@ class CatCommand extends BaseCommand
         $config2 = $input->getArgument('argument2');
         $argument3 = $input->getArgument('argument3');
         $this->order = $input->getOption('column-order');
+        $this->inline = $input->getOption('inline');
         if (!in_array($this->order, self::COLUMN_ORDER)) {
             throw new InvalidArgumentException(
                 sprintf(self::INVALID_COLUMN_ORDER, $this->order),
@@ -192,6 +200,8 @@ class CatCommand extends BaseCommand
             $b,
             json_encode($data2, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
         );
-        $output->write(shell_exec("difft --color always $a $b"));
+        $color = $output->isDecorated() ? '--color always' : '';
+        $inline = $this->inline ? '--display inline' : '';
+        $output->write(shell_exec("difft $color $inline $a $b"));
     }
 }
