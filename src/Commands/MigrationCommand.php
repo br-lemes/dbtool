@@ -176,6 +176,7 @@ class MigrationCommand extends BaseCommand
         );
         $pkCount = count($pk);
         if ($pkCount === 0) {
+            $this->ignoreIdColumn = false;
             return $result .
                 "\$this->table('{$this->tableName}', ['id' => false])\n";
         }
