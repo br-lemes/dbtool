@@ -40,7 +40,9 @@ class MoveCommand extends BaseCommand
     HELP;
 
     private DatabaseConnection $db1;
-    private DatabaseConnection $db2;
+    private ?DatabaseConnection $db2;
+    private InputInterface $input;
+    private OutputInterface $output;
 
     function complete(
         CompletionInput $input,
@@ -100,6 +102,9 @@ class MoveCommand extends BaseCommand
 
     function exec(InputInterface $input, OutputInterface $output): int
     {
+        $this->input = $input;
+        $this->output = $output;
+
         $config1 = $input->getArgument('config1');
         $argument2 = $input->getArgument('argument2');
         $argument3 = $input->getArgument('argument3');
@@ -107,80 +112,98 @@ class MoveCommand extends BaseCommand
         $this->db1 = new DatabaseConnection($config1, $output);
         $path = realpath(__DIR__ . '/../../config');
 
-        // Case 1: Rename within same database
         if (!file_exists("$path/$argument2.php")) {
-            if ($this->db1->tableExists($argument3)) {
-                /** @var QuestionHelper $helper */
-                $helper = $this->getHelper('question');
-                $question = new ConfirmationQuestion(
-                    "Table '$argument3' already exists in the database. " .
-                        'Do you want to overwrite it? (y/N) ',
-                    false,
-                );
-
-                if (!$helper->ask($input, $output, $question)) {
-                    $output->writeln(self::CANCELLED);
-                    return Command::FAILURE;
-                }
-                $this->db1->dropTable($argument3);
-            }
-            $this->db1->renameTable($argument2, $argument3);
-            $output->writeln(
-                "Table '$argument2' renamed to '$argument3' successfully.",
-            );
-            return Command::SUCCESS;
+            return $this->rename($argument2, $argument3);
         }
 
-        // Case 2: Move to another database
         $this->db2 = new DatabaseConnection($argument2, $output);
 
         if ($this->db1->type === $this->db2->type) {
-            if ($this->db2->tableExists($argument3)) {
-                /** @var QuestionHelper $helper */
-                $helper = $this->getHelper('question');
-                $question = new ConfirmationQuestion(
-                    "Table '$argument3' already exists in destination. " .
-                        'Do you want to overwrite it? (y/N) ',
-                    false,
-                );
+            return $this->moveSameType($argument3);
+        }
 
-                if (!$helper->ask($input, $output, $question)) {
-                    $output->writeln(self::CANCELLED);
-                    return Command::FAILURE;
-                }
-                $this->db2->dropTable($argument3);
-            }
+        return $this->moveDiffType($argument3);
+    }
 
-            $schema = $this->db1->getTableSchema($argument3);
-            $this->db2->exec($schema);
-        } else {
-            if (!$this->hasCompatibleSchema($argument3)) {
-                $output->writeln(self::SCHEMAS_NOT_COMPATIBLE);
-                return Command::FAILURE;
-            }
+    private function move(string $table): int
+    {
+        $this->db1->streamTableData(
+            $table,
+            fn($batch) => $this->db2->insertInto($table, $batch),
+        );
+        $this->db1->dropTable($table);
+
+        $this->output->writeln(
+            "Table '$table' moved successfully to destination database.",
+        );
+        return Command::SUCCESS;
+    }
+
+    private function moveDiffType(string $table): int
+    {
+        if (!$this->hasCompatibleSchema($table)) {
+            $this->output->writeln(self::SCHEMAS_NOT_COMPATIBLE);
+            return Command::FAILURE;
+        }
+        /** @var QuestionHelper $helper */
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion(
+            "Table '$table' may be incompatible. " .
+                'Do you want to clear it? (y/N) ',
+            false,
+        );
+
+        if (!$helper->ask($this->input, $this->output, $question)) {
+            $this->output->writeln('Operation cancelled.');
+            return Command::FAILURE;
+        }
+        $this->db2->truncateTable($table);
+        return $this->move($table);
+    }
+
+    private function moveSameType(string $table): int
+    {
+        if ($this->db2->tableExists($table)) {
             /** @var QuestionHelper $helper */
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion(
-                "Table '$argument3' may be incompatible. " .
-                    'Do you want to clear it? (y/N) ',
+                "Table '$table' already exists in destination. " .
+                    'Do you want to overwrite it? (y/N) ',
                 false,
             );
 
-            if (!$helper->ask($input, $output, $question)) {
-                $output->writeln('Operation cancelled.');
+            if (!$helper->ask($this->input, $this->output, $question)) {
+                $this->output->writeln(self::CANCELLED);
                 return Command::FAILURE;
             }
-            $this->db2->truncateTable($argument3);
+            $this->db2->dropTable($table);
         }
 
-        $this->db1->streamTableData(
-            $argument3,
-            fn($batch) => $this->db2->insertInto($argument3, $batch),
-        );
-        $this->db1->dropTable($argument3);
+        $schema = $this->db1->getTableSchema($table);
+        $this->db2->exec($schema);
+        return $this->move($table);
+    }
 
-        $output->writeln(
-            "Table '$argument3' moved successfully to destination database.",
+    private function rename(string $oldName, string $newName): int
+    {
+        if ($this->db1->tableExists($newName)) {
+            /** @var QuestionHelper $helper */
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion(
+                "Table '$newName' already exists in the database. " .
+                    'Do you want to overwrite it? (y/N) ',
+                false,
+            );
+
+            if (!$helper->ask($this->input, $this->output, $question)) {
+                $this->output->writeln(self::CANCELLED);
+                return Command::FAILURE;
+            }
+            $this->db1->dropTable($newName);
+        }
+        $this->db1->renameTable($oldName, $newName);
+        $this->output->writeln(
+            "Table '$oldName' renamed to '$newName' successfully.",
         );
         return Command::SUCCESS;
     }
