@@ -243,69 +243,15 @@ class PgSQLDriver extends AbstractDatabaseDriver
         $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
         $sqlParts = ["CREATE TABLE $schemaTable ("];
 
-        $columns = $this->getSchemaColumns($table);
+        $columns = $this->getSchemaColumnsDefinitions($table);
+        $keys = $this->getSchemaKeysDefinitions($table);
 
-        $columnDefs = [];
-        foreach ($columns as $col) {
-            $def = "    \"{$col['column_name']}\" ";
-
-            if (strpos($col['column_default'] ?? '', 'nextval') !== false) {
-                $col['data_type'] =
-                    $col['data_type'] === 'bigint' ? 'bigserial' : 'serial';
-                $col['column_default'] = null;
-            }
-
-            $type = $col['data_type'];
-            if ($col['character_maximum_length']) {
-                $type .= "({$col['character_maximum_length']})";
-            } elseif ($col['numeric_precision'] && $col['numeric_scale']) {
-                $type .= "({$col['numeric_precision']}, {$col['numeric_scale']})";
-            }
-            $def .= $type;
-
-            if ($col['is_nullable'] === 'NO') {
-                $def .= ' NOT NULL';
-            }
-
-            if ($col['column_default'] !== null) {
-                $def .= " DEFAULT {$col['column_default']}";
-            }
-
-            $columnDefs[] = $def;
-        }
-
-        $keys = $this->getSchemaKeys($table);
-
-        foreach ($keys as $key) {
-            $columnNames = explode(',', trim($key['column_names'], '{}'));
-            $columnsList = implode(
-                ', ',
-                array_map(fn($col) => "\"$col\"", $columnNames),
-            );
-            if ($key['key_type'] === 'PRIMARY KEY') {
-                $columnDefs[] = "    CONSTRAINT \"{$table}_pkey\" {$key['key_type']} ($columnsList)";
-            } elseif ($key['key_type'] === 'UNIQUE') {
-                $constraintName = $table . '_' . implode('_', $columnNames);
-                $columnDefs[] = "    CONSTRAINT \"$constraintName\" {$key['key_type']} ($columnsList)";
-            }
-        }
-
-        $sqlParts[] = implode(",\n", $columnDefs);
+        $sqlParts[] = implode(",\n", array_merge($columns, $keys));
         $sqlParts[] = ');';
 
-        $indexes = $this->getSchemaIndexes($table);
+        $indexes = $this->getSchemaIndexesDefinitions($table);
 
-        foreach ($indexes as $index) {
-            $columnNames = explode(',', trim($index['column_names'], '{}'));
-            $columnsList = implode(
-                ', ',
-                array_map(fn($col) => "\"$col\"", $columnNames),
-            );
-            $indexName = $table . '_' . implode('_', $columnNames);
-            $sqlParts[] = "CREATE INDEX \"$indexName\" ON $schemaTable ($columnsList);";
-        }
-
-        return implode("\n", $sqlParts);
+        return implode("\n", array_merge($sqlParts, $indexes));
     }
 
     function getTables(): array
@@ -467,6 +413,40 @@ class PgSQLDriver extends AbstractDatabaseDriver
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    private function getSchemaColumnsDefinitions(string $table): array
+    {
+        $columns = $this->getSchemaColumns($table);
+        $result = [];
+        foreach ($columns as $col) {
+            $def = "    \"{$col['column_name']}\" ";
+
+            if (strpos($col['column_default'] ?? '', 'nextval') !== false) {
+                $col['data_type'] =
+                    $col['data_type'] === 'bigint' ? 'bigserial' : 'serial';
+                $col['column_default'] = null;
+            }
+
+            $type = $col['data_type'];
+            if ($col['character_maximum_length']) {
+                $type .= "({$col['character_maximum_length']})";
+            } elseif ($col['numeric_precision'] && $col['numeric_scale']) {
+                $type .= "({$col['numeric_precision']}, {$col['numeric_scale']})";
+            }
+            $def .= $type;
+
+            if ($col['is_nullable'] === 'NO') {
+                $def .= ' NOT NULL';
+            }
+
+            if ($col['column_default'] !== null) {
+                $def .= " DEFAULT {$col['column_default']}";
+            }
+
+            $result[] = $def;
+        }
+        return $result;
+    }
+
     private function getSchemaIndexes(string $table): array
     {
         $indexesSql = <<<SQL
@@ -498,7 +478,24 @@ class PgSQLDriver extends AbstractDatabaseDriver
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    function getSchemaKeys(string $table): array
+    private function getSchemaIndexesDefinitions(string $table): array
+    {
+        $result = [];
+        $schemaTable = "\"{$this->config['schema']}\".\"$table\"";
+        $indexes = $this->getSchemaIndexes($table);
+        foreach ($indexes as $index) {
+            $columnNames = explode(',', trim($index['column_names'], '{}'));
+            $columnsList = implode(
+                ', ',
+                array_map(fn($col) => "\"$col\"", $columnNames),
+            );
+            $indexName = $table . '_' . implode('_', $columnNames);
+            $result[] = "CREATE INDEX \"$indexName\" ON $schemaTable ($columnsList);";
+        }
+        return $result;
+    }
+
+    private function getSchemaKeys(string $table): array
     {
         $constraintsSql = <<<SQL
             SELECT
@@ -531,5 +528,25 @@ class PgSQLDriver extends AbstractDatabaseDriver
             ':table' => $table,
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    private function getSchemaKeysDefinitions(string $table): array
+    {
+        $result = [];
+        $keys = $this->getSchemaKeys($table);
+        foreach ($keys as $key) {
+            $columnNames = explode(',', trim($key['column_names'], '{}'));
+            $columnsList = implode(
+                ', ',
+                array_map(fn($col) => "\"$col\"", $columnNames),
+            );
+            if ($key['key_type'] === 'PRIMARY KEY') {
+                $result[] = "    CONSTRAINT \"{$table}_pkey\" {$key['key_type']} ($columnsList)";
+            } elseif ($key['key_type'] === 'UNIQUE') {
+                $constraintName = $table . '_' . implode('_', $columnNames);
+                $result[] = "    CONSTRAINT \"$constraintName\" {$key['key_type']} ($columnsList)";
+            }
+        }
+        return $result;
     }
 }
