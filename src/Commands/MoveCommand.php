@@ -5,6 +5,7 @@ namespace DBTool\Commands;
 
 use DBTool\Database\DatabaseConnection;
 use DBTool\Traits\ConstTrait;
+use DBTool\Traits\HasCompatibleSchemaTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -16,6 +17,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class MoveCommand extends BaseCommand
 {
     use ConstTrait;
+    use HasCompatibleSchemaTrait;
 
     private string $help = <<<HELP
     Moves or renames a table within or across databases.
@@ -36,6 +38,9 @@ class MoveCommand extends BaseCommand
         - Prompts to clear destination data
         - Copies data without altering destination schema, then drops source
     HELP;
+
+    private DatabaseConnection $db1;
+    private DatabaseConnection $db2;
 
     function complete(
         CompletionInput $input,
@@ -99,12 +104,12 @@ class MoveCommand extends BaseCommand
         $argument2 = $input->getArgument('argument2');
         $argument3 = $input->getArgument('argument3');
 
-        $db1 = new DatabaseConnection($config1, $output);
+        $this->db1 = new DatabaseConnection($config1, $output);
         $path = realpath(__DIR__ . '/../../config');
 
         // Case 1: Rename within same database
         if (!file_exists("$path/$argument2.php")) {
-            if ($db1->tableExists($argument3)) {
+            if ($this->db1->tableExists($argument3)) {
                 /** @var QuestionHelper $helper */
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion(
@@ -117,9 +122,9 @@ class MoveCommand extends BaseCommand
                     $output->writeln(self::CANCELLED);
                     return Command::FAILURE;
                 }
-                $db1->dropTable($argument3);
+                $this->db1->dropTable($argument3);
             }
-            $db1->renameTable($argument2, $argument3);
+            $this->db1->renameTable($argument2, $argument3);
             $output->writeln(
                 "Table '$argument2' renamed to '$argument3' successfully.",
             );
@@ -127,10 +132,10 @@ class MoveCommand extends BaseCommand
         }
 
         // Case 2: Move to another database
-        $db2 = new DatabaseConnection($argument2, $output);
+        $this->db2 = new DatabaseConnection($argument2, $output);
 
-        if ($db1->type === $db2->type) {
-            if ($db2->tableExists($argument3)) {
+        if ($this->db1->type === $this->db2->type) {
+            if ($this->db2->tableExists($argument3)) {
                 /** @var QuestionHelper $helper */
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion(
@@ -143,13 +148,13 @@ class MoveCommand extends BaseCommand
                     $output->writeln(self::CANCELLED);
                     return Command::FAILURE;
                 }
-                $db2->dropTable($argument3);
+                $this->db2->dropTable($argument3);
             }
 
-            $schema = $db1->getTableSchema($argument3);
-            $db2->exec($schema);
+            $schema = $this->db1->getTableSchema($argument3);
+            $this->db2->exec($schema);
         } else {
-            if (!$this->hasCompatibleSchema($db1, $db2, $argument3)) {
+            if (!$this->hasCompatibleSchema($argument3)) {
                 $output->writeln(self::SCHEMAS_NOT_COMPATIBLE);
                 return Command::FAILURE;
             }
@@ -165,35 +170,18 @@ class MoveCommand extends BaseCommand
                 $output->writeln('Operation cancelled.');
                 return Command::FAILURE;
             }
-            $db2->truncateTable($argument3);
+            $this->db2->truncateTable($argument3);
         }
 
-        $db1->streamTableData(
+        $this->db1->streamTableData(
             $argument3,
-            fn($batch) => $db2->insertInto($argument3, $batch),
+            fn($batch) => $this->db2->insertInto($argument3, $batch),
         );
-        $db1->dropTable($argument3);
+        $this->db1->dropTable($argument3);
 
         $output->writeln(
             "Table '$argument3' moved successfully to destination database.",
         );
         return Command::SUCCESS;
-    }
-
-    private function hasCompatibleSchema(
-        DatabaseConnection $db1,
-        DatabaseConnection $db2,
-        string $table,
-    ): bool {
-        $columns1 = $db1->getColumns($table, 'native');
-        $columns2 = $db2->getColumns($table, 'native');
-        if ($columns1 === null || $columns2 === null) {
-            return false; // @codeCoverageIgnore
-        }
-        $names1 = array_column($columns1, 'COLUMN_NAME');
-        $names2 = array_column($columns2, 'COLUMN_NAME');
-        sort($names1);
-        sort($names2);
-        return $names1 === $names2;
     }
 }

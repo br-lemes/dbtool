@@ -5,6 +5,7 @@ namespace DBTool\Commands;
 
 use DBTool\Database\DatabaseConnection;
 use DBTool\Traits\ConstTrait;
+use DBTool\Traits\HasCompatibleSchemaTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -16,6 +17,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class CopyCommand extends BaseCommand
 {
     use ConstTrait;
+    use HasCompatibleSchemaTrait;
 
     private string $help = <<<HELP
     Copies a table's data and schema (same-type databases) to another database.
@@ -138,19 +140,5 @@ class CopyCommand extends BaseCommand
 
         $output->writeln("Table '$tableName' copied successfully.");
         return Command::SUCCESS;
-    }
-
-    private function hasCompatibleSchema(string $table): bool
-    {
-        $columns1 = $this->db1->getColumns($table, 'native');
-        $columns2 = $this->db2->getColumns($table, 'native');
-        if ($columns1 === null || $columns2 === null) {
-            return false; // @codeCoverageIgnore
-        }
-        $names1 = array_column($columns1, 'COLUMN_NAME');
-        $names2 = array_column($columns2, 'COLUMN_NAME');
-        sort($names1);
-        sort($names2);
-        return $names1 === $names2;
     }
 }
